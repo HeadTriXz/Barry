@@ -1,0 +1,59 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Upload coverage for 'barry'
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./apps/barry/coverage/cobertura-coverage.xml
+          flags: barry
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage for '@barry/core'
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./packages/core/coverage/cobertura-coverage.xml
+          flags: core
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage for '@barry/logger'
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./packages/logger/coverage/cobertura-coverage.xml
+          flags: logger
+          token: ${{ secrets.CODECOV_TOKEN }}

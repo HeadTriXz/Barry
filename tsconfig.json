@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"alwaysStrict": true,
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+        "experimentalDecorators": true,
+		"lib": ["ES2022"],
+		"module": "ESNext",
+		"moduleResolution": "nodenext",
+		"newLine": "lf",
+		"outDir": "dist",
+		"pretty": true,
+        "resolveJsonModule": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"target": "ES2022",
+        "verbatimModuleSyntax": true
+	},
+	"exclude": ["node_modules"]
+}

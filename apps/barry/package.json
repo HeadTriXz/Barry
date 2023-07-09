@@ -1,0 +1,35 @@
+{
+  "name": "barry",
+  "version": "0.0.1",
+  "description": "Barry is a versatile Discord bot that simplifies server management with a range of features such as moderation, leveling, and marketplace tools.",
+  "repository": "HeadTriXz/Barry",
+  "author": "HeadTriXz",
+  "license": "AGPL-3.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rimraf coverage dist .turbo",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@barry/core": "*",
+    "@discordjs/core": "^0.6.0",
+    "@discordjs/rest": "^1.7.1"
+  },
+  "devDependencies": {
+    "@barry/testing": "*"
+  }
+}

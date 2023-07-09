@@ -1,0 +1,29 @@
+{
+  "name": "@barry/testing",
+  "version": "0.0.1",
+  "description": "A collection of mock data for testing Discord bots.",
+  "repository": "HeadTriXz/Barry",
+  "author": "HeadTriXz",
+  "license": "MIT",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rimraf coverage dist .turbo",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@discordjs/core": "^0.6.0"
+  }
+}

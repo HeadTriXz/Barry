@@ -1,0 +1,16 @@
+# Dependency directory
+node_modules
+
+# API keys and secrets
+.env
+
+# Build
+dist
+.turbo
+
+# Testing
+coverage
+
+# Editor
+.idea
+.vscode
