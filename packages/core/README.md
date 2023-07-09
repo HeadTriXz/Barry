@@ -101,7 +101,7 @@ Please note that the licenses may differ between different parts of the project.
 
 <!-- Image References -->
 [badge-build]:https://img.shields.io/github/actions/workflow/status/HeadTriXz/Barry/test.yml?branch=main&style=for-the-badge
-[badge-coverage]:https://img.shields.io/codecov/c/github/HeadTriXz/Barry?style=for-the-badge
+[badge-coverage]:https://img.shields.io/codecov/c/github/HeadTriXz/Barry?style=for-the-badge&flag=core
 [badge-contribute]:https://img.shields.io/badge/contributions-welcome-orange.svg?style=for-the-badge
 [badge-kofi]:https://ko-fi.com/img/githubbutton_sm.svg
 [badge-license]:https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge
