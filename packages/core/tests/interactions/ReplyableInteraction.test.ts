@@ -58,6 +58,19 @@ describe("ReplyableInteraction", () => {
             expect(offSpy).toHaveBeenCalledOnce();
         });
 
+        it("should resolve with a MessageComponentInteraction if it matches one of the components", async () => {
+            const offSpy = vi.spyOn(client, "off");
+
+            const data = createMockMessageComponentInteraction();
+            const response = InteractionFactory.from(data, client);
+            const promise = interaction.awaitMessageComponent("91256340920236565", ["select", "button"]);
+
+            client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+            await expect(promise).resolves.toBe(response);
+            expect(offSpy).toHaveBeenCalledOnce();
+        });
+
         it("should resolve with undefined if the timeout is reached", async () => {
             vi.useFakeTimers();
 

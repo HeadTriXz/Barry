@@ -60,7 +60,7 @@ export class ReplyableInteraction extends Interaction {
      */
     async awaitMessageComponent(
         messageID: string,
-        customID: string,
+        customID: string | string[],
         timeout: number = 15 * 60 * 1000
     ): Promise<MessageComponentInteraction | void> {
         return new Promise<MessageComponentInteraction | void>((resolve) => {
@@ -69,7 +69,11 @@ export class ReplyableInteraction extends Interaction {
                     return;
                 }
 
-                if (interaction.message.id === messageID && interaction.data.customID === customID) {
+                const toMatch = typeof customID === "string"
+                    ? [customID]
+                    : customID;
+
+                if (interaction.message.id === messageID && toMatch.includes(interaction.data.customID)) {
                     this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
                     resolve(interaction);
                 }
