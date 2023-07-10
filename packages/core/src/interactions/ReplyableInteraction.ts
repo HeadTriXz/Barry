@@ -54,13 +54,13 @@ export class ReplyableInteraction extends Interaction {
      * Waits for a message component response with the specified message and custom ID.
      *
      * @param messageID The ID of the message to listen for.
-     * @param customID The custom ID to match.
+     * @param customIDs An array of custom IDs to match.
      * @param timeout The timeout duration in milliseconds (default: 15 minutes).
      * @returns The matching MessageComponentInteraction or undefined if timed out.
      */
     async awaitMessageComponent(
         messageID: string,
-        customID: string,
+        customIDs: string[],
         timeout: number = 15 * 60 * 1000
     ): Promise<MessageComponentInteraction | void> {
         return new Promise<MessageComponentInteraction | void>((resolve) => {
@@ -69,7 +69,7 @@ export class ReplyableInteraction extends Interaction {
                     return;
                 }
 
-                if (interaction.message.id === messageID && interaction.data.customID === customID) {
+                if (interaction.message.id === messageID && customIDs.includes(interaction.data.customID)) {
                     this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
                     resolve(interaction);
                 }
