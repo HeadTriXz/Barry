@@ -50,20 +50,7 @@ describe("ReplyableInteraction", () => {
 
             const data = createMockMessageComponentInteraction();
             const response = InteractionFactory.from(data, client);
-            const promise = interaction.awaitMessageComponent("91256340920236565", "button");
-
-            client.emit(GatewayDispatchEvents.InteractionCreate, response);
-
-            await expect(promise).resolves.toBe(response);
-            expect(offSpy).toHaveBeenCalledOnce();
-        });
-
-        it("should resolve with a MessageComponentInteraction if it matches one of the components", async () => {
-            const offSpy = vi.spyOn(client, "off");
-
-            const data = createMockMessageComponentInteraction();
-            const response = InteractionFactory.from(data, client);
-            const promise = interaction.awaitMessageComponent("91256340920236565", ["select", "button"]);
+            const promise = interaction.awaitMessageComponent("91256340920236565", ["button"]);
 
             client.emit(GatewayDispatchEvents.InteractionCreate, response);
 
@@ -75,7 +62,7 @@ describe("ReplyableInteraction", () => {
             vi.useFakeTimers();
 
             const offSpy = vi.spyOn(client, "off");
-            const promise = interaction.awaitMessageComponent("91256340920236565", "button", 2000);
+            const promise = interaction.awaitMessageComponent("91256340920236565", ["button"], 2000);
 
             vi.advanceTimersByTime(3000);
 
@@ -90,7 +77,7 @@ describe("ReplyableInteraction", () => {
 
             const data = createMockApplicationCommandInteraction();
             const response = InteractionFactory.from(data, client);
-            const promise = interaction.awaitMessageComponent("91256340920236565", "button", 2000);
+            const promise = interaction.awaitMessageComponent("91256340920236565", ["button"], 2000);
 
             client.emit(GatewayDispatchEvents.InteractionCreate, response);
             vi.advanceTimersByTime(3000);
