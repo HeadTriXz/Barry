@@ -9,7 +9,7 @@ import { createMockClient } from "../../../../../mocks/index.js";
 import GeneralModule from "../../../../../../src/modules/general/index.js";
 import ReverseCommand from "../../../../../../src/modules/general/commands/user/reverse/index.js";
 
-describe("Reverse Search Image", () => {
+describe("Reverse Search Avatar", () => {
     let command: ReverseCommand;
     let interaction: ApplicationCommandInteraction;
 

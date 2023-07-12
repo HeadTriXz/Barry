@@ -22,12 +22,12 @@ export default class extends UserCommand<GeneralModule> {
      */
     constructor(module: GeneralModule) {
         super(module, {
-            name: "Reverse Search Image"
+            name: "Reverse Search Avatar"
         });
     }
 
     /**
-     * Executes the "Reverse Search Image" command.
+     * Executes the "Reverse Search Avatar" command.
      *
      * @param interaction The interaction that triggered the command.
      * @param target The resolved data provided with the command.
