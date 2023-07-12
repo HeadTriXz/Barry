@@ -7,9 +7,10 @@ import {
     Module
 } from "@barry/core";
 
-import fs from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import fs from "node:fs/promises";
 
 /**
  * A promise resolving into an array of constructor functions.

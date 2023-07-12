@@ -1,6 +1,6 @@
 import { type Client, Module, ValidationError } from "@barry/core";
 
-import { loadCommands } from "../../utils.js";
+import { loadCommands } from "../../utils/index.js";
 import config from "../../config.js";
 
 /**
