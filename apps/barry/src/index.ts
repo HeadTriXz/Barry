@@ -1,6 +1,6 @@
 import { Client, FastifyServer } from "@barry/core";
 
-import { loadModules } from "./utils.js";
+import { loadModules } from "./utils/index.js";
 import { API } from "@discordjs/core";
 import { Logger } from "@barry/logger";
 import { REST } from "@discordjs/rest";

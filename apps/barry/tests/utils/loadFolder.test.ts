@@ -1,7 +1,7 @@
 import type { Dirent } from "node:fs";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { loadCommands, loadEvents, loadFolder, loadModules } from "../src/utils.js";
+import { loadCommands, loadEvents, loadFolder, loadModules } from "../../src/utils/index.js";
 import { BaseCommand, Event, Module, SlashCommand } from "@barry/core";
 
 import fs from "node:fs/promises";
@@ -25,7 +25,7 @@ class MockModule extends Module {}
 
 vi.mock("node:fs/promises");
 
-describe("utils", () => {
+describe("loadFolder", () => {
     function createMockFile(name: string): Dirent {
         return {
             isDirectory: vi.fn().mockReturnValue(false),
