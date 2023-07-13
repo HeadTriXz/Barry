@@ -30,6 +30,11 @@ export type AnyInteraction = ApplicationCommandInteraction
     | PingInteraction;
 
 /**
+ * Represents an interaction that has been invoked in a guild.
+ */
+type GuildInteraction<T extends Interaction> = T & Required<Pick<T, "guildID" | "guildLocale" | "member">>;
+
+/**
  * Resolved data for an interaction.
  */
 export interface InteractionResolvedData {
@@ -200,6 +205,15 @@ export class Interaction {
      */
     isAutocomplete(): this is AutocompleteInteraction {
         return this.type === InteractionType.ApplicationCommandAutocomplete;
+    }
+
+    /**
+     * Checks if this interaction has been invoked in a guild.
+     *
+     * @returns Whether this interaction has been invoked in a guild.
+     */
+    isInvokedInGuild(): this is GuildInteraction<this> {
+        return this.guildID !== undefined;
     }
 
     /**

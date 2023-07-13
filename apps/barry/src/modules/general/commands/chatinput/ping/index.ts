@@ -8,11 +8,11 @@ import type GeneralModule from "../../../index.js";
 import config from "../../../../../config.js";
 
 /**
- * Represents a "ping" slash command.
+ * Represents a slash command that shows the latency.
  */
 export default class extends SlashCommand<GeneralModule> {
     /**
-     * Represents a "ping" slash command.
+     * Represents a slash command that shows the latency.
      *
      * @param module The module the command belongs to.
      */
