@@ -1,0 +1,17 @@
+coverage:
+  range: "70...90"
+  round: down
+  status:
+    patch: off
+    project:
+      default:
+        target: auto
+        threshold: 3%
+
+flag_management:
+  default_rules:
+    carryforward: true
+    statuses:
+      - type: project
+        target: auto
+        threshold: 3%
