@@ -5,10 +5,10 @@ import { ApplicationCommandInteraction } from "@barry/core";
 import { CDN } from "@discordjs/rest";
 import { createMockClient } from "../../../../../mocks/index.js";
 
-import AvatarCommand from "../../../../../../src/modules/general/commands/chatinput/avatar/index.js";
+import AvatarCommand from "../../../../../../src/modules/general/commands/user/avatar/index.js";
 import GeneralModule from "../../../../../../src/modules/general/index.js";
 
-describe("/avatar", () => {
+describe("View Avatar", () => {
     let command: AvatarCommand;
     let interaction: ApplicationCommandInteraction;
 
@@ -58,21 +58,6 @@ describe("/avatar", () => {
                     expect.objectContaining({
                         image: {
                             url: expect.stringMatching(/https:\/\/cdn\.discordapp\.com\/embed\/avatars\/[0-5]\.png/)
-                        }
-                    })
-                ]
-            });
-        });
-
-        it("should send the avatar of the user that issued the command if no user is provided", async () => {
-            await command.execute(interaction, {});
-
-            expect(interaction.createMessage).toHaveBeenCalledOnce();
-            expect(interaction.createMessage).toHaveBeenCalledWith({
-                embeds: [
-                    expect.objectContaining({
-                        image: {
-                            url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.webp?size=1024`
                         }
                     })
                 ]

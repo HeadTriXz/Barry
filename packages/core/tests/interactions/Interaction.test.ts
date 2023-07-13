@@ -136,6 +136,24 @@ describe("Interaction", () => {
         });
     });
 
+    describe("isInvokedInGuild", () => {
+        it("should return true when 'guild_id' is present", () => {
+            const data = createMockApplicationCommandInteraction();
+            const interaction = new Interaction(data, client);
+
+            expect(interaction.isInvokedInGuild()).toBe(true);
+        });
+
+        it("should return false when 'guild_id' is missing", () => {
+            const data = createMockApplicationCommandInteraction();
+            delete data.guild_id;
+
+            const interaction = new Interaction(data, client);
+
+            expect(interaction.isInvokedInGuild()).toBe(false);
+        });
+    });
+
     describe("isMessageComponent", () => {
         it("should return true when the interaction type is MESSAGE_COMPONENT", () => {
             const data = createMockMessageComponentInteraction();

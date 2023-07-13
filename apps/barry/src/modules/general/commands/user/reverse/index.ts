@@ -12,11 +12,11 @@ import { getReverseAvatarContent } from "../../../functions/reverse/getReverseCo
 import config from "../../../../../config.js";
 
 /**
- * Represents a slash command for reverse searching a user's avatar.
+ * Represents a user command for reverse searching a user's avatar.
  */
 export default class extends UserCommand<GeneralModule> {
     /**
-     * Represents a slash command for reverse searching a user's avatar.
+     * Represents a user command for reverse searching a user's avatar.
      *
      * @param module The module this command belongs to.
      */

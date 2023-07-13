@@ -13,11 +13,11 @@ import { getReverseContent } from "../../../functions/reverse/getReverseContent.
 import config from "../../../../../config.js";
 
 /**
- * Represents a slash command for reverse searching an image.
+ * Represents a message command for reverse searching an image.
  */
 export default class extends MessageCommand<GeneralModule> {
     /**
-     * Represents a slash command for reverse searching an image.
+     * Represents a message command for reverse searching an image.
      *
      * @param module The module this command belongs to.
      */
