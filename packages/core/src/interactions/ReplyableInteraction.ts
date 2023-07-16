@@ -86,54 +86,44 @@ export class ReplyableInteraction extends Interaction {
      * @param options The options for awaiting the message component response.
      * @returns The matching MessageComponentInteraction or undefined if timed out.
      */
-    async awaitMessageComponent(
-        options: AwaitMessageComponentOptions = {}
-    ): Promise<MessageComponentInteraction | void> {
-        options.customIDs ??= [];
-        options.messageID ??= this.#originalMessageID;
-        options.timeout ??= 15 * 60 * 1000;
-
-        if (options.userID === undefined) {
-            options.userID = this.user.id;
-        }
-
-        if (options.messageID === undefined && !this.acknowledged) {
+    async awaitMessageComponent({
+        customIDs = [],
+        messageID = this.#originalMessageID,
+        timeout = 15 * 60 * 1000,
+        userID = this.user.id
+    }: AwaitMessageComponentOptions = {}): Promise<MessageComponentInteraction | undefined> {
+        if (messageID === undefined && !this.acknowledged) {
             throw new Error("You must send an initial response before listening for components.");
         }
 
         return new Promise((resolve) => {
+            const cleanup = (interaction?: MessageComponentInteraction): void => {
+                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
+
+                clearTimeout(timeoutID);
+                resolve(interaction);
+            };
+
             const listener = async (interaction: AnyInteraction): Promise<void> => {
-                if (!interaction.isMessageComponent()) {
+                const isValidComponent = interaction.isMessageComponent()
+                    && (customIDs.length === 0 || customIDs.includes(interaction.data.customID))
+                    && (userID === null || interaction.user.id === userID);
+
+                if (!isValidComponent) {
                     return;
                 }
 
-                if (options.customIDs?.length && !options.customIDs.includes(interaction.data.customID)) {
-                    return;
-                }
-
-                if (options.userID !== null && interaction.user.id !== options.userID) {
-                    return;
-                }
-
-                if (options.messageID === undefined) {
+                if (messageID === undefined) {
                     const message = await this.getOriginalMessage();
-                    options.messageID = message.id;
-
-                    console.log("Fetched message");
+                    messageID = message.id;
                 }
 
-                if (interaction.message.id === options.messageID) {
-                    this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                    clearTimeout(timeout);
-                    resolve(interaction);
+                if (interaction.message.id === messageID) {
+                    cleanup(interaction);
                 }
             };
 
-            const timeout = setTimeout(() => {
-                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                resolve();
-            }, options.timeout);
-
+            const timeoutID = setTimeout(cleanup, timeout);
             this.#client.on(GatewayDispatchEvents.InteractionCreate, listener);
         });
     }
@@ -148,24 +138,26 @@ export class ReplyableInteraction extends Interaction {
     async awaitModalSubmit(
         customID: string,
         timeout: number = 15 * 60 * 1000
-    ): Promise<ModalSubmitInteraction | void> {
+    ): Promise<ModalSubmitInteraction | undefined> {
         return new Promise((resolve) => {
+            const cleanup = (interaction?: ModalSubmitInteraction): void => {
+                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
+
+                clearTimeout(timeoutID);
+                resolve(interaction);
+            };
+
             const listener = (interaction: AnyInteraction): void => {
                 if (!interaction.isModalSubmit()) {
                     return;
                 }
 
                 if (interaction.data.customID === customID) {
-                    this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                    resolve(interaction);
+                    cleanup(interaction);
                 }
             };
 
-            setTimeout(() => {
-                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                resolve();
-            }, timeout);
-
+            const timeoutID = setTimeout(cleanup, timeout);
             this.#client.on(GatewayDispatchEvents.InteractionCreate, listener);
         });
     }

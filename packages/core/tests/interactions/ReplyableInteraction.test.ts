@@ -215,7 +215,7 @@ describe("ReplyableInteraction", () => {
                 const promise = interaction.awaitMessageComponent({
                     customIDs: ["button"],
                     messageID: "91256340920236565",
-                    userID: null
+                    userID: undefined
                 });
 
                 client.emit(GatewayDispatchEvents.InteractionCreate, response);
