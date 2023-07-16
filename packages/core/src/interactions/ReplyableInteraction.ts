@@ -30,6 +30,31 @@ interface APIInteractionResponseCallbackDataWithFiles extends APIInteractionResp
 }
 
 /**
+ * Represents options for awaiting a message component response.
+ */
+interface AwaitMessageComponentOptions {
+    /**
+     * An array of `custom_id`'s to match.
+     */
+    customIDs?: string[];
+
+    /**
+     * The ID of the message to match. Defaults to the initial response.
+     */
+    messageID?: string;
+
+    /**
+     * The timeout duration in milliseconds. Defaults to 15 minutes.
+     */
+    timeout?: number;
+
+    /**
+     * The ID of the user to match, or null to allow any user. Defaults to the interaction user.
+     */
+    userID?: string | null;
+}
+
+/**
  * Represents an interaction.
  */
 export class ReplyableInteraction extends Interaction {
@@ -37,6 +62,11 @@ export class ReplyableInteraction extends Interaction {
      * The client that received the interaction.
      */
     #client: Client;
+
+    /**
+     * The ID of the initial interaction response.
+     */
+    #originalMessageID?: string;
 
     /**
      * Represents an interaction.
@@ -51,35 +81,49 @@ export class ReplyableInteraction extends Interaction {
     }
 
     /**
-     * Waits for a message component response with the specified message and custom ID.
+     * Waits for a message component response.
      *
-     * @param messageID The ID of the message to listen for.
-     * @param customIDs An array of custom IDs to match.
-     * @param timeout The timeout duration in milliseconds (default: 15 minutes).
+     * @param options The options for awaiting the message component response.
      * @returns The matching MessageComponentInteraction or undefined if timed out.
      */
-    async awaitMessageComponent(
-        messageID: string,
-        customIDs: string[],
-        timeout: number = 15 * 60 * 1000
-    ): Promise<MessageComponentInteraction | void> {
-        return new Promise<MessageComponentInteraction | void>((resolve) => {
-            const listener = (interaction: AnyInteraction): void => {
-                if (!interaction.isMessageComponent()) {
+    async awaitMessageComponent({
+        customIDs = [],
+        messageID = this.#originalMessageID,
+        timeout = 15 * 60 * 1000,
+        userID = this.user.id
+    }: AwaitMessageComponentOptions = {}): Promise<MessageComponentInteraction | undefined> {
+        if (messageID === undefined && !this.acknowledged) {
+            throw new Error("You must send an initial response before listening for components.");
+        }
+
+        return new Promise((resolve) => {
+            const cleanup = (interaction?: MessageComponentInteraction): void => {
+                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
+
+                clearTimeout(timeoutID);
+                resolve(interaction);
+            };
+
+            const listener = async (interaction: AnyInteraction): Promise<void> => {
+                const isValidComponent = interaction.isMessageComponent()
+                    && (customIDs.length === 0 || customIDs.includes(interaction.data.customID))
+                    && (userID === null || interaction.user.id === userID);
+
+                if (!isValidComponent) {
                     return;
                 }
 
-                if (interaction.message.id === messageID && customIDs.includes(interaction.data.customID)) {
-                    this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                    resolve(interaction);
+                if (messageID === undefined) {
+                    const message = await this.getOriginalMessage();
+                    messageID = message.id;
+                }
+
+                if (interaction.message.id === messageID) {
+                    cleanup(interaction);
                 }
             };
 
-            setTimeout(() => {
-                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                resolve();
-            }, timeout);
-
+            const timeoutID = setTimeout(cleanup, timeout);
             this.#client.on(GatewayDispatchEvents.InteractionCreate, listener);
         });
     }
@@ -94,24 +138,26 @@ export class ReplyableInteraction extends Interaction {
     async awaitModalSubmit(
         customID: string,
         timeout: number = 15 * 60 * 1000
-    ): Promise<ModalSubmitInteraction | void> {
-        return new Promise<ModalSubmitInteraction | void>((resolve) => {
+    ): Promise<ModalSubmitInteraction | undefined> {
+        return new Promise((resolve) => {
+            const cleanup = (interaction?: ModalSubmitInteraction): void => {
+                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
+
+                clearTimeout(timeoutID);
+                resolve(interaction);
+            };
+
             const listener = (interaction: AnyInteraction): void => {
                 if (!interaction.isModalSubmit()) {
                     return;
                 }
 
                 if (interaction.data.customID === customID) {
-                    this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                    resolve(interaction);
+                    cleanup(interaction);
                 }
             };
 
-            setTimeout(() => {
-                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
-                resolve();
-            }, timeout);
-
+            const timeoutID = setTimeout(cleanup, timeout);
             this.#client.on(GatewayDispatchEvents.InteractionCreate, listener);
         });
     }
@@ -225,7 +271,10 @@ export class ReplyableInteraction extends Interaction {
      * @returns The modified message.
      */
     async editOriginalMessage(options: APIInteractionResponseCallbackDataWithFiles): Promise<APIMessage> {
-        return this.editFollowupMessage("@original", options);
+        const message = await this.editFollowupMessage("@original", options);
+        this.#originalMessageID = message.id;
+
+        return message;
     }
 
     /**
@@ -244,6 +293,9 @@ export class ReplyableInteraction extends Interaction {
      * @returns The found message.
      */
     async getOriginalMessage(): Promise<APIMessage> {
-        return this.getFollowupMessage("@original");
+        const message = await this.getFollowupMessage("@original");
+        this.#originalMessageID = message.id;
+
+        return message;
     }
 }
