@@ -145,12 +145,12 @@ async function getPageContent<T>(
  * @param index The index of the selected page.
  * @param options Options for the pagination.
  */
-async function awaitNavigationUpdate<T>(
-    messageID: string,
-    index: number,
-    options: PaginationOptions<T>
-): Promise<void> {
-    const response = await options.interaction.awaitMessageComponent(messageID, ["previous", "next"], options.timeout);
+async function awaitNavigationUpdate<T>(index: number, options: PaginationOptions<T>): Promise<void> {
+    const response = await options.interaction.awaitMessageComponent({
+        customIDs: ["previous", "next"],
+        timeout: options.timeout
+    });
+
     if (response !== undefined) {
         index += response.data.customID === "next" ? 1 : -1;
         options.interaction = response;
@@ -168,15 +168,12 @@ async function awaitNavigationUpdate<T>(
  * @param index The index of the selected page.
  * @param options Options for the pagination.
  */
-async function handleNavigationUpdate<T>(
-    index: number,
-    options: PaginationOptions<T>
-): Promise<void> {
+async function handleNavigationUpdate<T>(index: number, options: PaginationOptions<T>): Promise<void> {
     const content = await getPageContent(index, options);
-    const message = await options.interaction.editOriginalMessage(content);
+    await options.interaction.editOriginalMessage(content);
 
     if (options.values.length > options.pageSize) {
-        await awaitNavigationUpdate(message.id, index, options);
+        await awaitNavigationUpdate(index, options);
     }
 }
 

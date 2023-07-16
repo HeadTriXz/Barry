@@ -1,7 +1,7 @@
 import { type API, GatewayDispatchEvents, InteractionResponseType } from "@discordjs/core";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Client, InteractionFactory, ReplyableInteraction } from "../../src/index.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,
@@ -17,18 +17,18 @@ describe("ReplyableInteraction", () => {
             api: {
                 webhooks: {
                     deleteMessage: vi.fn(),
-                    editMessage: vi.fn(() => Promise.resolve({
+                    editMessage: vi.fn().mockResolvedValue({
                         content: "Hello World",
                         id: "91256340920236565"
-                    })),
-                    execute: vi.fn(() => Promise.resolve({
+                    }),
+                    execute: vi.fn().mockResolvedValue({
                         content: "Hello World",
                         id: "91256340920236565"
-                    })),
-                    getMessage: vi.fn(() => Promise.resolve({
+                    }),
+                    getMessage: vi.fn().mockResolvedValue({
                         content: "Hello World",
                         id: "91256340920236565"
-                    }))
+                    })
                 }
             } as unknown as API
         });
@@ -42,15 +42,18 @@ describe("ReplyableInteraction", () => {
         let interaction: ReplyableInteraction;
 
         beforeEach(() => {
-            interaction = new ReplyableInteraction(createMockApplicationCommandInteraction(), client);
+            interaction = new ReplyableInteraction(createMockApplicationCommandInteraction(), client, vi.fn());
         });
 
-        it("should resolve with the matching MessageComponentInteraction when found", async () => {
+        it("should stop listening for interactions once matched", async () => {
             const offSpy = vi.spyOn(client, "off");
 
             const data = createMockMessageComponentInteraction();
             const response = InteractionFactory.from(data, client);
-            const promise = interaction.awaitMessageComponent("91256340920236565", ["button"]);
+            const promise = interaction.awaitMessageComponent({
+                customIDs: ["button"],
+                messageID: "91256340920236565"
+            });
 
             client.emit(GatewayDispatchEvents.InteractionCreate, response);
 
@@ -58,32 +61,185 @@ describe("ReplyableInteraction", () => {
             expect(offSpy).toHaveBeenCalledOnce();
         });
 
-        it("should resolve with undefined if the timeout is reached", async () => {
-            vi.useFakeTimers();
-
-            const offSpy = vi.spyOn(client, "off");
-            const promise = interaction.awaitMessageComponent("91256340920236565", ["button"], 2000);
-
-            vi.advanceTimersByTime(3000);
-
-            await expect(promise).resolves.toBeUndefined();
-            expect(offSpy).toHaveBeenCalledOnce();
-        });
-
-        it("should ignore non-messagecomponent interactions", async () => {
+        it("should ignore interactions that are not of type 'MessageComponent'", async () => {
             vi.useFakeTimers();
 
             const offSpy = vi.spyOn(client, "off");
 
             const data = createMockApplicationCommandInteraction();
             const response = InteractionFactory.from(data, client);
-            const promise = interaction.awaitMessageComponent("91256340920236565", ["button"], 2000);
+            const promise = interaction.awaitMessageComponent({
+                customIDs: ["button"],
+                messageID: "91256340920236565",
+                timeout: 2000
+            });
 
             client.emit(GatewayDispatchEvents.InteractionCreate, response);
             vi.advanceTimersByTime(3000);
 
             await expect(promise).resolves.toBeUndefined();
             expect(offSpy).toHaveBeenCalledOnce();
+        });
+
+        describe("'messageID' option", () => {
+            it("should use the initial response's message ID if 'messageID' is undefined", async () => {
+                await interaction.getOriginalMessage();
+
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({ customIDs: ["button"] });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).resolves.toBe(response);
+            });
+
+            it("should fetch the original message if 'messageID' is undefined", async () => {
+                await interaction.createMessage({
+                    content: "Hello World"
+                });
+
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({ customIDs: ["button"] });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).resolves.toBe(response);
+            });
+
+            it("should throw an error if the interaction has no initial response", async () => {
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({ customIDs: ["button"] });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).rejects.toThrowError(
+                    "You must send an initial response before listening for components."
+                );
+            });
+        });
+
+        describe("'customIDs' option", () => {
+            it("should resolve if the custom ID matches on of the provided 'customIDs'", async () => {
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({
+                    customIDs: ["button", "not-button"],
+                    messageID: "91256340920236565"
+                });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).resolves.toBe(response);
+            });
+
+            it("should ignore if the custom ID does not match one of the provided 'customIDs'", async () => {
+                vi.useFakeTimers();
+
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({
+                    customIDs: ["not-a-button", "fake-button"],
+                    messageID: "91256340920236565"
+                });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+                vi.runAllTimers();
+
+                await expect(promise).resolves.toBeUndefined();
+            });
+
+            it("should allow any custom ID if 'customIDs' has no items", async () => {
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({
+                    customIDs: [],
+                    messageID: "91256340920236565"
+                });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).resolves.toBe(response);
+            });
+
+            it("should allow any custom ID if 'customIDs' is undefined", async () => {
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({
+                    messageID: "91256340920236565"
+                });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).resolves.toBe(response);
+            });
+        });
+
+        describe("'userID' option", () => {
+            it("should resolve if the user ID matches the provided 'userID' option", async () => {
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({
+                    customIDs: ["button"],
+                    messageID: "91256340920236565",
+                    userID: "257522665441460225"
+                });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).resolves.toBe(response);
+            });
+
+            it("should ignore if the user ID does not match the provided 'userID' option", async () => {
+                vi.useFakeTimers();
+
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({
+                    customIDs: ["button"],
+                    messageID: "91256340920236565",
+                    userID: "257522665437265920"
+                });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+                vi.runAllTimers();
+
+                await expect(promise).resolves.toBeUndefined();
+            });
+
+            it("should allow any ID if 'userID' is null", async () => {
+                const data = createMockMessageComponentInteraction();
+                const response = InteractionFactory.from(data, client);
+                const promise = interaction.awaitMessageComponent({
+                    customIDs: ["button"],
+                    messageID: "91256340920236565",
+                    userID: null
+                });
+
+                client.emit(GatewayDispatchEvents.InteractionCreate, response);
+
+                await expect(promise).resolves.toBe(response);
+            });
+        });
+
+        describe("'timeout' option", () => {
+            it("should resolve with undefined if the timeout is reached", async () => {
+                vi.useFakeTimers();
+
+                const offSpy = vi.spyOn(client, "off");
+                const promise = interaction.awaitMessageComponent({
+                    customIDs: ["button"],
+                    messageID: "91256340920236565",
+                    timeout: 2000
+                });
+
+                vi.advanceTimersByTime(3000);
+
+                await expect(promise).resolves.toBeUndefined();
+                expect(offSpy).toHaveBeenCalledOnce();
+            });
         });
     });
 
@@ -94,7 +250,7 @@ describe("ReplyableInteraction", () => {
             interaction = new ReplyableInteraction(createMockApplicationCommandInteraction(), client);
         });
 
-        it("should resolve with the matching ModalSubmitInteraction when found", async () => {
+        it("should resolve with the matching interaction when found", async () => {
             const offSpy = vi.spyOn(client, "off");
             const response = InteractionFactory.from(createMockModalSubmitInteraction(), client);
             const promise = interaction.awaitModalSubmit("modal");
@@ -117,7 +273,7 @@ describe("ReplyableInteraction", () => {
             expect(offSpy).toHaveBeenCalledOnce();
         });
 
-        it("should ignore non-modal interactions", async () => {
+        it("should ignore interactions that are not of type 'ModalSubmit'", async () => {
             vi.useFakeTimers();
 
             const offSpy = vi.spyOn(client, "off");
