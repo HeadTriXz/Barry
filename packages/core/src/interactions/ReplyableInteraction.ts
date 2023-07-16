@@ -64,11 +64,6 @@ export class ReplyableInteraction extends Interaction {
     #client: Client;
 
     /**
-     * Whether this interaction has sent its initial interaction response.
-     */
-    #hasInitialResponse: boolean = false;
-
-    /**
      * The ID of the initial interaction response.
      */
     #originalMessageID?: string;
@@ -102,7 +97,7 @@ export class ReplyableInteraction extends Interaction {
             options.userID = this.user.id;
         }
 
-        if (options.messageID === undefined && !this.#hasInitialResponse) {
+        if (options.messageID === undefined && !this.acknowledged) {
             throw new Error("You must send an initial response before listening for components.");
         }
 
@@ -123,6 +118,8 @@ export class ReplyableInteraction extends Interaction {
                 if (options.messageID === undefined) {
                     const message = await this.getOriginalMessage();
                     options.messageID = message.id;
+
+                    console.log("Fetched message");
                 }
 
                 if (interaction.message.id === options.messageID) {
@@ -203,7 +200,6 @@ export class ReplyableInteraction extends Interaction {
         });
 
         this.acknowledged = true;
-        this.#hasInitialResponse = true;
     }
 
     /**
@@ -244,7 +240,6 @@ export class ReplyableInteraction extends Interaction {
         });
 
         this.acknowledged = true;
-        this.#hasInitialResponse = true;
     }
 
     /**
@@ -284,7 +279,10 @@ export class ReplyableInteraction extends Interaction {
      * @returns The modified message.
      */
     async editOriginalMessage(options: APIInteractionResponseCallbackDataWithFiles): Promise<APIMessage> {
-        return this.editFollowupMessage("@original", options);
+        const message = await this.editFollowupMessage("@original", options);
+        this.#originalMessageID = message.id;
+
+        return message;
     }
 
     /**
@@ -304,8 +302,6 @@ export class ReplyableInteraction extends Interaction {
      */
     async getOriginalMessage(): Promise<APIMessage> {
         const message = await this.getFollowupMessage("@original");
-
-        this.#hasInitialResponse = true;
         this.#originalMessageID = message.id;
 
         return message;
