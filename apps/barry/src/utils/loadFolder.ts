@@ -55,10 +55,60 @@ function getCallerPath(): string {
  * @param path The folder to load the files from.
  * @param base The base class used to filter the found files.
  * @param callerPath The path the the caller file.
+ * @param loadAll Whether to load all files or only "index.ts" files.
  * @returns An array of loaded files.
  */
-export async function loadFolder<T>(path: string, base: Constructor<T>): LoadedFiles<T> {
-    return loadFromCallerPath(path, base, getCallerPath());
+async function loadFromCallerPath<T>(
+    path: string,
+    base: Constructor<T>,
+    callerPath: string,
+    loadAll: boolean
+): LoadedFiles<T> {
+    const fullPath = resolve(callerPath, "..", path);
+    const entries = await fs.readdir(fullPath, { withFileTypes: true });
+    if (entries.length === 0) {
+        return [];
+    }
+
+    const files = entries.filter((e) => e.isFile() && (loadAll || e.name === "index.js"));
+    const items = await Promise.all(
+        files.map((f) => import(resolve(fullPath, f.name)) as Promise<ImportedFile<T>>)
+    );
+
+    const filtered = items
+        .filter(({ default: item }) => item.prototype instanceof base)
+        .map(({ default: item }) => item);
+
+    if (filtered.length > 0 && !loadAll) {
+        return filtered;
+    }
+
+    const folders = entries.filter((e) => e.isDirectory());
+    const nestedItems = await Promise.all(
+        folders.map((f) => loadFromCallerPath(resolve(fullPath, f.name), base, callerPath, loadAll))
+    );
+
+    return filtered.concat(...nestedItems);
+}
+
+/**
+ * Loads all commands from the specified folder.
+ *
+ * @param path The folder to load the commands from.
+ * @returns An array of loaded commands.
+ */
+export async function loadCommands(path: string): LoadedFiles<AnyCommand> {
+    return loadFromCallerPath(path, BaseCommand as Constructor<AnyCommand>, getCallerPath(), false);
+}
+
+/**
+ * Loads all events from the specified folder.
+ *
+ * @param path The folder to load the events from.
+ * @returns An array of loaded events.
+ */
+export async function loadEvents(path: string): LoadedFiles<Event> {
+    return loadFromCallerPath(path, Event, getCallerPath(), true);
 }
 
 /**
@@ -66,67 +116,19 @@ export async function loadFolder<T>(path: string, base: Constructor<T>): LoadedF
  *
  * @param path The folder to load the files from.
  * @param base The base class used to filter the found files.
- * @param callerPath The path the the caller file.
+ * @param loadAll Whether to load all files or only "index.js" files.
  * @returns An array of loaded files.
  */
-async function loadFromCallerPath<T>(path: string, base: Constructor<T>, callerPath: string): LoadedFiles<T> {
-    const fullPath = resolve(callerPath, "..", path);
-    const entries = await fs.readdir(fullPath, { withFileTypes: true });
-    if (entries.length === 0) {
-        return [];
-    }
-
-    const file = entries.find((e) => e.isFile() && e.name === "index.js");
-    if (file !== undefined) {
-        const { default: item } = await import(resolve(fullPath, file.name)) as ImportedFile<T>;
-        if (!(item?.prototype instanceof base)) {
-            return [];
-        }
-
-        return [item];
-    }
-
-    const folders = entries.filter((e) => e.isDirectory());
-    if (folders.length === 0) {
-        return [];
-    }
-
-    const items = await Promise.all(
-        folders.map((f) => loadFromCallerPath(resolve(fullPath, f.name), base, callerPath))
-    );
-
-    return items.flat();
-}
-
-/**
- * Loads all commands from the specified folder.
- *
- * @param path The folder to load the commands from.
- * @param callerPath The path the the caller file.
- * @returns An array of loaded commands.
- */
-export async function loadCommands(path: string): LoadedFiles<AnyCommand> {
-    return loadFromCallerPath(path, BaseCommand as Constructor<AnyCommand>, getCallerPath());
-}
-
-/**
- * Loads all events from the specified folder.
- *
- * @param path The folder to load the events from.
- * @param callerPath The path the the caller file.
- * @returns An array of loaded events.
- */
-export async function loadEvents(path: string): LoadedFiles<Event> {
-    return loadFromCallerPath(path, Event, getCallerPath());
+export async function loadFolder<T>(path: string, base: Constructor<T>, loadAll: boolean): LoadedFiles<T> {
+    return loadFromCallerPath(path, base, getCallerPath(), loadAll);
 }
 
 /**
  * Loads all modules from the specified folder.
  *
  * @param path The folder to load the modules from.
- * @param callerPath The path the the caller file.
  * @returns An array of loaded modules.
  */
 export async function loadModules(path: string): LoadedFiles<Module> {
-    return loadFromCallerPath(path, Module, getCallerPath());
+    return loadFromCallerPath(path, Module, getCallerPath(), false);
 }
