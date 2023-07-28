@@ -197,4 +197,12 @@ export abstract class Module<T extends Client = Client> {
             this.events.push(new EventClass(this));
         }
     }
+
+    /**
+     * Checks if the guild has enabled this module.
+     *
+     * @param guildID The ID of the guild.
+     * @returns Whether the guild has enabled this module.
+     */
+    abstract isEnabled(guildID: string): Awaitable<boolean>;
 }

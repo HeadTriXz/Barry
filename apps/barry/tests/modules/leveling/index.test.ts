@@ -129,6 +129,38 @@ describe("LevelingModule", () => {
         });
     });
 
+    describe("isEnabled", () => {
+        it("should return true if the guild has the module enabled", async () => {
+            const settingsSpy = vi.spyOn(module.levelingSettings, "getOrCreate").mockResolvedValue({
+                guildID: "68239102456844360",
+                enabled: true,
+                ignoredChannels: [],
+                ignoredRoles: []
+            });
+
+            const enabled = await module.isEnabled("68239102456844360");
+
+            expect(settingsSpy).toHaveBeenCalledOnce();
+            expect(settingsSpy).toHaveBeenCalledWith("68239102456844360");
+            expect(enabled).toBe(true);
+        });
+
+        it("should return false if the guild has the module disabled", async () => {
+            const settingsSpy = vi.spyOn(module.levelingSettings, "getOrCreate").mockResolvedValue({
+                guildID: "68239102456844360",
+                enabled: false,
+                ignoredChannels: [],
+                ignoredRoles: []
+            });
+
+            const enabled = await module.isEnabled("68239102456844360");
+
+            expect(settingsSpy).toHaveBeenCalledOnce();
+            expect(settingsSpy).toHaveBeenCalledWith("68239102456844360");
+            expect(enabled).toBe(false);
+        });
+    });
+
     describe("#notifyMember", () => {
         it("should send a notification in the configured channel if the notification type is 'CustomChannel'", async () => {
             module.memberActivity.upsert = vi.fn();

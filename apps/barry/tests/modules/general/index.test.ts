@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApplicationCommandInteraction, Module } from "@barry/core";
+import { MessageFlags } from "@discordjs/core";
 import { createMockApplicationCommandInteraction } from "@barry/testing";
 import { createMockApplication } from "../../mocks/application.js";
 
@@ -71,7 +72,8 @@ describe("GeneralModule", () => {
 
                     expect(interaction.createMessage).toHaveBeenCalledOnce();
                     expect(interaction.createMessage).toHaveBeenCalledWith({
-                        content: expect.stringContaining("You are not permitted to use that command.")
+                        content: expect.stringContaining("You are not permitted to use that command."),
+                        flags: MessageFlags.Ephemeral
                     });
                 });
 
@@ -85,7 +87,8 @@ describe("GeneralModule", () => {
 
                     expect(interaction.createMessage).toHaveBeenCalledOnce();
                     expect(interaction.createMessage).toHaveBeenCalledWith({
-                        content: expect.stringContaining("You are not permitted to use that command.")
+                        content: expect.stringContaining("You are not permitted to use that command."),
+                        flags: MessageFlags.Ephemeral
                     });
                 });
 
@@ -96,7 +99,8 @@ describe("GeneralModule", () => {
                     await module.client.interactions.handle(interaction);
 
                     expect(interaction.createMessage).not.toHaveBeenCalledWith({
-                        content: expect.stringContaining("You are not permitted to use that command.")
+                        content: expect.stringContaining("You are not permitted to use that command."),
+                        flags: MessageFlags.Ephemeral
                     });
                 });
 
