@@ -156,6 +156,19 @@ describe("AutocompleteInteractionHandler", () => {
 
                 expect(resultSpy).not.toHaveBeenCalled();
             });
+
+            it("should do nothing if the module is disabled", async () => {
+                const data = createMockAutocompleteInteraction();
+                const interaction = new AutocompleteInteraction(data, client, vi.fn());
+                const resultSpy = vi.spyOn(interaction, "result");
+                const module = client.modules.get("mock")!;
+
+                vi.spyOn(module, "isEnabled").mockReturnValue(false);
+
+                await handler.handle(interaction);
+
+                expect(resultSpy).not.toHaveBeenCalled();
+            });
         });
 
         describe("Focused option", () => {

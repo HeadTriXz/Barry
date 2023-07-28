@@ -46,6 +46,11 @@ export class ApplicationCommandInteractionHandler implements InteractionHandler 
         }
 
         if (interaction.guildID !== undefined) {
+            const moduleEnabled = await command.module.isEnabled(interaction.guildID);
+            if (!moduleEnabled) {
+                throw new ValidationError("This command is currently disabled for this guild.");
+            }
+
             if (command.appPermissions !== undefined && interaction.appPermissions !== undefined) {
                 const perms = interaction.appPermissions & command.appPermissions;
                 if (perms !== command.appPermissions) {

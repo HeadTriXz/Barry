@@ -16,6 +16,10 @@ export function createMockModule(options: ModuleOptions): ConcreteConstructor<Mo
         constructor(client: Client) {
             super(client, options);
         }
+
+        isEnabled(): boolean {
+            return true;
+        }
     };
 }
 
@@ -34,5 +38,9 @@ export class MockModule extends Module {
             ...mockModuleOptions,
             ...options
         });
+    }
+
+    isEnabled(): boolean {
+        return true;
     }
 }
