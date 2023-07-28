@@ -17,6 +17,8 @@
   "scripts": {
     "build": "turbo run build",
     "clean": "turbo run clean",
+    "db:generate": "dotenv -- turbo run db:generate",
+    "db:push": "dotenv -- turbo run db:push",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
@@ -38,6 +40,7 @@
     "tsup": "^7.1.0",
     "turbo": "^1.10.7",
     "typescript": "^5.1.3",
-    "vitest": "^0.32.2"
+    "vitest": "^0.32.2",
+    "vitest-mock-extended": "^1.1.4"
   }
 }

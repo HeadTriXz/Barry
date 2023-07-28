@@ -15,7 +15,7 @@ export type ConstructorArray<T> = Awaitable<Array<ConcreteConstructor<T>>>;
 /**
  * Represents the options for a module.
  */
-export interface ModuleOptions {
+export interface ModuleOptions<T extends Client = Client> {
     /**
      * The commands associated with the module.
      */
@@ -24,7 +24,7 @@ export interface ModuleOptions {
     /**
      * The dependencies of the module.
      */
-    dependencies?: ConstructorArray<Module>;
+    dependencies?: ConstructorArray<Module<T>>;
 
     /**
      * The description of the module.
@@ -51,11 +51,11 @@ export interface ModuleOptions {
  * Represents a basic module.
  * @abstract
  */
-export abstract class Module {
+export abstract class Module<T extends Client = Client> {
     /**
      * The client that initialized the module.
      */
-    client: Client;
+    client: T;
 
     /**
      * The commands associated with the module.
@@ -90,7 +90,7 @@ export abstract class Module {
     /**
      * The options for the module.
      */
-    #options: ModuleOptions;
+    #options: ModuleOptions<T>;
 
     /**
      * The registered commands associated with the module.
@@ -108,7 +108,7 @@ export abstract class Module {
      * @param client The client that initialized the module.
      * @param options The options for the module.
      */
-    constructor(client: Client, options: ModuleOptions) {
+    constructor(client: T, options: ModuleOptions<T>) {
         this.client = client;
         this.description = options.description;
         this.id = options.id;
@@ -179,7 +179,7 @@ export abstract class Module {
      * @param dependencies The dependencies to load.
      * @private
      */
-    async #loadDependencies(dependencies: ConstructorArray<Module>): Promise<void> {
+    async #loadDependencies(dependencies: ConstructorArray<Module<T>>): Promise<void> {
         const modules = await dependencies;
         await Promise.all(
             modules.map((ModuleClass) => this.dependencies.add(new ModuleClass(this.client)))

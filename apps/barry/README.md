@@ -105,14 +105,13 @@ The following environment variables **must be** set in order to run the applicat
 | DISCORD_CLIENT_ID    | The ID of your Discord application.                                                 |
 | DISCORD_PUBLIC_KEY   | The public key of your Discord application.                                         |
 | DISCORD_TOKEN        | The token of your Discord bot.                                                      |
-| SERVER_ENDPOINT      | The endpoint for handling interactions. (default: `/interactions`)                  |
-| SERVER_HOST          | The hostname or IP address where your server will be hosted. (default: `localhost`) |
-| SERVER_PORT          | The port on which your server will listen for incoming requests. (default: `3000`)  |
 | POSTGRES_HOST        | The hostname or IP address of the database. (default: `localhost`)                  |
-| POSRGRES_PORT        | The port of the database. (default: `5432`)                                         |
+| POSTGRES_PORT        | The port of the database. (default: `5432`)                                         |
 | POSTGRES_DB          | The name of the database.                                                           |
 | POSTGRES_PASSWORD    | The password for authenticating with the database.                                  |
 | POSTGRES_USER        | The username for authenticating with the database.                                  |
+| REDIS_HOST           | The hostname or IP address of redis. (default: `localhost`)                         |
+| REDIS_PORT           | The port of redis. (default: `6379`)                                                |
 
 The following environment variables are **optional**:
 | Environment Variable | Description                                                             |

@@ -3,7 +3,6 @@ import {
     type APIChannel,
     type APIInteraction,
     type APIInteractionDataResolvedChannel,
-    type APIInteractionDataResolvedGuildMember,
     type APIInteractionGuildMember,
     type APIRole,
     type APIUser,
@@ -49,9 +48,9 @@ export interface InteractionResolvedData {
     channels: Map<string, APIInteractionDataResolvedChannel>;
 
     /**
-     * A map of resolved partial members.
+     * A map of resolved members.
      */
-    members: Map<string, APIInteractionDataResolvedGuildMember>;
+    members: Map<string, Omit<APIInteractionGuildMember, "deaf" | "mute">>;
 
     /**
      * A map of resolved roles.

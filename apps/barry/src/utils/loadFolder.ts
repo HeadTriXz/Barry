@@ -70,7 +70,7 @@ async function loadFromCallerPath<T>(
         return [];
     }
 
-    const files = entries.filter((e) => e.isFile() && (loadAll || e.name === "index.js"));
+    const files = entries.filter((e) => e.isFile() && (loadAll ? e.name.endsWith(".js") : e.name === "index.js"));
     const items = await Promise.all(
         files.map((f) => import(resolve(fullPath, f.name)) as Promise<ImportedFile<T>>)
     );

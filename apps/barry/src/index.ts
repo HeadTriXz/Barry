@@ -1,17 +1,12 @@
-import { Client, FastifyServer } from "@barry/core";
+import { GatewayDispatchEvents, GatewayIntentBits } from "@discordjs/core";
 
-import { loadModules } from "./utils/index.js";
-import { API } from "@discordjs/core";
+import { Application } from "./Application.js";
 import { Logger } from "@barry/logger";
-import { REST } from "@discordjs/rest";
+import { loadModules } from "./utils/index.js";
 
 // Check environment variables.
 if (process.env.DISCORD_CLIENT_ID === undefined) {
     throw new Error("Missing environment variable: DISCORD_CLIENT_ID");
-}
-
-if (process.env.DISCORD_PUBLIC_KEY === undefined) {
-    throw new Error("Missing environment variable: DISCORD_PUBLIC_KEY");
 }
 
 if (process.env.DISCORD_TOKEN === undefined) {
@@ -26,48 +21,29 @@ const logger = new Logger({
     }
 });
 
-process.on("uncaughtException", (error) => {
-    logger.error(error);
-});
-
-// Initialize the server.
-const server = new FastifyServer({
-    publicKey: process.env.DISCORD_PUBLIC_KEY
-});
-
-// Initialize the client.
-const rest = new REST().setToken(process.env.DISCORD_TOKEN);
-const api = new API(rest);
-
-const client = new Client({
-    api: api,
-    applicationID: process.env.DISCORD_CLIENT_ID,
+// Intialize the application.
+const app = new Application({
+    discord: {
+        applicationID: process.env.DISCORD_CLIENT_ID,
+        intents: GatewayIntentBits.GuildMessages | GatewayIntentBits.GuildVoiceStates,
+        token: process.env.DISCORD_TOKEN
+    },
     logger: logger,
     modules: loadModules("./modules"),
-    server: server,
-    serverEndpoint: process.env.SERVER_ENDPOINT
+    redis: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT) || undefined
+    }
 });
 
-try {
-    // Start the server.
-    const serverHost = process.env.SERVER_HOST || "localhost";
-    const serverPort = process.env.SERVER_PORT !== undefined
-        ? Number(process.env.SERVER_PORT)
-        : 3000;
+process.on("uncaughtException", (error) => {
+    logger.fatal(error);
+});
 
-    await server.listen(serverPort, serverHost);
+app.on(GatewayDispatchEvents.Ready, ({ user }) => {
+    logger.info(`Successfully logged in as ${user.username}#${user.discriminator}`);
+});
 
-    // Start the client.
-    await client.initialize();
-    if (process.env.NODE_ENV !== "production" && process.env.DEVELOPER_GUILDS !== undefined) {
-        const guilds = process.env.DEVELOPER_GUILDS.trim().split(/\s*,\s*/);
-
-        for (const command of client.commands) {
-            command.guilds = guilds;
-        }
-    }
-
-    await client.commands.sync();
-} catch (error: unknown) {
-    client.logger.fatal(error);
-}
+app.initialize().catch((error) => {
+    logger.fatal(error);
+});

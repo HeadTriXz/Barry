@@ -47,10 +47,8 @@ export class MessageApplicationCommandInteractionData extends ApplicationCommand
             messages: new Map()
         };
 
-        if (data.resolved?.messages !== undefined) {
-            for (const id in data.resolved.messages) {
-                this.resolved.messages.set(id, data.resolved.messages[id]);
-            }
+        for (const id in data.resolved.messages) {
+            this.resolved.messages.set(id, data.resolved.messages[id]);
         }
 
         this.targetID = data.target_id;

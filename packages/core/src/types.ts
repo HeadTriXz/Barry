@@ -4,7 +4,7 @@ import type { GatewaySendPayload } from "@discordjs/core";
 /**
  * Represents a type that may be awaited like a Promise, or returned synchronously.
  */
-export type Awaitable<T> = T | Promise<T>;
+export type Awaitable<T> = T | PromiseLike<T>;
 
 /**
  * Represents a constructor of an abstract class.

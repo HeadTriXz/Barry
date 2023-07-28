@@ -1,5 +1,4 @@
 import {
-    type Client,
     type ReplyableInteraction,
     ApplicationCommandInteraction,
     MessageComponentInteraction
@@ -14,10 +13,11 @@ import {
     mockMessage
 } from "@barry/testing";
 
-import { createMockClient } from "../mocks/index.js";
+import { Application } from "../../src/Application.js";
+import { createMockApplication } from "../mocks/index.js";
 
 describe("createPaginatedMessage", () => {
-    let client: Client;
+    let client: Application;
     let mockPaginationOptions: PaginationOptions<string>;
 
     let interaction: ReplyableInteraction;
@@ -27,13 +27,10 @@ describe("createPaginatedMessage", () => {
     beforeEach(() => {
         vi.useFakeTimers();
 
-        client = createMockClient({
-            api: {
-                webhooks: {
-                    editMessage: vi.fn().mockResolvedValue(mockMessage)
-                }
-            }
-        });
+        client = createMockApplication();
+
+        vi.spyOn(client.api.webhooks, "editMessage")
+            .mockResolvedValue(mockMessage);
 
         const data = createMockApplicationCommandInteraction();
         const nextComponent = createMockMessageComponentInteraction({

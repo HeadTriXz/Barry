@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+// Leveling
+enum LevelUpNotificationType {
+  CurrentChannel @map("CURRENT_CHANNEL")
+  CustomChannel  @map("CUSTOM_CHANNEL")
+  DirectMessage  @map("DIRECT_MESSAGE")
+}
+
+model LevelUpSettings {
+  guildID             String                  @id @map("guild_id")
+  message             String                  @default("Congratulations {user}! You have reached level {level}.")
+  notificationChannel String?                 @map("notification_channel")
+  notificationType    LevelUpNotificationType @default(CurrentChannel) @map("notification_type")
+
+  @@map("level_up_settings")
+}
+
+model LevelingSettings {
+  guildID         String   @id @map("guild_id")
+  enabled         Boolean  @default(false)
+  ignoredChannels String[] @default([]) @map("ignored_channels")
+  ignoredRoles    String[] @default([]) @map("ignored_roles")
+
+  @@map("leveling_settings")
+}
+
+model MemberActivity {
+  guildID      String @map("guild_id")
+  userID       String @map("user_id")
+  messageCount Int    @default(0) @map("message_count")
+  experience   Int    @default(0)
+  level        Int    @default(0)
+  reputation   Int    @default(0)
+  voiceMinutes Int    @default(0) @map("voice_minutes")
+
+  @@id([guildID, userID])
+  @@map("member_activity")
+}

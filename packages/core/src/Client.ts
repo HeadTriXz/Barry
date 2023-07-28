@@ -17,6 +17,8 @@ import {
     type APIInteraction,
     type MappedEvents,
     type WithIntrinsicProps,
+    type GatewayVoiceState,
+    type GatewayDispatchPayload,
     GatewayDispatchEvents
 } from "@discordjs/core";
 
@@ -31,7 +33,10 @@ import { WebSocketShardEvents } from "@discordjs/ws";
 /**
  * A mapped type of all included default events.
  */
-type IncludedEvents = Omit<MappedEvents, GatewayDispatchEvents.InteractionCreate>;
+type IncludedEvents = Omit<
+    MappedEvents,
+    GatewayDispatchEvents.InteractionCreate | GatewayDispatchEvents.VoiceStateUpdate
+>;
 
 /**
  * A mapped type that extracts the intrinsic props from the values of a given mapped type.
@@ -42,6 +47,7 @@ export type ClientEvents = {
         : MappedEvents[K];
 } & {
     [GatewayDispatchEvents.InteractionCreate]: [AnyInteraction];
+    [GatewayDispatchEvents.VoiceStateUpdate]: [GatewayVoiceState, string?];
 };
 
 /**
@@ -183,6 +189,11 @@ export class Client extends EventEmitter {
     server?: Server;
 
     /**
+     * A map that stores the voice channel connections for users in a guild.
+     */
+    voiceConnections: Map<string, string> = new Map();
+
+    /**
      * Options for the client.
      */
     #options: BaseClientOptions;
@@ -214,14 +225,7 @@ export class Client extends EventEmitter {
         this.modules = new ModuleService();
 
         this.gateway?.on(WebSocketShardEvents.Dispatch, ({ data }) => {
-            if (data.t !== GatewayDispatchEvents.InteractionCreate) {
-                return this.emit(data.t as any, data.d);
-            }
-
-            const interaction = InteractionFactory.from(data.d, this);
-
-            this.emit(GatewayDispatchEvents.InteractionCreate, interaction);
-            return this.interactions.handle(interaction);
+            this.#handleGatewayDispatchEvent(data);
         });
 
         this.server?.post(this.#options.serverEndpoint, async (body, respond) => {
@@ -247,6 +251,40 @@ export class Client extends EventEmitter {
         await Promise.all(
             modules.map((ModuleClass) => this.modules.add(new ModuleClass(this)))
         );
+    }
+
+    /**
+     * Handles gateway dispatch events and emits appropriate client events.
+     *
+     * @param payload The payload from the gateway dispatch event.
+     */
+    #handleGatewayDispatchEvent(payload: GatewayDispatchPayload): void {
+        switch (payload.t) {
+            case GatewayDispatchEvents.InteractionCreate: {
+                const interaction = InteractionFactory.from(payload.d, this);
+
+                this.emit(payload.t, interaction);
+                this.interactions.handle(interaction);
+                break;
+            }
+            case GatewayDispatchEvents.VoiceStateUpdate: {
+                const scope = payload.d.guild_id ?? "global";
+                const key = `${scope}:${payload.d.user_id}`;
+
+                const oldChannelID = this.voiceConnections.get(key);
+                if (payload.d.channel_id === null) {
+                    this.voiceConnections.delete(key);
+                } else {
+                    this.voiceConnections.set(key, payload.d.channel_id);
+                }
+
+                this.emit(payload.t, payload.d, oldChannelID);
+                break;
+            }
+            default: {
+                this.emit(payload.t as any, payload.d);
+            }
+        }
     }
 
     /**

@@ -18,6 +18,8 @@ RUN npm ci --include=dev
 FROM base AS builder
 COPY --from=installer /app/ .
 COPY --from=sourcer /app/out/full/ .
+
+RUN npx turbo run db:generate
 RUN npx turbo run build --filter=barry...
 
 # Start the application

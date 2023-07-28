@@ -5,8 +5,7 @@ import type {
 } from "@discordjs/core";
 
 import type { ApplicationCommandInteraction } from "../index.js";
-import type { Client } from "../Client.js";
-import type { Module } from "../modules/Module.js";
+import type { Module } from "../modules/index.js";
 
 /**
  * Options for a {@link BaseCommand}.
@@ -71,7 +70,7 @@ export abstract class BaseCommand<M extends Module = Module> {
     /**
      * The client that initialized the command.
      */
-    client: Client;
+    client: M["client"];
 
     /**
      * The period during which the user cannot execute the same command (in seconds).

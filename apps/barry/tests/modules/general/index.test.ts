@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApplicationCommandInteraction, Module } from "@barry/core";
 import { createMockApplicationCommandInteraction } from "@barry/testing";
-import { createMockClient } from "../../mocks/client.js";
+import { createMockApplication } from "../../mocks/application.js";
 
 import GeneralModule from "../../../src/modules/general/index.js";
 import PingCommand from "../../../src/modules/general/commands/chatinput/ping/index.js";
@@ -13,9 +13,7 @@ describe("GeneralModule", () => {
     let module: GeneralModule;
 
     beforeEach(() => {
-        vi.unstubAllEnvs();
-
-        const client = createMockClient();
+        const client = createMockApplication();
         client.logger.error = vi.fn();
 
         Module.prototype.initialize = vi.fn(() => {
@@ -31,6 +29,10 @@ describe("GeneralModule", () => {
         const data = createMockApplicationCommandInteraction();
         interaction = new ApplicationCommandInteraction(data, client);
         interaction.createMessage = vi.fn();
+    });
+
+    afterEach(() => {
+        vi.unstubAllEnvs();
     });
 
     describe("initialize", () => {
@@ -74,6 +76,8 @@ describe("GeneralModule", () => {
                 });
 
                 it("should disallow everyone if no developers are set and 'ownerOnly' is true", async () => {
+                    vi.stubEnv("DEVELOPER_USERS", "");
+
                     command.ownerOnly = true;
 
                     await module.initialize();

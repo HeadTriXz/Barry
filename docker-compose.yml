@@ -6,23 +6,35 @@ services:
       dockerfile: ./apps/barry/Dockerfile
     depends_on:
       - postgres
-    environment:
-      - SERVER_HOST=0.0.0.0
+      - redis
     env_file:
       - .env
-    ports:
-      - "${SERVER_PORT:-3000}:${SERVER_PORT:-3000}"
+    environment:
+      - POSTGRES_URL=postgresql://barry:password@postgres:5432/barry
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     restart: always
 
   postgres:
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_DB=barry
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=barry
     image: postgres:15-alpine
     ports:
-      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+      - "5432:5432"
     restart: always
     volumes:
       - postgres:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7.0-alpine
+    ports:
+      - "6379:6379"
+    restart: always
+    volumes:
+      - redis:/data
+
 volumes:
   postgres:
+  redis:

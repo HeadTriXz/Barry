@@ -1,4 +1,4 @@
-import type { Client, ClientEvents } from "../Client.js";
+import type { ClientEvents } from "../Client.js";
 import type { Module } from "../index.js";
 
 /**
@@ -17,12 +17,7 @@ export abstract class Event<M extends Module = Module, K extends Emittable = Emi
     /**
      * The client that initialized the event.
      */
-    client: Client;
-
-    /**
-     * The module that owns the event.
-     */
-    module: M;
+    client: M["client"];
 
     /**
      * The name of the event.
@@ -35,9 +30,8 @@ export abstract class Event<M extends Module = Module, K extends Emittable = Emi
      * @param module The module that owns the event.
      * @param name The name of the event.
      */
-    constructor(module: M, name: K) {
+    constructor(public module: M, name: K) {
         this.client = module.client;
-        this.module = module;
         this.name = name;
     }
 

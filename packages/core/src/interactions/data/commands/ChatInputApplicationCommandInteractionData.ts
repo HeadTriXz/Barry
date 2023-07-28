@@ -56,8 +56,15 @@ export class ChatInputApplicationCommandInteractionData extends ApplicationComma
         }
 
         if (data.resolved?.members !== undefined) {
+            if (data.resolved.users === undefined) {
+                throw new Error("Resolved user data is missing while processing members.");
+            }
+
             for (const id in data.resolved.members) {
-                this.resolved.members.set(id, data.resolved.members[id]);
+                this.resolved.members.set(id, {
+                    ...data.resolved.members[id],
+                    user: data.resolved.users[id]
+                });
             }
         }
 

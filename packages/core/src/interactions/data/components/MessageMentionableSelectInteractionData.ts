@@ -36,19 +36,26 @@ export class MessageMentionableSelectInteractionData extends MessageComponentInt
             users: new Map()
         };
 
-        if (data.resolved?.members !== undefined) {
+        if (data.resolved.members !== undefined) {
+            if (data.resolved.users === undefined) {
+                throw new Error("Resolved user data is missing while processing members.");
+            }
+
             for (const id in data.resolved.members) {
-                this.resolved.members.set(id, data.resolved.members[id]);
+                this.resolved.members.set(id, {
+                    ...data.resolved.members[id],
+                    user: data.resolved.users[id]
+                });
             }
         }
 
-        if (data.resolved?.roles !== undefined) {
+        if (data.resolved.roles !== undefined) {
             for (const id in data.resolved.roles) {
                 this.resolved.roles.set(id, data.resolved.roles[id]);
             }
         }
 
-        if (data.resolved?.users !== undefined) {
+        if (data.resolved.users !== undefined) {
             for (const id in data.resolved.users) {
                 this.resolved.users.set(id, data.resolved.users[id]);
             }

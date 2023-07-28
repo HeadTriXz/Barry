@@ -1,7 +1,7 @@
 import { ApplicationCommandInteraction, getCreatedAt } from "@barry/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplicationCommandInteraction, mockMessage } from "@barry/testing";
-import { createMockClient } from "../../../../../mocks/index.js";
+import { createMockApplication } from "../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../src/modules/general/index.js";
 import PingCommand from "../../../../../../src/modules/general/commands/chatinput/ping/index.js";
@@ -11,7 +11,7 @@ describe("/ping", () => {
     let interaction: ApplicationCommandInteraction;
 
     beforeEach(() => {
-        const client = createMockClient();
+        const client = createMockApplication();
 
         const module = new GeneralModule(client);
         command = new PingCommand(module);

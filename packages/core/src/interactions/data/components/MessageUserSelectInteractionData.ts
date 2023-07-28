@@ -35,16 +35,17 @@ export class MessageUserSelectInteractionData extends MessageComponentInteractio
             users: new Map()
         };
 
-        if (data.resolved?.members !== undefined) {
+        if (data.resolved.members !== undefined) {
             for (const id in data.resolved.members) {
-                this.resolved.members.set(id, data.resolved.members[id]);
+                this.resolved.members.set(id, {
+                    ...data.resolved.members[id],
+                    user: data.resolved.users[id]
+                });
             }
         }
 
-        if (data.resolved?.users !== undefined) {
-            for (const id in data.resolved.users) {
-                this.resolved.users.set(id, data.resolved.users[id]);
-            }
+        for (const id in data.resolved.users) {
+            this.resolved.users.set(id, data.resolved.users[id]);
         }
 
         this.values = data.values;
