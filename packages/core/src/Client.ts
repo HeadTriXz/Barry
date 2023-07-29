@@ -15,10 +15,10 @@ import {
 import {
     type API,
     type APIInteraction,
+    type GatewayDispatchPayload,
+    type GatewayVoiceState,
     type MappedEvents,
     type WithIntrinsicProps,
-    type GatewayVoiceState,
-    type GatewayDispatchPayload,
     GatewayDispatchEvents
 } from "@discordjs/core";
 
