@@ -47,6 +47,13 @@ export class AutocompleteInteractionHandler implements InteractionHandler {
             throw new Error("Application command option is missing autocomplete callback.");
         }
 
+        if (interaction.guildID !== undefined) {
+            const moduleEnabled = await command.module.isEnabled(interaction.guildID);
+            if (!moduleEnabled) {
+                return;
+            }
+        }
+
         if (
             data.type === ApplicationCommandOptionType.Integer ||
             data.type === ApplicationCommandOptionType.Number
