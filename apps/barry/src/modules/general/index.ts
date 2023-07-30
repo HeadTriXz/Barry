@@ -1,6 +1,7 @@
 import type { Application } from "../../Application.js";
 
 import { Module, ValidationError } from "@barry/core";
+import { MessageFlags } from "@discordjs/core";
 import { loadCommands } from "../../utils/index.js";
 import config from "../../config.js";
 
@@ -49,12 +50,22 @@ export default class GeneralModule extends Module<Application> {
             } catch (error: unknown) {
                 if (interaction.isApplicationCommand() && error instanceof ValidationError) {
                     return interaction.createMessage({
-                        content: `${config.emotes.error} ${error.message}`
+                        content: `${config.emotes.error} ${error.message}`,
+                        flags: MessageFlags.Ephemeral
                     });
                 }
 
                 this.client.logger.error(error);
             }
         });
+    }
+
+    /**
+     * Checks if the guild has enabled this module.
+     *
+     * @returns Whether the guild has enabled this module.
+     */
+    isEnabled(): boolean {
+        return true;
     }
 }

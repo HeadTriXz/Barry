@@ -118,6 +118,17 @@ export default class LevelingModule extends Module<Application> {
     }
 
     /**
+     * Checks if the guild has enabled this module.
+     *
+     * @param guildID The ID of the guild.
+     * @returns Whether the guild has enabled this module.
+     */
+    async isEnabled(guildID: string): Promise<boolean> {
+        const settings = await this.levelingSettings.getOrCreate(guildID);
+        return settings.enabled;
+    }
+
+    /**
      * Notifies the user about their new level.
      *
      * @param member The member activity record of the user.

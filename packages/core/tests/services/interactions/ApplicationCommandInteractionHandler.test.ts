@@ -143,6 +143,18 @@ describe("ApplicationCommandInteractionHandler", () => {
                 expect(expiresAt).toBeGreaterThan(Date.now());
             });
 
+            it("should throw a ValidationError if the module is disabled", async () => {
+                const data = createMockApplicationCommandInteraction();
+                const interaction = new ApplicationCommandInteraction(data, client);
+                const module = client.modules.get("mock")!;
+
+                vi.spyOn(module, "isEnabled").mockReturnValue(false);
+
+                await expect(() => handler.handle(interaction)).rejects.toThrowError(
+                    "This command is currently disabled for this guild."
+                );
+            });
+
             it("should throw a ValidationError for insufficient bot permissions", async () => {
                 const data = createMockApplicationCommandInteraction();
                 const interaction = new ApplicationCommandInteraction(data, client);
