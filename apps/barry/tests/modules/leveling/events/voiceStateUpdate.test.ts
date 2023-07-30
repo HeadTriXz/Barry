@@ -1,11 +1,11 @@
 import type { GatewayVoiceState } from "@discordjs/core";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { prisma, redis } from "../../../mocks/index.js";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
 import { mockMember } from "@barry/testing";
-import { prisma } from "../../../mocks/index.js";
 
 import LevelingModule from "../../../../src/modules/leveling/index.js";
 import VoiceStateUpdateEvent from "../../../../src/modules/leveling/events/voiceStateUpdate.js";
@@ -68,7 +68,7 @@ describe("VoiceStateUpdate Event", () => {
             await event.execute(state, channelID);
 
             expect(incrementSpy).not.toHaveBeenCalled();
-            expect(event.client.redis.set).not.toHaveBeenCalled();
+            expect(redis.set).not.toHaveBeenCalled();
         });
 
         it("should ignore if the user has not left, joined, or moved to a different channel", async () => {
@@ -77,17 +77,17 @@ describe("VoiceStateUpdate Event", () => {
             await event.execute({ ...state, channel_id: channelID }, channelID);
 
             expect(incrementSpy).not.toHaveBeenCalled();
-            expect(event.client.redis.set).not.toHaveBeenCalled();
+            expect(redis.set).not.toHaveBeenCalled();
         });
 
         it("should set the voice start time when a user joins a voice channel", async () => {
             await event.execute({ ...state, channel_id: channelID });
 
-            expect(event.client.redis.set).toHaveBeenCalledOnce();
+            expect(redis.set).toHaveBeenCalledOnce();
         });
 
         it("should update voice minutes for the user when they leave a voice channel", async () => {
-            vi.mocked(event.client.redis.get).mockResolvedValue("1690543918340");
+            vi.mocked(redis.get).mockResolvedValue("1690543918340");
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(state, channelID);
@@ -100,7 +100,7 @@ describe("VoiceStateUpdate Event", () => {
         });
 
         it("should check if the user has leveled up if the previous channel is known", async () => {
-            vi.mocked(event.client.redis.get).mockResolvedValue("1690543918340");
+            vi.mocked(redis.get).mockResolvedValue("1690543918340");
             const checkLevelSpy = vi.spyOn(event.module, "checkLevel");
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
@@ -111,7 +111,7 @@ describe("VoiceStateUpdate Event", () => {
         });
 
         it("should not check if the user has leveled up if the previous channel is unknown", async () => {
-            vi.mocked(event.client.redis.get).mockResolvedValue("1690543918340");
+            vi.mocked(redis.get).mockResolvedValue("1690543918340");
             const checkLevelSpy = vi.spyOn(event.module, "checkLevel");
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
@@ -152,7 +152,7 @@ describe("VoiceStateUpdate Event", () => {
         });
 
         it("should not update voice minutes if the start time is not cached", async () => {
-            vi.mocked(event.client.redis.get).mockResolvedValue(null);
+            vi.mocked(redis.get).mockResolvedValue(null);
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(state, channelID);
@@ -161,7 +161,6 @@ describe("VoiceStateUpdate Event", () => {
         });
 
         it("should ignore 'Cannot send messages to this user' errors", async () => {
-            const loggerSpy = vi.spyOn(event.client.logger, "error");
             const response = {
                 code: 50007,
                 message: "Cannot send messages to this user"
@@ -169,23 +168,21 @@ describe("VoiceStateUpdate Event", () => {
 
             const error = new DiscordAPIError(response, 50007, 200, "GET", "", {});
 
-            vi.mocked(event.client.redis.get).mockResolvedValue("1690543918340");
+            vi.mocked(redis.get).mockResolvedValue("1690543918340");
             vi.spyOn(event.module, "checkLevel").mockRejectedValue(error);
 
             await event.execute(state, channelID);
 
-            expect(loggerSpy).not.toHaveBeenCalledOnce();
+            expect(event.client.logger.error).not.toHaveBeenCalledOnce();
         });
 
         it("should handle errors during execution", async () => {
-            const loggerSpy = vi.spyOn(event.client.logger, "error");
-
-            vi.mocked(event.client.redis.get).mockResolvedValue("1690543918340");
+            vi.mocked(redis.get).mockResolvedValue("1690543918340");
             vi.spyOn(event.module, "checkLevel").mockRejectedValue(new Error("Oh no!"));
 
             await event.execute(state, channelID);
 
-            expect(loggerSpy).toHaveBeenCalledOnce();
+            expect(event.client.logger.error).toHaveBeenCalledOnce();
         });
     });
 });

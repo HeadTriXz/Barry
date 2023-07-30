@@ -15,7 +15,6 @@ describe("GeneralModule", () => {
 
     beforeEach(() => {
         const client = createMockApplication();
-        client.logger.error = vi.fn();
 
         Module.prototype.initialize = vi.fn(() => {
             module.commands = [command];

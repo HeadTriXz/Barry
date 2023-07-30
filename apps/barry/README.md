@@ -103,7 +103,6 @@ The following environment variables **must be** set in order to run the applicat
 | Environment Variable | Description                                                                         |
 |----------------------|-------------------------------------------------------------------------------------|
 | DISCORD_CLIENT_ID    | The ID of your Discord application.                                                 |
-| DISCORD_PUBLIC_KEY   | The public key of your Discord application.                                         |
 | DISCORD_TOKEN        | The token of your Discord bot.                                                      |
 | POSTGRES_HOST        | The hostname or IP address of the database. (default: `localhost`)                  |
 | POSTGRES_PORT        | The port of the database. (default: `5432`)                                         |

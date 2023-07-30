@@ -1,12 +1,23 @@
-import type { Redis } from "ioredis";
-
 import { Module, UserCommand } from "@barry/core";
 
 import { Application } from "../../src/Application.js";
 import { GatewayIntentBits } from "@discordjs/core";
-import { mockDeep } from "vitest-mock-extended";
 import { prisma } from "./prisma.js";
+import { redis } from "./redis.js";
 import { vi } from "vitest";
+
+vi.mock("ioredis", () => ({
+    Redis: vi.fn(() => redis)
+}));
+
+vi.mock("@prisma/client", async (importOriginal) => {
+    const original = await importOriginal<typeof import("@prisma/client")>();
+
+    return {
+        ...original,
+        PrismaClient: vi.fn(() => prisma)
+    };
+});
 
 export class MockCommand extends UserCommand {
     constructor(module: Module) {
@@ -52,13 +63,19 @@ export const mockAppOptions = {
  */
 export function createMockApplication(override: Record<string, any> = {}): Application {
     const app = new Application({
+        logger: {
+            debug: vi.fn(),
+            error: vi.fn(),
+            fatal: vi.fn(),
+            info: vi.fn(),
+            trace: vi.fn(),
+            warn: vi.fn()
+        },
         ...mockAppOptions,
         ...override
     });
 
     app.gateway.connect = vi.fn();
-    app.redis = mockDeep<Redis>();
-    app.prisma = prisma;
 
     return app;
 }

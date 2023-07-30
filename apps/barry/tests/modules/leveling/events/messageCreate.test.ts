@@ -121,7 +121,6 @@ describe("MessageCreate Event", () => {
         });
 
         it("should ignore 'Cannot send messages to this user' errors", async () => {
-            const loggerSpy = vi.spyOn(event.client.logger, "error");
             const response = {
                 code: 50007,
                 message: "Cannot send messages to this user"
@@ -132,18 +131,17 @@ describe("MessageCreate Event", () => {
 
             await event.execute(message);
 
-            expect(loggerSpy).not.toHaveBeenCalled();
+            expect(event.client.logger.error).not.toHaveBeenCalled();
         });
 
         it("should handle errors during execution to prevent cooldowns not being set", async () => {
-            const loggerSpy = vi.spyOn(event.client.logger, "error");
             const cooldownSpy = vi.spyOn(event.client.cooldowns, "set");
 
             vi.spyOn(event.module, "checkLevel").mockRejectedValue(new Error("Oh no!"));
 
             await event.execute(message);
 
-            expect(loggerSpy).toHaveBeenCalledOnce();
+            expect(event.client.logger.error).toHaveBeenCalledOnce();
             expect(cooldownSpy).toHaveBeenCalledOnce();
         });
     });

@@ -4,8 +4,6 @@ import { createMockApplication, mockAppOptions } from "./mocks/application.js";
 import { API } from "@discordjs/core";
 import { Application } from "../src/Application.js";
 import { Client } from "@barry/core";
-import { Logger } from "@barry/logger";
-import { WebSocketManager } from "@discordjs/ws";
 
 describe("Application", () => {
     let app: Application;
@@ -23,8 +21,8 @@ describe("Application", () => {
         it("should initialize with the provided options", () => {
             expect(app.api).toBeInstanceOf(API);
             expect(app.applicationID).toBe(mockAppOptions.discord.applicationID);
-            expect(app.gateway).toBeInstanceOf(WebSocketManager);
-            expect(app.logger).toBeInstanceOf(Logger);
+            expect(app.gateway).toBeDefined();
+            expect(app.logger).toBeDefined();
             expect(app.prisma).toBeDefined();
             expect(app.redis).toBeDefined();
         });
