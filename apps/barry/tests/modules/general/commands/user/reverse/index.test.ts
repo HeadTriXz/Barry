@@ -2,9 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplicationCommandInteraction, mockUser } from "@barry/testing";
 
 import { ApplicationCommandInteraction } from "@barry/core";
-import { CDN } from "@discordjs/rest";
 import { MessageFlags } from "@discordjs/core";
-import { createMockClient } from "../../../../../mocks/index.js";
+import { createMockApplication } from "../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../src/modules/general/index.js";
 import ReverseCommand from "../../../../../../src/modules/general/commands/user/reverse/index.js";
@@ -14,14 +13,7 @@ describe("Reverse Search Avatar", () => {
     let interaction: ApplicationCommandInteraction;
 
     beforeEach(() => {
-        const client = createMockClient({
-            api: {
-                rest: {
-                    cdn: new CDN()
-                }
-            }
-        });
-
+        const client = createMockApplication();
         const module = new GeneralModule(client);
         command = new ReverseCommand(module);
 

@@ -14,6 +14,8 @@
   },
   "scripts": {
     "build": "npm run clean && tsc",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate",
     "clean": "rimraf coverage dist .turbo",
     "dev": "tsc --watch --preserveWatchOutput",
     "lint": "eslint .",
@@ -27,9 +29,15 @@
   "dependencies": {
     "@barry/core": "*",
     "@discordjs/core": "^0.6.0",
-    "@discordjs/rest": "^1.7.1"
+    "@discordjs/rest": "^1.7.1",
+    "@discordjs/ws": "^0.8.3",
+    "@napi-rs/canvas": "^0.1.41",
+    "@prisma/client": "^5.0.0",
+    "canvas-constructor": "^7.0.1",
+    "ioredis": "^5.3.2"
   },
   "devDependencies": {
-    "@barry/testing": "*"
+    "@barry/testing": "*",
+    "prisma": "^5.0.0"
   }
 }

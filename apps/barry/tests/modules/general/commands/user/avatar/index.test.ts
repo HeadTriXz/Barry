@@ -2,8 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplicationCommandInteraction, mockUser } from "@barry/testing";
 
 import { ApplicationCommandInteraction } from "@barry/core";
-import { CDN } from "@discordjs/rest";
-import { createMockClient } from "../../../../../mocks/index.js";
+import { createMockApplication } from "../../../../../mocks/index.js";
 
 import AvatarCommand from "../../../../../../src/modules/general/commands/user/avatar/index.js";
 import GeneralModule from "../../../../../../src/modules/general/index.js";
@@ -13,19 +12,12 @@ describe("View Avatar", () => {
     let interaction: ApplicationCommandInteraction;
 
     beforeEach(() => {
-        const client = createMockClient({
-            api: {
-                rest: {
-                    cdn: new CDN()
-                }
-            }
-        });
-
+        const client = createMockApplication();
         const module = new GeneralModule(client);
         command = new AvatarCommand(module);
 
         const data = createMockApplicationCommandInteraction();
-        interaction = new ApplicationCommandInteraction(data, command.client);
+        interaction = new ApplicationCommandInteraction(data, client);
         interaction.createMessage = vi.fn();
     });
 

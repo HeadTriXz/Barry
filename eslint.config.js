@@ -229,11 +229,12 @@ export default [
         }
     },
     {
-        files: ["apps/**/*.test.ts", "packages/**/*.test.ts"],
+        files: ["apps/**/tests/**/*.ts", "packages/**/tests/**/*.ts"],
         plugins: {
             "@typescript-eslint": ts
         },
         rules: {
+            "@typescript-eslint/consistent-type-imports": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
             "@typescript-eslint/unbound-method": "off"
         }

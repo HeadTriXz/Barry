@@ -1,18 +1,19 @@
-import { type Client, Module, ValidationError } from "@barry/core";
+import type { Application } from "../../Application.js";
 
+import { Module, ValidationError } from "@barry/core";
 import { loadCommands } from "../../utils/index.js";
 import config from "../../config.js";
 
 /**
  * Represents the general module.
  */
-export default class GeneralModule extends Module {
+export default class GeneralModule extends Module<Application> {
     /**
      * Represents the general module.
      *
      * @param client The client that initialized the module.
      */
-    constructor(client: Client) {
+    constructor(client: Application) {
         super(client, {
             id: "general",
             name: "General",

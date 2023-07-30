@@ -7,7 +7,7 @@ import {
 
 import { ApplicationCommandInteraction } from "@barry/core";
 import { MessageFlags } from "@discordjs/core";
-import { createMockClient } from "../../../../../mocks/index.js";
+import { createMockApplication } from "../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../src/modules/general/index.js";
 import ReverseCommand from "../../../../../../src/modules/general/commands/message/reverse/index.js";
@@ -17,7 +17,7 @@ describe("Reverse Search Image", () => {
     let interaction: ApplicationCommandInteraction;
 
     beforeEach(() => {
-        const client = createMockClient();
+        const client = createMockApplication();
 
         const module = new GeneralModule(client);
         command = new ReverseCommand(module);

@@ -135,11 +135,9 @@ export abstract class SlashCommand<M extends Module = Module> extends BaseComman
         }
 
         for (const option of this.options) {
-            const o = Object.assign(option, {
-                autocomplete: option.autocomplete !== undefined
-            });
-
+            const o = { ...option, autocomplete: option.autocomplete !== undefined };
             delete o.isMember;
+
             options.push(o as APIApplicationCommandBasicOption);
         }
 

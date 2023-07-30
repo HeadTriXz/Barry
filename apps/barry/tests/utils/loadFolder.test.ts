@@ -55,7 +55,7 @@ describe("loadFolder", () => {
             vi.mocked(fs.readdir).mockResolvedValue([]);
 
             const path = "/path/to/folder";
-            const commands = await loadFolder(path, BaseCommand);
+            const commands = await loadFolder(path, BaseCommand, false);
 
             expect(commands.length).toBe(0);
             expect(fs.readdir).toHaveBeenCalledOnce();
@@ -73,7 +73,7 @@ describe("loadFolder", () => {
                 default: MockCommand
             }));
 
-            const commands = await loadFolder(path, BaseCommand);
+            const commands = await loadFolder(path, BaseCommand, false);
 
             expect(commands).toEqual([MockCommand]);
             expect(fs.readdir).toHaveBeenCalledOnce();
@@ -91,7 +91,7 @@ describe("loadFolder", () => {
                 default: MockEvent
             }));
 
-            const commands = await loadFolder(path, BaseCommand);
+            const commands = await loadFolder(path, BaseCommand, false);
 
             expect(commands.length).toBe(0);
             expect(fs.readdir).toHaveBeenCalledOnce();
@@ -118,7 +118,7 @@ describe("loadFolder", () => {
                 default: MockCommand
             }));
 
-            const commands = await loadFolder(path, BaseCommand);
+            const commands = await loadFolder(path, BaseCommand, false);
 
             expect(commands.length).toBe(2);
             expect(fs.readdir).toHaveBeenCalledTimes(3);
@@ -138,7 +138,7 @@ describe("loadFolder", () => {
                 .mockResolvedValueOnce([folder])
                 .mockResolvedValue([file]);
 
-            const commands = await loadFolder(path, BaseCommand);
+            const commands = await loadFolder(path, BaseCommand, false);
 
             expect(commands.length).toBe(0);
             expect(fs.readdir).toHaveBeenCalledTimes(2);

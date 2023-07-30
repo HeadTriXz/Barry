@@ -3,7 +3,7 @@ import { createMockApplicationCommandInteraction, mockAttachment } from "@barry/
 
 import { ApplicationCommandInteraction } from "@barry/core";
 import { MessageFlags } from "@discordjs/core";
-import { createMockClient } from "../../../../../../mocks/index.js";
+import { createMockApplication } from "../../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../../src/modules/general/index.js";
 import ReverseImageCommand from "../../../../../../../src/modules/general/commands/chatinput/reverse/image/index.js";
@@ -13,7 +13,7 @@ describe("Reverse Search Image", () => {
     let interaction: ApplicationCommandInteraction;
 
     beforeEach(() => {
-        const client = createMockClient();
+        const client = createMockApplication();
 
         const module = new GeneralModule(client);
         command = new ReverseImageCommand(module);

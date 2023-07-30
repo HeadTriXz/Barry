@@ -172,6 +172,18 @@ describe("MessageMentionableSelectInteractionData", () => {
             expect(data.resolved.roles.get("68239102456844360")).toEqual(mockRole);
             expect(data.resolved.users.get("257522665441460225")).toEqual(mockUser);
         });
+
+        it("should throw an error if resolved user data is missing while processing members", () => {
+            expect(() => {
+                new MessageMentionableSelectInteractionData({
+                    ...mockMessageMentionableSelect,
+                    resolved: {
+                        ...mockMessageMentionableSelect.resolved,
+                        users: undefined
+                    }
+                });
+            }).toThrowError("Resolved user data is missing while processing members.");
+        });
     });
 });
 

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApplicationCommandInteraction } from "@barry/core";
 import { createMockApplicationCommandInteraction } from "@barry/testing";
-import { createMockClient } from "../../../../../mocks/index.js";
+import { createMockApplication } from "../../../../../mocks/index.js";
 
 import * as generator from "../../../../../../src/modules/general/commands/chatinput/lipsum/generator.js";
 
@@ -14,7 +14,7 @@ describe("/lipsum", () => {
     let interaction: ApplicationCommandInteraction;
 
     beforeEach(() => {
-        const client = createMockClient();
+        const client = createMockApplication();
 
         const module = new GeneralModule(client);
         command = new LipsumCommand(module);
