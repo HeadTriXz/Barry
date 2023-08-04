@@ -13,7 +13,7 @@ import { prisma } from "../../../../../mocks/index.js";
 import LevelingModule from "../../../../../../src/modules/leveling/index.js";
 import ReputationCommand from "../../../../../../src/modules/leveling/commands/user/rep/index.js";
 
-describe("Add Reputation", () => {
+describe("Give Reputation", () => {
     const guildID = "68239102456844360";
     const userID = "257522665437265920";
 
