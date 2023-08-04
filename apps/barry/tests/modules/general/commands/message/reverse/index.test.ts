@@ -6,7 +6,7 @@ import {
 } from "@barry/testing";
 
 import { ApplicationCommandInteraction } from "@barry/core";
-import { MessageFlags } from "@discordjs/core";
+import { ComponentType, MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../src/modules/general/index.js";
@@ -49,6 +49,7 @@ describe("Reverse Search Image", () => {
 
         expect(interaction.editOriginalMessage).toHaveBeenCalledOnce();
         expect(interaction.editOriginalMessage).toHaveBeenCalledWith({
+            content: "",
             embeds: [
                 expect.objectContaining({
                     description: expect.stringContaining("**Google Lens**"),
@@ -59,5 +60,32 @@ describe("Reverse Search Image", () => {
             ],
             flags: MessageFlags.Ephemeral
         });
+    });
+
+    it("should modify the pagination buttons", async () => {
+        interaction.editOriginalMessage = vi.fn();
+        vi.useFakeTimers();
+        vi.runAllTimersAsync();
+
+        await command.execute(interaction, {
+            message: { ...mockMessage, attachments: [mockAttachment, mockAttachment] }
+        });
+
+        expect(interaction.editOriginalMessage).toHaveBeenCalledTimes(2);
+        expect(interaction.editOriginalMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                components: [{
+                    components: [
+                        expect.objectContaining({
+                            label: "Previous Image"
+                        }),
+                        expect.objectContaining({
+                            label: "Next Image"
+                        })
+                    ],
+                    type: ComponentType.ActionRow
+                }]
+            })
+        );
     });
 });

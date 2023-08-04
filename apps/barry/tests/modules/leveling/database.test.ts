@@ -212,6 +212,20 @@ describe("MemberActivityRepository", () => {
         };
     });
 
+    describe("count", () => {
+        it("should return the amount of member activity records for the specified guild", async () => {
+            vi.mocked(prisma.memberActivity.count).mockResolvedValue(420);
+
+            const count = await repository.count(guildID);
+
+            expect(count).toEqual(420);
+            expect(prisma.memberActivity.count).toHaveBeenCalledOnce();
+            expect(prisma.memberActivity.count).toHaveBeenCalledWith({
+                where: { guildID }
+            });
+        });
+    });
+
     describe("create", () => {
         it("should create a new member activity record for the specified guild", async () => {
             await repository.create(guildID, userID);

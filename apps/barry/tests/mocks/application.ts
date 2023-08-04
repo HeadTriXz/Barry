@@ -40,6 +40,10 @@ export class MockModule extends Module {
             commands: [MockCommand]
         });
     }
+
+    isEnabled(): boolean {
+        return true;
+    }
 }
 
 export const mockAppOptions = {

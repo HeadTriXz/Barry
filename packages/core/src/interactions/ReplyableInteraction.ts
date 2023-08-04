@@ -22,7 +22,7 @@ import { Interaction } from "./Interaction.js";
 /**
  * Represents options for interaction response data with files.
  */
-interface APIInteractionResponseCallbackDataWithFiles extends APIInteractionResponseCallbackData {
+export interface APIInteractionResponseCallbackDataWithFiles extends APIInteractionResponseCallbackData {
     /**
      * Files to attach to the response.
      */
