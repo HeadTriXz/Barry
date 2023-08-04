@@ -1,13 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createMockApplicationCommandInteraction, mockInteractionMember, mockUser } from "@barry/testing";
+import {
+    createMockApplicationCommandInteraction,
+    mockInteractionMember,
+    mockUser
+} from "@barry/testing";
 
 import { ApplicationCommandInteraction } from "@barry/core";
+import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
+import { prisma } from "../../../../../mocks/index.js";
 
 import LevelingModule from "../../../../../../src/modules/leveling/index.js";
 import ReputationCommand from "../../../../../../src/modules/leveling/commands/user/rep/index.js";
-import { prisma } from "../../../../../mocks/index.js";
-import { MessageFlags } from "@discordjs/core";
 
 describe("Add Reputation", () => {
     const guildID = "68239102456844360";
