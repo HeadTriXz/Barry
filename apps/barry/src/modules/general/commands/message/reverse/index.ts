@@ -7,7 +7,7 @@ import {
 import type GeneralModule from "../../../index.js";
 
 import { MessageFlags } from "@discordjs/core";
-import { createPaginatedMessage } from "../../../../../utils/pagination.js";
+import { PaginationMessage } from "../../../../../utils/pagination.js";
 import { getReverseContent } from "../../../functions/reverse/getReverseContent.js";
 
 import config from "../../../../../config.js";
@@ -42,20 +42,16 @@ export default class extends MessageCommand<GeneralModule> {
             });
         }
 
-        await createPaginatedMessage({
-            buttons: {
-                next: {
-                    label: "Next Image"
-                },
-                previous: {
-                    label: "Previous Image"
-                }
-            },
-            content: (_, index) => getReverseContent(attachments, index),
+        await PaginationMessage.create({
+            buttons: (previous, next) => [
+                { ...previous, label: "Previous Image" },
+                { ...next, label: "Next Image" }
+            ],
+            content: (index) => getReverseContent(attachments, index),
+            count: attachments.length,
             flags: MessageFlags.Ephemeral,
             interaction: interaction,
-            pageSize: 1,
-            values: attachments
+            pageSize: 1
         });
     }
 }

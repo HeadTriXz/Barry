@@ -202,6 +202,18 @@ export class MemberActivityRepository {
     }
 
     /**
+     * Counts the amount of registered members for the specified guild.
+     *
+     * @param guildID The ID of the guild.
+     * @returns The amount of registered members.
+     */
+    async count(guildID: string): Promise<number> {
+        return this.#prisma.memberActivity.count({
+            where: { guildID }
+        });
+    }
+
+    /**
      * Creates a new member activity record for the specified member.
      *
      * @param guildID The ID of the guild.

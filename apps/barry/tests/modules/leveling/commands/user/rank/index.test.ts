@@ -8,11 +8,25 @@ import { createMockApplication } from "../../../../../mocks/application.js";
 import LevelingModule from "../../../../../../src/modules/leveling/index.js";
 import RankCommand from "../../../../../../src/modules/leveling/commands/user/rank/index.js";
 
-vi.mock("canvas-constructor/napi-rs", async (importActual) => {
-    const actual = await importActual<typeof import("canvas-constructor/napi-rs")>();
+vi.mock("canvas-constructor/napi-rs", () => {
+    const MockCanvas: typeof Canvas = vi.fn();
+    MockCanvas.prototype.arc = vi.fn().mockReturnThis();
+    MockCanvas.prototype.beginPath = vi.fn().mockReturnThis();
+    MockCanvas.prototype.printCircle = vi.fn().mockReturnThis();
+    MockCanvas.prototype.printCircularImage = vi.fn().mockReturnThis();
+    MockCanvas.prototype.printRoundedRectangle = vi.fn().mockReturnThis();
+    MockCanvas.prototype.printText = vi.fn().mockReturnThis();
+    MockCanvas.prototype.setColor = vi.fn().mockReturnThis();
+    MockCanvas.prototype.setLineCap = vi.fn().mockReturnThis();
+    MockCanvas.prototype.setStroke = vi.fn().mockReturnThis();
+    MockCanvas.prototype.setStrokeWidth = vi.fn().mockReturnThis();
+    MockCanvas.prototype.setTextAlign = vi.fn().mockReturnThis();
+    MockCanvas.prototype.setTextFont = vi.fn().mockReturnThis();
+    MockCanvas.prototype.stroke = vi.fn().mockReturnThis();
+    MockCanvas.prototype.pngAsync = vi.fn().mockResolvedValue(Buffer.from("Hello World"));
 
     return {
-        ...actual,
+        Canvas: MockCanvas,
         loadFont: vi.fn(),
         loadImage: vi.fn()
     };
@@ -35,21 +49,6 @@ describe("View Rank", () => {
         interaction.defer = vi.fn();
         interaction.editOriginalMessage = vi.fn();
 
-        vi.spyOn(Canvas.prototype, "arc").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "beginPath").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "printCircle").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "printCircularImage").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "printRoundedRectangle").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "printText").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "setColor").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "setLineCap").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "setStroke").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "setStrokeWidth").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "setTextAlign").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "setTextFont").mockReturnThis();
-        vi.spyOn(Canvas.prototype, "pngAsync")
-            .mockResolvedValue(Buffer.from("Hello World"));
-
         vi.mocked(client.prisma.memberActivity.findUnique).mockResolvedValue({
             guildID: guildID,
             userID: userID,
@@ -62,7 +61,7 @@ describe("View Rank", () => {
     });
 
     afterEach(() => {
-        vi.restoreAllMocks();
+        vi.clearAllMocks();
     });
 
     describe("execute", () => {

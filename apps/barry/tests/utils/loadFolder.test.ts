@@ -21,7 +21,11 @@ class MockEvent extends Event {
     }
 }
 
-class MockModule extends Module {}
+class MockModule extends Module {
+    isEnabled(): boolean {
+        return true;
+    }
+}
 
 vi.mock("node:fs/promises");
 
