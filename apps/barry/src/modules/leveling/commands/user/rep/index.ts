@@ -9,24 +9,24 @@ import { MessageFlags } from "@discordjs/core";
 import config from "../../../../../config.js";
 
 /**
- * Represents a user command to add reputation to a member.
+ * Represents a user command to give reputation to a member.
  */
 export default class extends UserCommand<LevelingModule> {
     /**
-     * Represents a user command to add reputation to a member.
+     * Represents a user command to give reputation to a member.
      *
      * @param module The module this command belongs to.
      */
     constructor(module: LevelingModule) {
         super(module, {
-            name: "Add Reputation",
+            name: "Give Reputation",
             cooldown: 86400,
             guildOnly: true
         });
     }
 
     /**
-     * Executes the "Add Reputation" command.
+     * Executes the "Give Reputation" command.
      *
      * @param interaction The interaction that triggered the command.
      * @param target The resolved data provided with the command.
