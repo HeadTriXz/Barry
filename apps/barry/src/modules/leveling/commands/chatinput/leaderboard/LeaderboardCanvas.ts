@@ -14,7 +14,7 @@ import {
 import { Canvas, loadImage } from "canvas-constructor/napi-rs";
 import { LeaderboardPodium } from "./LeaderboardPodium.js";
 import { MemberActivitySortBy } from "../../../database.js";
-import { getDefaultAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry/core";
 
 /**
  * Represents the dimensions of a piece of text in a canvas.
@@ -118,7 +118,12 @@ export class LeaderboardCanvas {
      * @param radius The radius of the avatar.
      */
     async printAvatar(user: APIUser, x: number, y: number, radius: number): Promise<void> {
-        const avatarURL = this.#getAvatarURL(user);
+        const avatarURL = getAvatarURL(user, {
+            extension: "png",
+            forceStatic: true,
+            size: 256
+        });
+
         const avatar = await loadImage(avatarURL);
 
         this.canvas.printCircularImage(avatar, x, y, radius);
@@ -281,22 +286,6 @@ export class LeaderboardCanvas {
             this.printUsername(user, 260 + width, center - 8, 450);
             this.printScore(members[i][sortBy], center + 15);
         }
-    }
-
-    /**
-     * Gets the URL of the user's avatar.
-     *
-     * @param user The user to get the avatar of.
-     * @returns The avatar URL of the user.
-     */
-    #getAvatarURL(user: APIUser): string {
-        return user.avatar !== null
-            ? this.module.client.api.rest.cdn.avatar(user.id, user.avatar, {
-                extension: "png",
-                forceStatic: true,
-                size: 256
-            })
-            : getDefaultAvatarURL(user);
     }
 
     /**

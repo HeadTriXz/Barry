@@ -140,9 +140,7 @@ export class PaginationMessage<T = unknown> {
      * @param options The options for pagination.
      */
     constructor(options: AnyPaginationOptions<T>) {
-        this.#options = Object.assign({
-            timeout: 600000
-        }, options);
+        this.#options = options;
     }
 
     /**

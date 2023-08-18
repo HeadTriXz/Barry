@@ -1,10 +1,15 @@
 import {
+    type APIMessage,
+    type GatewayIntentBits,
+    API,
+    GatewayDispatchEvents
+} from "@discordjs/core";
+import {
     type ConstructorArray,
     type Gateway,
     type Module,
     Client
 } from "@barry/core";
-import { type GatewayIntentBits, API } from "@discordjs/core";
 import { type RedisOptions, Redis } from "ioredis";
 import type { BaseLogger } from "@barry/logger";
 
@@ -94,6 +99,42 @@ export class Application extends Client {
         });
 
         this.redis = new Redis(options.redis);
+    }
+
+    /**
+     * Waits for a message in the provided channel.
+     *
+     * @param channelID The ID of the channel.
+     * @param authorID The ID of the author to match.
+     * @param timeout The timeout duration in milliseconds. Defaults to 15 minutes.
+     * @returns The matching message or undefined if timed out.
+     */
+    async awaitMessage(
+        channelID: string,
+        authorID?: string,
+        timeout: number = 15 * 60 * 1000
+    ): Promise<APIMessage | undefined> {
+        return new Promise((resolve) => {
+            const cleanup = (message?: APIMessage): void => {
+                this.off(GatewayDispatchEvents.MessageCreate, listener);
+
+                clearTimeout(timeoutID);
+                resolve(message);
+            };
+
+            const listener = (message: APIMessage): void => {
+                if (authorID !== undefined && message.author.id !== authorID) {
+                    return;
+                }
+
+                if (message.channel_id === channelID) {
+                    cleanup(message);
+                }
+            };
+
+            const timeoutID = setTimeout(cleanup, timeout);
+            this.on(GatewayDispatchEvents.MessageCreate, listener);
+        });
     }
 
     /**

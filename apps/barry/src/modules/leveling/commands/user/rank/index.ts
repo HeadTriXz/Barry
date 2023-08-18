@@ -2,7 +2,7 @@ import {
     type ApplicationCommandInteraction,
     type UserCommandTarget,
     UserCommand,
-    getDefaultAvatarURL
+    getAvatarURL
 } from "@barry/core";
 import {
     type Image,
@@ -80,7 +80,7 @@ export default class extends UserCommand<LevelingModule> {
         await interaction.defer();
 
         const entity = await this.module.memberActivity.getOrCreate(interaction.guildID, user.id);
-        const avatar = await loadImage(this.#getAvatarURL(user));
+        const avatar = await loadImage(getAvatarURL(user, { size: 256 }));
 
         const canvas = new Canvas(1000, 790);
 
@@ -99,18 +99,6 @@ export default class extends UserCommand<LevelingModule> {
                 name: "rank.png"
             }]
         });
-    }
-
-    /**
-     * Gets the URL of the user's avatar.
-     *
-     * @param user The user to get the avatar of.
-     * @returns The avatar URL of the user.
-     */
-    #getAvatarURL(user: APIUser): string {
-        return user.avatar !== null
-            ? this.client.api.rest.cdn.avatar(user.id, user.avatar, { size: 256 })
-            : getDefaultAvatarURL(user);
     }
 
     /**

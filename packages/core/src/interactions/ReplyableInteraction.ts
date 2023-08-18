@@ -89,7 +89,7 @@ export class ReplyableInteraction extends Interaction {
     async awaitMessageComponent({
         customIDs = [],
         messageID = this.#originalMessageID,
-        timeout = 15 * 60 * 1000,
+        timeout = 10 * 60 * 1000,
         userID = this.user.id
     }: AwaitMessageComponentOptions = {}): Promise<MessageComponentInteraction | undefined> {
         if (messageID === undefined && !this.acknowledged) {
@@ -137,7 +137,7 @@ export class ReplyableInteraction extends Interaction {
      */
     async awaitModalSubmit(
         customID: string,
-        timeout: number = 15 * 60 * 1000
+        timeout: number = 10 * 60 * 1000
     ): Promise<ModalSubmitInteraction | undefined> {
         return new Promise((resolve) => {
             const cleanup = (interaction?: ModalSubmitInteraction): void => {
