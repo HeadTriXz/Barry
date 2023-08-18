@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplication, mockAppOptions } from "./mocks/application.js";
 
-import { API } from "@discordjs/core";
+import { API, GatewayDispatchEvents } from "@discordjs/core";
 import { Application } from "../src/Application.js";
 import { Client } from "@barry/core";
+import { mockMessage, mockUser } from "@barry/testing";
 
 describe("Application", () => {
     let app: Application;
@@ -25,6 +26,49 @@ describe("Application", () => {
             expect(app.logger).toBeDefined();
             expect(app.prisma).toBeDefined();
             expect(app.redis).toBeDefined();
+        });
+    });
+
+    describe("awaitMessage", () => {
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it("should resolve with the matching interaction when found", async () => {
+            const offSpy = vi.spyOn(app, "off");
+            const promise = app.awaitMessage(mockMessage.channel_id);
+
+            app.emit(GatewayDispatchEvents.MessageCreate, mockMessage);
+
+            await expect(promise).resolves.toBe(mockMessage);
+            expect(offSpy).toHaveBeenCalledOnce();
+        });
+
+        it("should resolve with undefined if the timeout is reached", async () => {
+            vi.useFakeTimers();
+
+            const offSpy = vi.spyOn(app, "off");
+            const promise = app.awaitMessage(mockMessage.channel_id, undefined, 2000);
+
+            vi.advanceTimersByTime(3000);
+
+            await expect(promise).resolves.toBeUndefined();
+            expect(offSpy).toHaveBeenCalledOnce();
+        });
+
+        it("should ignore users that do not match the supplied user", async () => {
+            const offSpy = vi.spyOn(app, "off");
+            const promise = app.awaitMessage(mockMessage.channel_id, mockMessage.author.id);
+
+            app.emit(GatewayDispatchEvents.MessageCreate, {
+                ...mockMessage,
+                author: { ...mockUser, id: "257522665458237440" }
+            });
+
+            app.emit(GatewayDispatchEvents.MessageCreate, mockMessage);
+
+            await expect(promise).resolves.toBe(mockMessage);
+            expect(offSpy).toHaveBeenCalledOnce();
         });
     });
 

@@ -44,3 +44,49 @@ model MemberActivity {
   @@id([guildID, userID])
   @@map("member_activity")
 }
+
+// Marketplace
+/// Profiles
+enum ProfileCreationStatus {
+  Profile      @map("PROFILE")
+  Availability @map("AVAILABILITY")
+  Contact      @map("CONTACT")
+  Banner       @map("BANNER")
+  Preview      @map("PREVIEW")
+}
+
+model Profile {
+  userID         String                 @id @map("user_id")
+  about          String
+  availability   Int?
+  bannerURL      String?                @map("banner_url")
+  contact        String?
+  creationStatus ProfileCreationStatus? @map("creation_status")
+  links          String[]               @default([])
+  messages       ProfileMessage[]
+  location       String?
+  pricing        String?
+  skills         String[]               @default([])
+
+  @@map("profiles")
+}
+
+model ProfileMessage {
+  messageID String @id @map("message_id")
+  guildID   String @map("guild_id")
+  userID    String @map("user_id")
+
+  profile   Profile @relation(references: [userID], fields: [userID])
+
+  @@index([guildID, userID])
+  @@map("profile_messages")
+}
+
+model ProfilesSettings {
+  guildID       String  @id @map("guild_id")
+  channelID     String? @map("channel_id")
+  enabled       Boolean @default(false)
+  lastMessageID String? @map("last_message_id")
+
+  @@map("profiles_settings")
+}

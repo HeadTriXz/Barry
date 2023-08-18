@@ -25,7 +25,9 @@ const logger = new Logger({
 const app = new Application({
     discord: {
         applicationID: process.env.DISCORD_CLIENT_ID,
-        intents: GatewayIntentBits.GuildMessages | GatewayIntentBits.GuildVoiceStates,
+        intents: GatewayIntentBits.GuildMessages
+            | GatewayIntentBits.GuildVoiceStates
+            | GatewayIntentBits.DirectMessages,
         token: process.env.DISCORD_TOKEN
     },
     logger: logger,

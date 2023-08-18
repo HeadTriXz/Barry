@@ -1,5 +1,6 @@
 import {
     type AnyCommand,
+    type Client,
     type ConcreteConstructor,
     type Constructor,
     BaseCommand,
@@ -129,6 +130,6 @@ export async function loadFolder<T>(path: string, base: Constructor<T>, loadAll:
  * @param path The folder to load the modules from.
  * @returns An array of loaded modules.
  */
-export async function loadModules(path: string): LoadedFiles<Module> {
+export async function loadModules<T extends Client = Client>(path: string): LoadedFiles<Module<T>> {
     return loadFromCallerPath(path, Module, getCallerPath(), false);
 }

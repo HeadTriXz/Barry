@@ -1,6 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { getCreatedAt, getDefaultAvatar, getDefaultAvatarURL, getDiscordEpoch } from "../../src/index.js";
+import {
+    getAvatarURL,
+    getCreatedAt,
+    getDefaultAvatar,
+    getDefaultAvatarURL,
+    getDiscordEpoch
+} from "../../src/index.js";
 import { mockUser } from "@barry/testing";
+
+describe("getAvatarURL", () => {
+    it("should return the url of the avatar of the user", () => {
+        const url = getAvatarURL({ ...mockUser, id: "257522665458237440" });
+
+        expect(url).toBe("https://cdn.discordapp.com/avatars/257522665458237440/9507a0067e219e749e74a678d14b791a.webp");
+    });
+
+    it("should return the default avatat url of the user if the user has no avatar", () => {
+        const url = getAvatarURL({ ...mockUser, avatar: null, id: "257522665458237440" });
+
+        expect(url).toBe("https://cdn.discordapp.com/embed/avatars/5.png");
+    });
+});
 
 describe("getCreatedAt", () => {
     it("should return the correct creation timestamp", () => {

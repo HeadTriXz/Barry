@@ -4,6 +4,22 @@ import {
     CDNRoutes,
     RouteBases
 } from "@discordjs/core";
+import { type ImageURLOptions, CDN } from "@discordjs/rest";
+
+/**
+ * Gets the URL of the user's avatar.
+ *
+ * @param user The user to get the avatar of.
+ * @param options Optional options for the avatar.
+ * @returns The avatar URL of the user.
+ */
+export function getAvatarURL(user: APIUser, options?: ImageURLOptions): string {
+    const cdn = new CDN();
+
+    return user.avatar !== null
+        ? cdn.avatar(user.id, user.avatar, options)
+        : getDefaultAvatarURL(user);
+}
 
 /**
  * Gets the creation timestamp of a Snowflake.

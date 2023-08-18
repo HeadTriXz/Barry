@@ -39,6 +39,11 @@ export class ModalSubmitInteraction extends UpdatableInteraction {
     declare type: InteractionType.ModalSubmit;
 
     /**
+     * A map containing the values submitted by users for each custom ID.
+     */
+    values: Record<string, string> = {};
+
+    /**
      * Represents a modal submit interaction.
      *
      * @param data The raw interaction object.
@@ -52,5 +57,9 @@ export class ModalSubmitInteraction extends UpdatableInteraction {
             components: data.data.components,
             customID: data.data.custom_id
         };
+
+        for (const { components } of data.data.components) {
+            this.values[components[0].custom_id] = components[0].value;
+        }
     }
 }
