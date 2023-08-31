@@ -1,4 +1,8 @@
-import { type Profile, ProfileCreationStatus } from "@prisma/client";
+import {
+    type Profile,
+    type ProfilesSettings,
+    ProfileCreationStatus
+} from "@prisma/client";
 import type { UpdatableInteraction } from "@barry/core";
 import type ProfilesModule from "../index.js";
 
@@ -23,11 +27,13 @@ export class ProfileEditor {
      * Represents a class for editing and creating profiles.
      *
      * @param module The profiles module.
+     * @param settings The settings for the profiles module.
      * @param isEditing Whether the profile is being edited.
      * @param profile The profile to edit.
      */
     constructor(
         public module: ProfilesModule,
+        public settings: ProfilesSettings,
         public isEditing: boolean = true,
         public profile?: Profile
     ) {}
@@ -57,7 +63,7 @@ export class ProfileEditor {
         this.profile = await this.module.profiles.upsert(interaction.user.id, {
             availability: bitflags,
             creationStatus: this.isEditing
-                ? null
+                ? undefined
                 : ProfileCreationStatus.Contact
         });
 
@@ -134,7 +140,7 @@ export class ProfileEditor {
             });
 
             if (retryResponse === undefined) {
-                await this.module.client.api.channels.createMessage(channelID, timeoutContent);
+                await this.module.client.api.channels.editMessage(channelID, message.id, timeoutContent);
                 return;
             }
 
@@ -157,7 +163,7 @@ export class ProfileEditor {
         this.profile = await this.module.profiles.upsert(interaction.user.id, {
             bannerURL: attachments[0].url,
             creationStatus: this.isEditing
-                ? null
+                ? undefined
                 : ProfileCreationStatus.Preview
         });
 
@@ -190,7 +196,7 @@ export class ProfileEditor {
                 ? null
                 : capitalizeEachSentence(response.values.contact),
             creationStatus: this.isEditing
-                ? null
+                ? undefined
                 : ProfileCreationStatus.Banner
         });
 
@@ -236,9 +242,6 @@ export class ProfileEditor {
 
         if (this.profile !== undefined) {
             switch (this.profile.creationStatus) {
-                case ProfileCreationStatus.Profile: {
-                    return this.editProfile(interaction);
-                }
                 case ProfileCreationStatus.Availability: {
                     return this.editAvailability(interaction);
                 }
@@ -317,16 +320,12 @@ export class ProfileEditor {
      * @param channelID The ID of the DM channel, if triggered in DMs.
      */
     async showPreview(interaction: UpdatableInteraction, channelID?: string): Promise<void> {
+        this.profile ??= await this.module.profiles.get(interaction.user.id) || undefined;
         if (this.profile === undefined) {
-            const profile = await this.module.profiles.get(interaction.user.id);
-            if (profile === null) {
-                return interaction.createMessage({
-                    content: `${config.emotes.error} I don't have access to that profile.`,
-                    flags: MessageFlags.Ephemeral
-                });
-            }
-
-            this.profile = profile;
+            return interaction.createMessage({
+                content: `${config.emotes.error} Failed to find the profile you're looking for.`,
+                flags: MessageFlags.Ephemeral
+            });
         }
 
         const content = getProfileContent(interaction.user, this.profile);
@@ -388,47 +387,35 @@ export class ProfileEditor {
         }
 
         if (response.data.customID === "publish") {
-            if (!interaction.isInvokedInGuild()) {
-                return;
-            }
+            if (this.isEditing) {
+                if (this.settings.channelID === null) {
+                    return interaction.createMessage({
+                        content: `${config.emotes.error} This guild hasn't setup their channel for profiles.`,
+                        flags: MessageFlags.Ephemeral
+                    });
+                }
 
-            const settings = await this.module.profilesSettings.getOrCreate(interaction.guildID);
-            if (!settings.enabled) {
-                return interaction.createMessage({
-                    content: `${config.emotes.error} Profiles are currently disabled for this guild.`,
-                    flags: MessageFlags.Ephemeral
-                });
-            }
-
-            if (settings.channelID === null) {
-                return interaction.createMessage({
-                    content: `${config.emotes.error} This guild hasn't setup their channel for profiles.`,
-                    flags: MessageFlags.Ephemeral
-                });
-            }
-
-            if (!this.isEditing) {
-                this.profile = await this.module.profiles.upsert(interaction.user.id, {
-                    creationStatus: null
-                });
-
-                await this.module.postProfile(interaction.user, this.profile, settings);
-            } else {
-                const message = await this.module.profileMessages.getLatest(interaction.guildID, interaction.user.id);
+                const message = await this.module.profileMessages.getLatest(this.settings.guildID, interaction.user.id);
                 if (message !== null) {
                     const content = getProfileContent(interaction.user, this.profile!);
                     try {
                         await this.module.client.api.channels.editMessage(
-                            settings.channelID,
+                            this.settings.channelID,
                             message.messageID,
                             content
                         );
                     } catch {
-                        this.module.client.logger.warn(`Could not edit last message (${message.messageID}) in the channel ${settings.channelID} of guild ${settings.guildID}`);
+                        this.module.client.logger.warn(`Could not edit last message (${message.messageID}) in the channel ${this.settings.channelID} of guild ${this.settings.guildID}`);
                     }
                 } else {
-                    await this.module.postProfile(interaction.user, this.profile!, settings);
+                    await this.module.postProfile(interaction.user, this.profile!, this.settings);
                 }
+            } else {
+                this.profile = await this.module.profiles.upsert(interaction.user.id, {
+                    creationStatus: null
+                });
+
+                await this.module.postProfile(interaction.user, this.profile, this.settings);
             }
 
             await response.editParent({

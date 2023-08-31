@@ -26,6 +26,7 @@ import * as utils from "../../../../../src/modules/marketplace/utils.js";
 describe("ProfileEditor", () => {
     let interaction: UpdatableInteraction;
     let module: ProfilesModule;
+    let settings: ProfilesSettings;
 
     beforeEach(() => {
         const client = createMockApplication();
@@ -34,6 +35,14 @@ describe("ProfileEditor", () => {
         const data = createMockModalSubmitInteraction();
         interaction = new UpdatableInteraction(data, client, vi.fn());
 
+        settings = {
+            channelID: mockChannel.id,
+            enabled: true,
+            guildID: "68239102456844360",
+            lastMessageID: null
+        };
+
+        vi.spyOn(module.profilesSettings, "get").mockResolvedValue(settings);
         vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
         vi.spyOn(client.api.channels, "createMessage").mockResolvedValue(mockMessage);
         vi.spyOn(client.api.channels, "editMessage").mockResolvedValue(mockMessage);
@@ -53,15 +62,14 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, true, mockProfile);
+            const editor = new ProfileEditor(module, settings, true, mockProfile);
             editor.next = vi.fn();
 
             await editor.editAvailability(interaction);
 
             expect(upsertSpy).toHaveBeenCalledOnce();
             expect(upsertSpy).toHaveBeenCalledWith(mockUser.id, {
-                availability: 41,
-                creationStatus: null
+                availability: 41
             });
         });
 
@@ -77,7 +85,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editAvailability(interaction);
@@ -100,7 +108,7 @@ describe("ProfileEditor", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editAvailability(interaction);
@@ -119,7 +127,7 @@ describe("ProfileEditor", () => {
 
             const editSpy = vi.spyOn(interaction, "editParent");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.editAvailability(interaction);
 
@@ -139,7 +147,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, true, mockProfile);
+            const editor = new ProfileEditor(module, settings, true, mockProfile);
 
             await editor.editAvailability(interaction);
 
@@ -173,15 +181,14 @@ describe("ProfileEditor", () => {
             });
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, true, mockProfile);
+            const editor = new ProfileEditor(module, settings, true, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
 
             expect(upsertSpy).toHaveBeenCalledOnce();
             expect(upsertSpy).toHaveBeenCalledWith(mockUser.id, {
-                bannerURL: "https://example.com/new-banner.png",
-                creationStatus: null
+                bannerURL: "https://example.com/new-banner.png"
             });
         });
 
@@ -199,7 +206,7 @@ describe("ProfileEditor", () => {
             });
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
@@ -217,7 +224,7 @@ describe("ProfileEditor", () => {
 
             const editSpy = vi.spyOn(interaction, "editParent");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
@@ -255,7 +262,7 @@ describe("ProfileEditor", () => {
                 .mockResolvedValue(mockMessage);
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             const bannerSpy = vi.spyOn(editor, "editBanner");
             editor.showPreview = vi.fn();
 
@@ -281,7 +288,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
@@ -298,12 +305,12 @@ describe("ProfileEditor", () => {
 
             const createSpy = vi.spyOn(module.client.api.channels, "createMessage");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
 
-            expect(createSpy).toHaveBeenCalledTimes(3);
+            expect(createSpy).toHaveBeenCalledTimes(2);
             expect(createSpy).toHaveBeenCalledWith(mockChannel.id, {
                 components: retryComponents,
                 content: expect.stringContaining("There are no images in that message.")
@@ -335,7 +342,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
@@ -359,7 +366,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
@@ -376,7 +383,7 @@ describe("ProfileEditor", () => {
 
             const createSpy = vi.spyOn(module.client.api.channels, "createMessage");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.editBanner(interaction, mockChannel.id, true);
@@ -406,15 +413,14 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, true, mockProfile);
+            const editor = new ProfileEditor(module, settings, true, mockProfile);
             editor.next = vi.fn();
 
             await editor.editContact(interaction);
 
             expect(upsertSpy).toHaveBeenCalledOnce();
             expect(upsertSpy).toHaveBeenCalledWith(mockUser.id, {
-                contact: "Send me a direct message!",
-                creationStatus: null
+                contact: "Send me a direct message!"
             });
         });
 
@@ -436,7 +442,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editContact(interaction);
@@ -465,7 +471,7 @@ describe("ProfileEditor", () => {
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editContact(interaction);
@@ -497,7 +503,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editContact(interaction);
@@ -514,7 +520,7 @@ describe("ProfileEditor", () => {
 
             const editSpy = vi.spyOn(interaction, "editParent");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.editContact(interaction);
 
@@ -541,7 +547,7 @@ describe("ProfileEditor", () => {
 
             const createSpy = vi.spyOn(response, "createMessage");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.editContact(interaction);
 
@@ -607,7 +613,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, true, mockProfile);
+            const editor = new ProfileEditor(module, settings, true, mockProfile);
             editor.next = vi.fn();
 
             await editor.editProfile(interaction);
@@ -674,7 +680,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editProfile(interaction);
@@ -741,7 +747,7 @@ describe("ProfileEditor", () => {
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editProfile(interaction);
@@ -811,7 +817,7 @@ describe("ProfileEditor", () => {
             );
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.next = vi.fn();
 
             await editor.editProfile(interaction);
@@ -832,7 +838,7 @@ describe("ProfileEditor", () => {
 
             const editSpy = vi.spyOn(interaction, "editParent");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.editProfile(interaction);
 
@@ -844,7 +850,7 @@ describe("ProfileEditor", () => {
 
     describe("next", () => {
         it("should show the preview if they are editing their profile", async () => {
-            const editor = new ProfileEditor(module, true, mockProfile);
+            const editor = new ProfileEditor(module, settings, true, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.next(interaction);
@@ -855,7 +861,7 @@ describe("ProfileEditor", () => {
 
         it("should edit the profile if the creation status is set to 'Profile'", async () => {
             const profile = { ...mockProfile, creationStatus: ProfileCreationStatus.Profile };
-            const editor = new ProfileEditor(module, false, profile);
+            const editor = new ProfileEditor(module, settings, false, profile);
             editor.editProfile = vi.fn();
 
             await editor.next(interaction);
@@ -866,7 +872,7 @@ describe("ProfileEditor", () => {
 
         it("should edit the availability if the creation status is set to 'Availability'", async () => {
             const profile = { ...mockProfile, creationStatus: ProfileCreationStatus.Availability };
-            const editor = new ProfileEditor(module, false, profile);
+            const editor = new ProfileEditor(module, settings, false, profile);
             editor.editAvailability = vi.fn();
 
             await editor.next(interaction);
@@ -877,7 +883,7 @@ describe("ProfileEditor", () => {
 
         it("should edit the contact information if the creation status is set to 'Contact'", async () => {
             const profile = { ...mockProfile, creationStatus: ProfileCreationStatus.Contact };
-            const editor = new ProfileEditor(module, false, profile);
+            const editor = new ProfileEditor(module, settings, false, profile);
             editor.editContact = vi.fn();
 
             await editor.next(interaction);
@@ -888,7 +894,7 @@ describe("ProfileEditor", () => {
 
         it("should edit the banner if the creation status is set to 'Banner'", async () => {
             const profile = { ...mockProfile, creationStatus: ProfileCreationStatus.Banner };
-            const editor = new ProfileEditor(module, false, profile);
+            const editor = new ProfileEditor(module, settings, false, profile);
             editor.promptBanner = vi.fn();
 
             await editor.next(interaction);
@@ -899,7 +905,7 @@ describe("ProfileEditor", () => {
 
         it("should show the preview if the creation status is set to 'Preview'", async () => {
             const profile = { ...mockProfile, creationStatus: ProfileCreationStatus.Preview };
-            const editor = new ProfileEditor(module, false, profile);
+            const editor = new ProfileEditor(module, settings, false, profile);
             editor.showPreview = vi.fn();
 
             await editor.next(interaction);
@@ -909,7 +915,7 @@ describe("ProfileEditor", () => {
         });
 
         it("should start creating a profile if no profile exists yet", async () => {
-            const editor = new ProfileEditor(module, false);
+            const editor = new ProfileEditor(module, settings, false);
             editor.editProfile = vi.fn();
 
             await editor.next(interaction);
@@ -929,7 +935,7 @@ describe("ProfileEditor", () => {
             const response = new MessageComponentInteraction(data, module.client, vi.fn());
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
 
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.editBanner = vi.fn();
 
             await editor.promptBanner(interaction);
@@ -948,7 +954,7 @@ describe("ProfileEditor", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
 
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
             editor.showPreview = vi.fn();
 
             await editor.promptBanner(interaction);
@@ -966,7 +972,7 @@ describe("ProfileEditor", () => {
 
             const editSpy = vi.spyOn(interaction, "editParent");
             const upsertSpy = vi.spyOn(module.profiles, "upsert");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.promptBanner(interaction);
 
@@ -981,7 +987,7 @@ describe("ProfileEditor", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
 
             const editSpy = vi.spyOn(interaction, "editOriginalMessage");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.showPreview(interaction);
 
@@ -1012,7 +1018,7 @@ describe("ProfileEditor", () => {
 
             const createSpy = vi.spyOn(module.client.api.channels, "createMessage");
             const editSpy = vi.spyOn(interaction, "editOriginalMessage");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.showPreview(interaction, mockChannel.id);
 
@@ -1024,7 +1030,7 @@ describe("ProfileEditor", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
 
             const getSpy = vi.spyOn(module.profiles, "get").mockResolvedValue(mockProfile);
-            const editor = new ProfileEditor(module, false);
+            const editor = new ProfileEditor(module, settings, false);
 
             await editor.showPreview(interaction, mockChannel.id);
 
@@ -1035,13 +1041,13 @@ describe("ProfileEditor", () => {
             vi.spyOn(module.profiles, "get").mockResolvedValue(null);
 
             const createSpy = vi.spyOn(interaction, "createMessage");
-            const editor = new ProfileEditor(module, false);
+            const editor = new ProfileEditor(module, settings, false);
 
             await editor.showPreview(interaction, mockChannel.id);
 
             expect(createSpy).toHaveBeenCalledOnce();
             expect(createSpy).toHaveBeenCalledWith({
-                content: expect.stringContaining("I don't have access to that profile."),
+                content: expect.stringContaining("Failed to find the profile you're looking for."),
                 flags: MessageFlags.Ephemeral
             });
         });
@@ -1052,7 +1058,7 @@ describe("ProfileEditor", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
 
             const editSpy = vi.spyOn(interaction, "editParent");
-            const editor = new ProfileEditor(module, false, mockProfile);
+            const editor = new ProfileEditor(module, settings, false, mockProfile);
 
             await editor.showPreview(interaction, mockChannel.id);
 
@@ -1061,19 +1067,6 @@ describe("ProfileEditor", () => {
         });
 
         describe("Publish", () => {
-            let settings: ProfilesSettings;
-
-            beforeEach(() => {
-                settings = {
-                    channelID: mockChannel.id,
-                    enabled: true,
-                    guildID: "68239102456844360",
-                    lastMessageID: null
-                };
-
-                vi.spyOn(module.profilesSettings, "get").mockResolvedValue(settings);
-            });
-
             it("should post the profile if the user is creating a new profile", async () => {
                 const data = createMockMessageComponentInteraction({
                     component_type: ComponentType.Button,
@@ -1085,7 +1078,7 @@ describe("ProfileEditor", () => {
                     new MessageComponentInteraction(data, module.client, vi.fn())
                 );
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 module.postProfile = vi.fn();
 
                 await editor.showPreview(interaction);
@@ -1110,7 +1103,7 @@ describe("ProfileEditor", () => {
                 );
 
                 const editSpy = vi.spyOn(module.client.api.channels, "editMessage");
-                const editor = new ProfileEditor(module, true, mockProfile);
+                const editor = new ProfileEditor(module, settings, true, mockProfile);
 
                 await editor.showPreview(interaction);
 
@@ -1130,36 +1123,13 @@ describe("ProfileEditor", () => {
                     new MessageComponentInteraction(data, module.client, vi.fn())
                 );
 
-                const editor = new ProfileEditor(module, true, mockProfile);
+                const editor = new ProfileEditor(module, settings, true, mockProfile);
                 module.postProfile = vi.fn();
 
                 await editor.showPreview(interaction);
 
                 expect(module.postProfile).toHaveBeenCalledOnce();
                 expect(module.postProfile).toHaveBeenCalledWith(mockUser, mockProfile, settings);
-            });
-
-            it("should show an error message if the module is disabled in the guild", async () => {
-                const data = createMockMessageComponentInteraction({
-                    component_type: ComponentType.Button,
-                    custom_id: "publish"
-                });
-
-                vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(
-                    new MessageComponentInteraction(data, module.client, vi.fn())
-                );
-
-                const createSpy = vi.spyOn(interaction, "createMessage");
-                const editor = new ProfileEditor(module, true, mockProfile);
-                settings.enabled = false;
-
-                await editor.showPreview(interaction);
-
-                expect(createSpy).toHaveBeenCalledOnce();
-                expect(createSpy).toHaveBeenCalledWith({
-                    content: expect.stringContaining("Profiles are currently disabled for this guild."),
-                    flags: MessageFlags.Ephemeral
-                });
             });
 
             it("should show an error message if the guild has not configured a channel for profiles", async () => {
@@ -1173,7 +1143,7 @@ describe("ProfileEditor", () => {
                 );
 
                 const createSpy = vi.spyOn(interaction, "createMessage");
-                const editor = new ProfileEditor(module, true, mockProfile);
+                const editor = new ProfileEditor(module, settings, true, mockProfile);
                 settings.channelID = null;
 
                 await editor.showPreview(interaction);
@@ -1202,31 +1172,12 @@ describe("ProfileEditor", () => {
                 );
 
                 const loggerSpy = vi.spyOn(module.client.logger, "warn");
-                const editor = new ProfileEditor(module, true, mockProfile);
+                const editor = new ProfileEditor(module, settings, true, mockProfile);
 
                 await editor.showPreview(interaction);
 
                 expect(loggerSpy).toHaveBeenCalledOnce();
                 expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining("Could not edit last message"));
-            });
-
-            it("should ignore if the ID of the guild is unknown", async () => {
-                const data = createMockMessageComponentInteraction({
-                    component_type: ComponentType.Button,
-                    custom_id: "publish"
-                });
-
-                vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(
-                    new MessageComponentInteraction(data, module.client, vi.fn())
-                );
-
-                const editor = new ProfileEditor(module, true, mockProfile);
-                interaction.guildID = undefined;
-                module.postProfile = vi.fn();
-
-                await editor.showPreview(interaction);
-
-                expect(module.postProfile).not.toHaveBeenCalled();
             });
         });
 
@@ -1242,7 +1193,7 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "awaitMessageComponent").mockResolvedValue(undefined);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 await editor.showPreview(interaction);
 
                 expect(editor.isEditing).toBe(true);
@@ -1261,7 +1212,7 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "awaitMessageComponent").mockResolvedValue(undefined);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 await editor.showPreview(interaction);
 
                 expect(editSpy).toHaveBeenCalledTimes(2);
@@ -1287,7 +1238,7 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "awaitMessageComponent").mockResolvedValue(editResponse);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 editor.editAvailability = vi.fn();
 
                 await editor.showPreview(interaction);
@@ -1315,7 +1266,7 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "awaitMessageComponent").mockResolvedValue(editResponse);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 editor.editBanner = vi.fn();
 
                 await editor.showPreview(interaction);
@@ -1343,7 +1294,7 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "awaitMessageComponent").mockResolvedValue(editResponse);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 editor.editContact = vi.fn();
 
                 await editor.showPreview(interaction);
@@ -1371,7 +1322,7 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "awaitMessageComponent").mockResolvedValue(editResponse);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 editor.editProfile = vi.fn();
 
                 await editor.showPreview(interaction);
@@ -1400,7 +1351,7 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "awaitMessageComponent").mockResolvedValue(editResponse);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 editor.editBanner = vi.fn();
 
                 await editor.showPreview(interaction, mockChannel.id);
@@ -1423,7 +1374,7 @@ describe("ProfileEditor", () => {
                     .mockResolvedValue(undefined);
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 const displaySpy = vi.spyOn(utils, "displayContact").mockResolvedValue();
 
                 await editor.showPreview(interaction);
@@ -1443,7 +1394,7 @@ describe("ProfileEditor", () => {
                     .mockResolvedValueOnce(new MessageComponentInteraction(data, module.client, vi.fn()))
                     .mockResolvedValue(undefined);
 
-                const editor = new ProfileEditor(module, false, mockProfile);
+                const editor = new ProfileEditor(module, settings, false, mockProfile);
                 const displaySpy = vi.spyOn(utils, "displayContact").mockResolvedValue();
 
                 await editor.showPreview(interaction);

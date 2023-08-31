@@ -105,7 +105,7 @@ describe("Contact (InteractionCreate) Event", () => {
 
             expect(createSpy).toHaveBeenCalledOnce();
             expect(createSpy).toHaveBeenCalledWith({
-                content: expect.stringContaining("I don't have access to that profile."),
+                content: expect.stringContaining("Failed to find the profile you're looking for."),
                 flags: MessageFlags.Ephemeral
             });
         });

@@ -113,7 +113,7 @@ export default class extends Event<ProfilesModule> {
             return interaction.editParent(timeoutContent);
         }
 
-        const editor = new ProfileEditor(this.module, true, profile);
+        const editor = new ProfileEditor(this.module, settings, true, profile);
         switch (response.data.values[0]) {
             case "availability": {
                 return editor.editAvailability(response);
