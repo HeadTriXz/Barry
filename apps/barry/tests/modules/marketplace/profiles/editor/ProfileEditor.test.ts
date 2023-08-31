@@ -859,17 +859,6 @@ describe("ProfileEditor", () => {
             expect(editor.showPreview).toHaveBeenCalledWith(interaction);
         });
 
-        it("should edit the profile if the creation status is set to 'Profile'", async () => {
-            const profile = { ...mockProfile, creationStatus: ProfileCreationStatus.Profile };
-            const editor = new ProfileEditor(module, settings, false, profile);
-            editor.editProfile = vi.fn();
-
-            await editor.next(interaction);
-
-            expect(editor.editProfile).toHaveBeenCalledOnce();
-            expect(editor.editProfile).toHaveBeenCalledWith(interaction);
-        });
-
         it("should edit the availability if the creation status is set to 'Availability'", async () => {
             const profile = { ...mockProfile, creationStatus: ProfileCreationStatus.Availability };
             const editor = new ProfileEditor(module, settings, false, profile);

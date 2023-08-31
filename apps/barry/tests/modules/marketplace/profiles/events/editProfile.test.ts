@@ -134,7 +134,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
         });
 
         it("should prompt the user if they'd like to finish their profile if they haven't yet", async () => {
-            vi.spyOn(event.module.profiles, "get").mockResolvedValue({ ...mockProfile, creationStatus: ProfileCreationStatus.Profile });
+            vi.spyOn(event.module.profiles, "get").mockResolvedValue({ ...mockProfile, creationStatus: ProfileCreationStatus.Contact });
             const createSpy = vi.spyOn(interaction, "createMessage");
 
             await event.execute(interaction);
