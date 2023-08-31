@@ -1,11 +1,8 @@
 import {
-    type APIActionRowComponent,
-    type APIButtonComponentWithCustomId,
     type APIEmbedField,
     type APIInteractionResponseCallbackData,
     type APIModalInteractionResponseCallbackData,
     type APIUser,
-    ButtonStyle,
     ComponentType,
     MessageFlags,
     TextInputStyle
@@ -16,10 +13,10 @@ import {
     ProfileAvailability,
     combinations,
     getEmoji
-} from "./availability.js";
+} from "../availability.js";
 import { getAvatarURL } from "@barry/core";
-import { parseLink } from "./functions/parseLink.js";
-import config from "../../../../../config.js";
+import { parseLink } from "./parseLink.js";
+import config from "../../../../../../config.js";
 
 /**
  * Generates the content for the 'editAvailability' message.
@@ -263,33 +260,3 @@ export function getProfileContent(user: APIUser, profile: Profile): APIInteracti
 
     return content;
 }
-
-/**
- * An array of components for the retry prompts.
- */
-export const retryComponents: Array<APIActionRowComponent<APIButtonComponentWithCustomId>> = [{
-    components: [
-        {
-            custom_id: "retry",
-            label: "Retry",
-            style: ButtonStyle.Success,
-            type: ComponentType.Button
-        },
-        {
-            custom_id: "continue",
-            label: "Continue",
-            style: ButtonStyle.Secondary,
-            type: ComponentType.Button
-        }
-    ],
-    type: ComponentType.ActionRow
-}];
-
-/**
- * The content for a timeout message.
- */
-export const timeoutContent: APIInteractionResponseCallbackData = {
-    components: [],
-    content: `${config.emotes.error} It took you too long to respond. Please try again.`,
-    embeds: []
-};

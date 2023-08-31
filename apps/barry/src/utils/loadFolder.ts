@@ -77,7 +77,7 @@ async function loadFromCallerPath<T>(
     );
 
     const filtered = items
-        .filter(({ default: item }) => item.prototype instanceof base)
+        .filter(({ default: item }) => item?.prototype instanceof base)
         .map(({ default: item }) => item);
 
     if (filtered.length > 0 && !loadAll) {

@@ -72,9 +72,9 @@ model Profile {
 }
 
 model ProfileMessage {
-  messageID String @id @map("message_id")
-  guildID   String @map("guild_id")
-  userID    String @map("user_id")
+  messageID String  @id @map("message_id")
+  guildID   String  @map("guild_id")
+  userID    String  @map("user_id")
 
   profile   Profile @relation(references: [userID], fields: [userID])
 
@@ -89,4 +89,68 @@ model ProfilesSettings {
   lastMessageID String? @map("last_message_id")
 
   @@map("profiles_settings")
+}
+
+/// Requests
+enum RequestStatus {
+  Available        @map("AVAILABLE")
+  Taken            @map("TAKEN")
+  Finished         @map("FINISHED")
+
+  DraftContact     @map("DRAFT_CONTACT")
+  DraftAttachments @map("DRAFT_ATTACHMENTS")
+  DraftPreview     @map("DRAFT_PREVIEW")
+}
+
+model Request {
+  id           Int                 @id @default(autoincrement())
+  attachments  RequestAttachment[]
+  compensation String
+  contact      String?
+  deadline     String?
+  description  String
+  location     String?
+  messages     RequestMessage[]
+  status       RequestStatus       @default(Available)
+  title        String
+  userID       String              @map("user_id")
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+
+  @@index([updatedAt, status])
+  @@index([userID, status])
+  
+  @@map("requests")
+}
+
+model RequestAttachment {
+  id          Int     @id @default(autoincrement())
+  contentType String  @map("content_type")
+  name        String
+  url         String
+  requestID   Int     @map("request_id")
+  request     Request @relation(references: [id], fields: [requestID], onDelete: Cascade)
+
+  @@index([requestID])
+  @@map("request_attachment")
+}
+
+model RequestMessage {
+  messageID String  @id @map("message_id")
+  guildID   String  @map("guild_id")
+  requestID Int     @map("request_id")
+  request   Request @relation(references: [id], fields: [requestID], onDelete: Cascade)
+
+  @@index([guildID, requestID])
+  @@map("request_messages")
+}
+
+model RequestsSettings {
+  guildID         String  @id @map("guild_id")
+  channelID       String? @map("channel_id")
+  enabled         Boolean @default(false)
+  lastMessageID   String? @map("last_message_id")
+  minCompensation Float   @default(50) @map("min_compensation")
+
+  @@map("requests_settings")
 }

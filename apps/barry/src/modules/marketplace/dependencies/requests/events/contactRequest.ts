@@ -1,27 +1,26 @@
 import { type AnyInteraction, Event } from "@barry/core";
-import type ProfilesModule from "../index.js";
+import type RequestsModule from "../index.js";
 
 import { GatewayDispatchEvents, MessageFlags } from "@discordjs/core";
-import { ProfileActionButton } from "../index.js";
+import { RequestActionButton } from "../index.js";
 import { displayContact } from "../../../utils.js";
-
 import config from "../../../../../config.js";
 
 /**
- * Represents an event handler for the 'Contact' button interaction on profiles.
+ * Represents an event handler for the 'Contact' button interaction on requests.
  */
-export default class extends Event<ProfilesModule> {
+export default class extends Event<RequestsModule> {
     /**
-     * Represents an event handler for the 'Contact' button interaction on profiles.
+     * Represents an event handler for the 'Contact' button interaction on requests.
      *
      * @param module The module the event belongs to.
      */
-    constructor(module: ProfilesModule) {
+    constructor(module: RequestsModule) {
         super(module, GatewayDispatchEvents.InteractionCreate);
     }
 
     /**
-     * Displays the contact information of a profile.
+     * Displays the contact information of a request.
      *
      * @param interaction The interaction that triggered the 'Contact' button.
      */
@@ -29,20 +28,20 @@ export default class extends Event<ProfilesModule> {
         const isValidInteraction = interaction.isInvokedInGuild()
             && interaction.isMessageComponent()
             && interaction.data.isButton()
-            && interaction.data.customID === ProfileActionButton.Contact;
+            && interaction.data.customID === RequestActionButton.Contact;
 
         if (!isValidInteraction) {
             return;
         }
 
-        const profile = await this.module.profiles.getByMessage(interaction.message.id);
-        if (profile === null) {
+        const request = await this.module.requests.getByMessage(interaction.message.id);
+        if (request === null) {
             return interaction.createMessage({
-                content: `${config.emotes.error} I don't have access to that profile.`,
+                content: `${config.emotes.error} Failed to find the request you're looking for.`,
                 flags: MessageFlags.Ephemeral
             });
         }
 
-        await displayContact(interaction, profile);
+        await displayContact(interaction, request);
     }
 }

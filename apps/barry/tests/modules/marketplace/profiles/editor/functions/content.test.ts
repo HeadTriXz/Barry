@@ -1,14 +1,14 @@
 import { ComponentType, MessageFlags, TextInputStyle } from "@discordjs/core";
-import { ProfileAvailability, combinations } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/availability.js";
+import { ProfileAvailability, combinations } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/availability.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
     getEditAvailabilityContent,
     getEditContactContent,
     getEditProfileContent,
     getProfileContent
-} from "../../../../../src/modules/marketplace/dependencies/profiles/editor/content.js";
+} from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/content.js";
 import { mockUser } from "@barry/testing";
-import { mockProfile } from "../mocks/profile.js";
+import { mockProfile } from "../../mocks/profile.js";
 
 describe("Content", () => {
     describe("getEditAvailabilityContent", () => {
@@ -179,7 +179,7 @@ describe("Content", () => {
             vi.useRealTimers();
         });
 
-        it("should return the correct content for the editContact message", () => {
+        it("should return the correct content for the editProfile message", () => {
             vi.useFakeTimers().setSystemTime("2023-01-01");
             const content = getEditProfileContent();
 
@@ -251,7 +251,7 @@ describe("Content", () => {
             });
         });
 
-        it("should set the correct default value if the profile is known", () => {
+        it("should set the correct default values if the profile is known", () => {
             vi.useFakeTimers().setSystemTime("2023-01-01");
             const content = getEditProfileContent(mockProfile);
 

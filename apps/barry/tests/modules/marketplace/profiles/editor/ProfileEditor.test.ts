@@ -1,13 +1,11 @@
+import { type ProfilesSettings, ProfileCreationStatus } from "@prisma/client";
+
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import {
     MessageComponentInteraction,
     ModalSubmitInteraction,
     UpdatableInteraction
 } from "@barry/core";
-import {
-    ProfileCreationStatus,
-    ProfilesSettings
-} from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockMessageComponentInteraction,
@@ -16,7 +14,7 @@ import {
     mockMessage,
     mockUser
 } from "@barry/testing";
-import { retryComponents, timeoutContent } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/content.js";
+import { retryComponents, timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
@@ -24,6 +22,7 @@ import { createMockApplication } from "../../../../mocks/application.js";
 import { mockProfile } from "../mocks/profile.js";
 
 import ProfilesModule from "../../../../../src/modules/marketplace/dependencies/profiles/index.js";
+import * as utils from "../../../../../src/modules/marketplace/utils.js";
 
 describe("ProfileEditor", () => {
     let interaction: UpdatableInteraction;
@@ -838,7 +837,7 @@ describe("ProfileEditor", () => {
 
             await editor.editProfile(interaction);
 
-            expect(upsertSpy).not.toHaveBeenCalledOnce();
+            expect(upsertSpy).not.toHaveBeenCalled();
             expect(editSpy).toHaveBeenCalledOnce();
             expect(editSpy).toHaveBeenCalledWith(timeoutContent);
         });
@@ -975,7 +974,6 @@ describe("ProfileEditor", () => {
             expect(upsertSpy).not.toHaveBeenCalled();
             expect(editSpy).toHaveBeenCalledTimes(2);
             expect(editSpy).toHaveBeenCalledWith(timeoutContent);
-
         });
     });
 
@@ -1427,12 +1425,12 @@ describe("ProfileEditor", () => {
                 vi.spyOn(response, "editOriginalMessage").mockResolvedValue(mockMessage);
 
                 const editor = new ProfileEditor(module, false, mockProfile);
-                module.displayContact = vi.fn();
+                const displaySpy = vi.spyOn(utils, "displayContact").mockResolvedValue();
 
                 await editor.showPreview(interaction);
 
-                expect(module.displayContact).toHaveBeenCalledOnce();
-                expect(module.displayContact).toHaveBeenCalledWith(interaction, mockProfile);
+                expect(displaySpy).toHaveBeenCalledOnce();
+                expect(displaySpy).toHaveBeenCalledWith(interaction, mockProfile);
             });
 
             it("should continue listening for interactions on the preview", async () => {
@@ -1447,12 +1445,12 @@ describe("ProfileEditor", () => {
                     .mockResolvedValue(undefined);
 
                 const editor = new ProfileEditor(module, false, mockProfile);
-                module.displayContact = vi.fn();
+                const displaySpy = vi.spyOn(utils, "displayContact").mockResolvedValue();
 
                 await editor.showPreview(interaction);
 
-                expect(module.displayContact).toHaveBeenCalledTimes(2);
-                expect(module.displayContact).toHaveBeenCalledWith(interaction, mockProfile);
+                expect(displaySpy).toHaveBeenCalledTimes(2);
+                expect(displaySpy).toHaveBeenCalledWith(interaction, mockProfile);
             });
         });
     });

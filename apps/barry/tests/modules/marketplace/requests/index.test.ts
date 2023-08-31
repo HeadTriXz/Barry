@@ -1,42 +1,47 @@
 import { ButtonStyle, ComponentType } from "@discordjs/core";
 import {
-    ProfileMessageRepository,
-    ProfileRepository,
-    ProfilesSettingsRepository
-} from "../../../../src/modules/marketplace/dependencies/profiles/database.js";
+    RequestMessageRepository,
+    RequestRepository,
+    RequestsSettingsRepository
+} from "../../../../src/modules/marketplace/dependencies/requests/database.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockUser, mockMessage } from "@barry/testing";
 
+import { RequestsSettings } from "@prisma/client";
 import { createMockApplication } from "../../../mocks/application.js";
-import { getProfileContent } from "../../../../src/modules/marketplace/dependencies/profiles/editor/functions/content.js";
-import { mockProfile } from "./mocks/profile.js";
+import { getRequestContent } from "../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
+import { mockRequest } from "./mocks/request.js";
 
-import ProfilesModule, { ManageProfileButton, ProfileActionButton } from "../../../../src/modules/marketplace/dependencies/profiles/index.js";
+import RequestsModule, { ManageRequestButton, RequestActionButton } from "../../../../src/modules/marketplace/dependencies/requests/index.js";
 
-describe("ProfilesModule", () => {
-    let module: ProfilesModule;
+describe("RequestsModule", () => {
+    let module: RequestsModule;
+    let settings: RequestsSettings;
 
     beforeEach(() => {
         const client = createMockApplication();
-        module = new ProfilesModule(client);
+        module = new RequestsModule(client);
+
+        settings = {
+            channelID: "48527482987641760",
+            enabled: true,
+            guildID: "68239102456844360",
+            lastMessageID: null,
+            minCompensation: 50
+        };
     });
 
     describe("constructor", () => {
         it("should set up the repositories correctly", () => {
-            expect(module.profileMessages).toBeInstanceOf(ProfileMessageRepository);
-            expect(module.profiles).toBeInstanceOf(ProfileRepository);
-            expect(module.profilesSettings).toBeInstanceOf(ProfilesSettingsRepository);
+            expect(module.requestMessages).toBeInstanceOf(RequestMessageRepository);
+            expect(module.requests).toBeInstanceOf(RequestRepository);
+            expect(module.requestsSettings).toBeInstanceOf(RequestsSettingsRepository);
         });
     });
 
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
-            const settingsSpy = vi.spyOn(module.profilesSettings, "get").mockResolvedValue({
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
+            const settingsSpy = vi.spyOn(module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
 
             const enabled = await module.isEnabled("68239102456844360");
 
@@ -46,12 +51,8 @@ describe("ProfilesModule", () => {
         });
 
         it("should return false if the guild has the module disabled", async () => {
-            const settingsSpy = vi.spyOn(module.profilesSettings, "get").mockResolvedValue({
-                channelID: "48527482987641760",
-                enabled: false,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
+            const settingsSpy = vi.spyOn(module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+            settings.enabled = false;
 
             const enabled = await module.isEnabled("68239102456844360");
 
@@ -61,17 +62,38 @@ describe("ProfilesModule", () => {
         });
     });
 
-    describe("postProfile", () => {
-        it("should post the profile in the configured channel", async () => {
-            const createSpy = vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
-            const content = getProfileContent(mockUser, mockProfile);
+    describe("isValidCompensation", () => {
+        it("should return false if the compensation does not contain a number", () => {
+            const isValid = module.isValidCompensation("test", 50);
 
-            await module.postProfile(mockUser, mockProfile, {
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
+            expect(isValid).toBe(false);
+        });
+
+        it("should return false if the compensation is less than the minimum", () => {
+            const isValid = module.isValidCompensation("$20", 50);
+
+            expect(isValid).toBe(false);
+        });
+
+        it("should return false if one of the numbers is less than the minimum", () => {
+            const isValid = module.isValidCompensation("$100, just kidding, $20", 50);
+
+            expect(isValid).toBe(false);
+        });
+
+        it("should return true if the compensation is valid", () => {
+            const isValid = module.isValidCompensation("$100", 50);
+
+            expect(isValid).toBe(true);
+        });
+    });
+
+    describe("postRequest", () => {
+        it("should post the request in the configured channel", async () => {
+            const createSpy = vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
+            const content = getRequestContent(mockUser, mockRequest);
+
+            await module.postRequest(mockUser, mockRequest, settings);
 
             expect(createSpy).toHaveBeenCalledTimes(2);
             expect(createSpy).toHaveBeenCalledWith("48527482987641760", {
@@ -79,13 +101,13 @@ describe("ProfilesModule", () => {
                 components: [{
                     components: [
                         {
-                            custom_id: ProfileActionButton.Contact,
+                            custom_id: RequestActionButton.Contact,
                             label: "Contact",
                             style: ButtonStyle.Success,
                             type: ComponentType.Button
                         },
                         {
-                            custom_id: ProfileActionButton.Report,
+                            custom_id: RequestActionButton.Report,
                             label: "Report",
                             style: ButtonStyle.Secondary,
                             type: ComponentType.Button
@@ -96,29 +118,24 @@ describe("ProfilesModule", () => {
             });
         });
 
-        it("should post the buttons after the profile", async () => {
+        it("should post the buttons after the request", async () => {
             const createSpy = vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
 
-            await module.postProfile(mockUser, mockProfile, {
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
+            await module.postRequest(mockUser, mockRequest, settings);
 
             expect(createSpy).toHaveBeenCalledTimes(2);
             expect(createSpy).toHaveBeenCalledWith("48527482987641760", {
                 components: [{
                     components: [
                         {
-                            custom_id: ManageProfileButton.Post,
-                            label: "Post Profile",
+                            custom_id: ManageRequestButton.Post,
+                            label: "Post Request",
                             style: ButtonStyle.Success,
                             type: ComponentType.Button
                         },
                         {
-                            custom_id: ManageProfileButton.Edit,
-                            label: "Edit Profile",
+                            custom_id: ManageRequestButton.Edit,
+                            label: "Edit Request",
                             style: ButtonStyle.Secondary,
                             type: ComponentType.Button
                         }
@@ -132,41 +149,30 @@ describe("ProfilesModule", () => {
             vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
 
             module.client.api.channels.deleteMessage = vi.fn();
+            settings.lastMessageID = "91256340920236565";
 
-            await module.postProfile(mockUser, mockProfile, {
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: "91256340920236565"
-            });
+            await module.postRequest(mockUser, mockRequest, settings);
 
             expect(module.client.api.channels.deleteMessage).toHaveBeenCalledOnce();
             expect(module.client.api.channels.deleteMessage).toHaveBeenCalledWith("48527482987641760", "91256340920236565");
         });
 
         it("should throw an error if the channel is unknown", async () => {
-            await expect(() =>
-                module.postProfile(mockUser, mockProfile, {
-                    channelID: null,
-                    enabled: true,
-                    guildID: "68239102456844360",
-                    lastMessageID: "91256340920236565"
-                })
-            ).rejects.toThrowError("Failed to post a profile, channel is unknown.");
+            settings.channelID = null;
+
+            await expect(() => module.postRequest(mockUser, mockRequest, settings)).rejects.toThrowError(
+                "Failed to post a request, channel is unknown."
+            );
         });
 
         it("should handle errors when deleting the previous buttons message", async () => {
             vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
             vi.spyOn(module.client.api.channels, "deleteMessage").mockRejectedValue(new Error());
+            settings.lastMessageID = "91256340920236565";
 
             const loggerSpy = vi.spyOn(module.client.logger, "warn");
 
-            await module.postProfile(mockUser, mockProfile, {
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: "91256340920236565"
-            });
+            await module.postRequest(mockUser, mockRequest, settings);
 
             expect(loggerSpy).toHaveBeenCalledOnce();
             expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining("Could not delete last message"));
