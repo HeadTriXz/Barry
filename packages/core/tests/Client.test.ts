@@ -15,13 +15,11 @@ import {
     GatewayOpcodes
 } from "@discordjs/core";
 
-import { beforeEach, describe, it, expect, vi } from "vitest";
 import {
     MockGateway,
     MockServer,
     createMockModule
 } from "./mocks/index.js";
-
 import { mockPingInteraction } from "@barry/testing";
 import { Logger } from "@barry/logger";
 

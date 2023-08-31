@@ -1,13 +1,12 @@
-import { APIChannel, ComponentType, MessageFlags } from "@discordjs/core";
+import { type APIChannel, ComponentType, MessageFlags } from "@discordjs/core";
+import { type ProfilesSettings, ProfileCreationStatus } from "@prisma/client";
+
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { ProfileCreationStatus, ProfilesSettings } from "@prisma/client";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockMessageComponentInteraction,
     mockChannel,
     mockPingInteraction
 } from "@barry/testing";
-
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockProfile } from "../mocks/profile.js";
@@ -135,7 +134,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
         });
 
         it("should prompt the user if they'd like to finish their profile if they haven't yet", async () => {
-            vi.spyOn(event.module.profiles, "get").mockResolvedValue({ ...mockProfile, creationStatus: ProfileCreationStatus.Profile });
+            vi.spyOn(event.module.profiles, "get").mockResolvedValue({ ...mockProfile, creationStatus: ProfileCreationStatus.Contact });
             const createSpy = vi.spyOn(interaction, "createMessage");
 
             await event.execute(interaction);
@@ -175,7 +174,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should ignore if the interaction is not the edit button", async () => {
+        it("should ignore if the interaction does not come from the 'Edit' button", async () => {
             const settingsSpy = vi.spyOn(event.module.profilesSettings, "get");
             interaction.data.customID = ManageProfileButton.Create;
 
@@ -184,7 +183,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should show an error message if the profiles are disabled in the guild", async () => {
+        it("should show an error message if the module is disabled in the guild", async () => {
             const createSpy = vi.spyOn(interaction, "createMessage");
             settings.enabled = false;
 
@@ -197,7 +196,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
             });
         });
 
-        it("should show an error message if the guild has not set a channel for profiles", async () => {
+        it("should show an error message if the guild has not configured a channel for profiles", async () => {
             const createSpy = vi.spyOn(interaction, "createMessage");
             settings.channelID = null;
 

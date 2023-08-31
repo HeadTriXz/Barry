@@ -1,18 +1,20 @@
+import type { RequestsSettings } from "@prisma/client";
+
 import { ButtonStyle, ComponentType } from "@discordjs/core";
 import {
     RequestMessageRepository,
     RequestRepository,
     RequestsSettingsRepository
 } from "../../../../src/modules/marketplace/dependencies/requests/database.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockUser, mockMessage } from "@barry/testing";
-
-import { RequestsSettings } from "@prisma/client";
 import { createMockApplication } from "../../../mocks/application.js";
 import { getRequestContent } from "../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
 import { mockRequest } from "./mocks/request.js";
 
-import RequestsModule, { ManageRequestButton, RequestActionButton } from "../../../../src/modules/marketplace/dependencies/requests/index.js";
+import RequestsModule, {
+    ManageRequestButton,
+    RequestActionButton
+} from "../../../../src/modules/marketplace/dependencies/requests/index.js";
 
 describe("RequestsModule", () => {
     let module: RequestsModule;

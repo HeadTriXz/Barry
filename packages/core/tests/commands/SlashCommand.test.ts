@@ -5,7 +5,6 @@ import {
 } from "@discordjs/core";
 import { type Module, Client } from "../../src/index.js";
 
-import { beforeEach, describe, expect, it } from "vitest";
 import {
     MockModule,
     MockSlashCommand,

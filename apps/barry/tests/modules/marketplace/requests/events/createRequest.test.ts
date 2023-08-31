@@ -1,16 +1,16 @@
+import type { RequestsSettings } from "@prisma/client";
+
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry/testing";
 
 import { RequestEditor } from "../../../../../src/modules/marketplace/dependencies/requests/editor/RequestEditor.js";
-import { RequestsSettings } from "@prisma/client";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockRequest } from "../mocks/request.js";
+import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
 
 import RequestsModule, { ManageRequestButton } from "../../../../../src/modules/marketplace/dependencies/requests/index.js";
 import CreateRequestEvent from "../../../../../src/modules/marketplace/dependencies/requests/events/createRequest.js";
-import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
 
 describe("Create Request (InteractionCreate) Event", () => {
     let event: CreateRequestEvent;
@@ -123,7 +123,7 @@ describe("Create Request (InteractionCreate) Event", () => {
             });
         });
 
-        it("should show an error message if the guild has not set a channel for requests", async () => {
+        it("should show an error message if the guild has not configured a channel for requests", async () => {
             settings.channelID = null;
 
             vi.spyOn(event.module.requests, "getDraft").mockResolvedValue(null);

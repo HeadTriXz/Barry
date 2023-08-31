@@ -38,7 +38,7 @@ export default class extends Event<ProfilesModule> {
         const profile = await this.module.profiles.getByMessage(interaction.message.id);
         if (profile === null) {
             return interaction.createMessage({
-                content: `${config.emotes.error} I don't have access to that profile.`,
+                content: `${config.emotes.error} Failed to find the profile you're looking for.`,
                 flags: MessageFlags.Ephemeral
             });
         }

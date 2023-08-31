@@ -1,7 +1,6 @@
 import { type API, GatewayDispatchEvents } from "@discordjs/core";
 import { type Module, Client } from "../../src/index.js";
 
-import { beforeEach, describe, expect, it } from "vitest";
 import { Event } from "../../src/events/index.js";
 import { MockModule } from "../mocks/index.js";
 

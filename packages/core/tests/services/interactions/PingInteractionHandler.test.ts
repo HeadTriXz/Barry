@@ -1,6 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PingInteraction, PingInteractionHandler } from "../../../src/index.js";
-
 import { InteractionResponseType } from "@discordjs/core";
 import { mockPingInteraction } from "@barry/testing";
 

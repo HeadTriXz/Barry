@@ -1,7 +1,6 @@
 import { type API, ApplicationCommandType } from "@discordjs/core";
 import { type Module, Client } from "../../src/index.js";
 
-import { beforeEach, describe, expect, it } from "vitest";
 import { MockMessageCommand, MockModule } from "../mocks/index.js";
 
 describe("MessageCommand", () => {

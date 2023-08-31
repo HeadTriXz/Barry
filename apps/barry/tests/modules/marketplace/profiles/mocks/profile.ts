@@ -1,4 +1,4 @@
-import { Profile } from "@prisma/client";
+import type { Profile } from "@prisma/client";
 import { ProfileAvailability } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/availability.js";
 import { mockUser } from "@barry/testing";
 

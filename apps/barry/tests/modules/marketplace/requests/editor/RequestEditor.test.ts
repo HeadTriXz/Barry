@@ -6,7 +6,6 @@ import {
     ModalSubmitInteraction,
     UpdatableInteraction
 } from "@barry/core";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,

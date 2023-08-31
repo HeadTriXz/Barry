@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplication, mockAppOptions } from "./mocks/application.js";
 
 import { API, GatewayDispatchEvents } from "@discordjs/core";

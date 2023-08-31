@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplicationCommandInteraction, mockAttachment } from "@barry/testing";
 
 import { ApplicationCommandInteraction } from "@barry/core";

@@ -1,5 +1,4 @@
 import { ApplicationCommandInteraction, getCreatedAt } from "@barry/core";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplicationCommandInteraction, mockMessage } from "@barry/testing";
 import { createMockApplication } from "../../../../../mocks/index.js";
 

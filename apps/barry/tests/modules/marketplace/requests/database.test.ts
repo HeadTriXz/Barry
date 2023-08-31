@@ -1,10 +1,9 @@
-import { Prisma, RequestStatus, RequestsSettings } from "@prisma/client";
+import { type RequestsSettings, Prisma, RequestStatus } from "@prisma/client";
 import {
     RequestMessageRepository,
     RequestRepository,
     RequestsSettingsRepository
 } from "../../../../src/modules/marketplace/dependencies/requests/database.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { mockChannel } from "@barry/testing";
 import { mockRequest } from "./mocks/request.js";

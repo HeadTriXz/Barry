@@ -1,5 +1,4 @@
 import { Canvas, loadImage } from "canvas-constructor/napi-rs";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplicationCommandInteraction, mockUser } from "@barry/testing";
 
 import { ApplicationCommandInteraction } from "@barry/core";

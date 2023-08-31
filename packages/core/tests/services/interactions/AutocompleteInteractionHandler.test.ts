@@ -12,7 +12,6 @@ import {
     SlashCommandOptionBuilder
 } from "../../../src/index.js";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     MockMessageCommand,
     MockSlashCommand,

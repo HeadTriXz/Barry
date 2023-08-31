@@ -1,5 +1,6 @@
+import type { ProfilesSettings } from "@prisma/client";
+
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockMessageComponentInteraction,
     mockChannel,
@@ -7,7 +8,6 @@ import {
 } from "@barry/testing";
 import { ComponentType } from "@discordjs/core";
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
-import { ProfilesSettings } from "@prisma/client";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockProfile } from "../mocks/profile.js";
 
@@ -88,7 +88,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should ignore if the interaction is not the create button", async () => {
+        it("should ignore if the interaction does not come from the 'Create' button", async () => {
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
                 custom_id: ManageProfileButton.Edit
@@ -102,7 +102,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should show an error message if the profiles are disabled in the guild", async () => {
+        it("should show an error message if the module is disabled in the guild", async () => {
             settings.enabled = false;
 
             const data = createMockMessageComponentInteraction({
@@ -120,7 +120,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
             });
         });
 
-        it("should show an error message if the guild has not set a channel for profiles", async () => {
+        it("should show an error message if the guild has not configured a channel for profiles", async () => {
             settings.channelID = null;
 
             const data = createMockMessageComponentInteraction({

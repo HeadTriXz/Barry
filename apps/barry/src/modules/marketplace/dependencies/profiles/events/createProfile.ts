@@ -55,7 +55,7 @@ export default class extends Event<ProfilesModule> {
             });
         }
 
-        const editor = new ProfileEditor(this.module, false, profile || undefined);
+        const editor = new ProfileEditor(this.module, settings, false, profile || undefined);
         await editor.next(interaction);
     }
 }

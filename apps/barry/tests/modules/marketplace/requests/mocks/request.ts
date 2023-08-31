@@ -1,5 +1,5 @@
+import type { RequestWithAttachments } from "../../../../../src/modules/marketplace/dependencies/requests/database.js";
 import { RequestStatus } from "@prisma/client";
-import { RequestWithAttachments } from "../../../../../src/modules/marketplace/dependencies/requests/database.js";
 import { mockUser } from "@barry/testing";
 
 export const mockRequest: RequestWithAttachments = {

@@ -1,11 +1,11 @@
+import type { ProfilesSettings } from "@prisma/client";
+
 import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
 } from "../../../../src/modules/marketplace/dependencies/profiles/database.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ProfilesSettings } from "@prisma/client";
 import { mockChannel } from "@barry/testing";
 import { mockProfile } from "./mocks/profile.js";
 import { prisma } from "../../../mocks/index.js";

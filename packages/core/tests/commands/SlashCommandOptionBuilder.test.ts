@@ -4,7 +4,6 @@ import {
     SlashCommandOptionBuilder
 } from "../../src/index.js";
 
-import { describe, expect, it } from "vitest";
 import { ApplicationCommandOptionType, ChannelType } from "@discordjs/core";
 import { createMockAutocompleteInteraction } from "@barry/testing";
 

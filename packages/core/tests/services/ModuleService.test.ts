@@ -1,6 +1,5 @@
 import { type API } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Client, ModuleService } from "../../src/index.js";
 import { MockModule } from "../mocks/index.js";
 

@@ -12,7 +12,6 @@ import {
     MemberActivitySortBy,
     MemberActivitySortOrder
 } from "../../../src/modules/leveling/database.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { prisma } from "../../mocks/index.js";
 

@@ -1,11 +1,3 @@
-import {
-    type SpyInstance,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    vi
-} from "vitest";
 import { Logger, LogSeverity } from "../src/index.js";
 
 import * as Sentry from "@sentry/node";
@@ -18,11 +10,10 @@ vi.mock("@sentry/node", () => ({
 }));
 
 describe("Logger", () => {
-    let consoleSpy: SpyInstance;
-
     beforeEach(() => {
         vi.restoreAllMocks();
-        consoleSpy = vi.spyOn(console, "log").mockImplementation(() => void 0);
+
+        console.log = vi.fn();
     });
 
     describe("debug", () => {
@@ -32,9 +23,9 @@ describe("Logger", () => {
 
             logger.debug(message);
 
-            expect(consoleSpy).toHaveBeenCalledOnce();
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("DEBUG"));
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+            expect(console.log).toHaveBeenCalledOnce();
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining("DEBUG"));
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
         });
     });
 
@@ -45,9 +36,9 @@ describe("Logger", () => {
 
             logger.error(message);
 
-            expect(consoleSpy).toHaveBeenCalledOnce();
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("ERROR"));
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+            expect(console.log).toHaveBeenCalledOnce();
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining("ERROR"));
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
         });
     });
 
@@ -58,9 +49,9 @@ describe("Logger", () => {
 
             logger.fatal(message);
 
-            expect(consoleSpy).toHaveBeenCalledOnce();
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("FATAL"));
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+            expect(console.log).toHaveBeenCalledOnce();
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining("FATAL"));
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
         });
     });
 
@@ -71,9 +62,9 @@ describe("Logger", () => {
 
             logger.info(message);
 
-            expect(consoleSpy).toHaveBeenCalledOnce();
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("INFO"));
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+            expect(console.log).toHaveBeenCalledOnce();
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining("INFO"));
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
         });
     });
 
@@ -84,9 +75,9 @@ describe("Logger", () => {
 
             logger.trace(message);
 
-            expect(consoleSpy).toHaveBeenCalledOnce();
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("TRACE"));
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+            expect(console.log).toHaveBeenCalledOnce();
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining("TRACE"));
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
         });
     });
 
@@ -97,9 +88,9 @@ describe("Logger", () => {
 
             logger.warn(message);
 
-            expect(consoleSpy).toHaveBeenCalledOnce();
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("WARN"));
-            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+            expect(console.log).toHaveBeenCalledOnce();
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining("WARN"));
+            expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
         });
     });
 
@@ -111,9 +102,9 @@ describe("Logger", () => {
 
                 logger.warn(message);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("WARN"));
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining("WARN"));
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
             });
 
             it("should log a message when the severity is higher than minSeverity", () => {
@@ -122,9 +113,9 @@ describe("Logger", () => {
 
                 logger.warn(message);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("WARN"));
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining("WARN"));
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
             });
 
             it("should not log a message when the severity is lower than minSeverity", () => {
@@ -133,7 +124,7 @@ describe("Logger", () => {
 
                 logger.warn(message);
 
-                expect(consoleSpy).not.toHaveBeenCalled();
+                expect(console.log).not.toHaveBeenCalled();
             });
 
             it("should set minSeverity to 'INFO' in a production environment", () => {
@@ -142,7 +133,7 @@ describe("Logger", () => {
 
                 logger.debug(message);
 
-                expect(consoleSpy).not.toHaveBeenCalled();
+                expect(console.log).not.toHaveBeenCalled();
             });
 
             it("should set minSeverity to 'TRACE' in a non-production environment", () => {
@@ -151,7 +142,7 @@ describe("Logger", () => {
 
                 logger.trace(message);
 
-                expect(consoleSpy).toHaveBeenCalled();
+                expect(console.log).toHaveBeenCalled();
             });
         });
 
@@ -170,8 +161,8 @@ describe("Logger", () => {
 
                 logger.info(message);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(date));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(date));
             });
 
             it("should hide the date if 'showDate' is false", () => {
@@ -181,8 +172,8 @@ describe("Logger", () => {
 
                 logger.info(message);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining(date));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).not.toHaveBeenCalledWith(expect.stringContaining(date));
             });
 
             it("should show the date by default in a production environment", () => {
@@ -192,8 +183,8 @@ describe("Logger", () => {
 
                 logger.info(message);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(date));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(date));
             });
 
             it("should hide the date by default in a non-production environment", () => {
@@ -203,8 +194,8 @@ describe("Logger", () => {
 
                 logger.info(message);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining(date));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).not.toHaveBeenCalledWith(expect.stringContaining(date));
             });
         });
 
@@ -221,8 +212,8 @@ describe("Logger", () => {
 
                 logger.info("Hello %s", "World");
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("Hello World"));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining("Hello World"));
             });
 
             it("should format log messages with error objects", () => {
@@ -234,10 +225,10 @@ describe("Logger", () => {
 
                 logger.error(message, error);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(error.message));
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(stack));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(error.message));
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(stack));
             });
 
             it("should ignore the error stack if undefined", () => {
@@ -250,10 +241,10 @@ describe("Logger", () => {
                 error.stack = undefined;
                 logger.error(message, error);
 
-                expect(consoleSpy).toHaveBeenCalledOnce();
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(message));
-                expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(error.message));
-                expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining(stack));
+                expect(console.log).toHaveBeenCalledOnce();
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(message));
+                expect(console.log).toHaveBeenCalledWith(expect.stringContaining(error.message));
+                expect(console.log).not.toHaveBeenCalledWith(expect.stringContaining(stack));
             });
         });
 

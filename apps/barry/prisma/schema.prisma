@@ -48,7 +48,6 @@ model MemberActivity {
 // Marketplace
 /// Profiles
 enum ProfileCreationStatus {
-  Profile      @map("PROFILE")
   Availability @map("AVAILABILITY")
   Contact      @map("CONTACT")
   Banner       @map("BANNER")

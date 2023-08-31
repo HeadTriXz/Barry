@@ -1,12 +1,15 @@
 import {
+    type IndexBasedPaginationOptions,
+    type ValueBasedPaginationOptions,
+    PaginationMessage
+} from "../../src/utils/index.js";
+import {
     type ReplyableInteraction,
     ApplicationCommandInteraction,
     MessageComponentInteraction
 } from "@barry/core";
-import { IndexBasedPaginationOptions, PaginationMessage, ValueBasedPaginationOptions } from "../../src/utils/index.js";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,

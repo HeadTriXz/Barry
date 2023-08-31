@@ -1,6 +1,5 @@
 import { type API, InteractionType } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     ApplicationCommandInteraction,
     ApplicationCommandInteractionHandler,

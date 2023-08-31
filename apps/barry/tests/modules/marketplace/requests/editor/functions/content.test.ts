@@ -1,8 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getEditContactContent, getEditRequestContent, getRequestContent } from "../../../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
+import { type RequestsSettings, RequestStatus } from "@prisma/client";
+
 import { ComponentType, TextInputStyle } from "@discordjs/core";
+import {
+    getEditContactContent,
+    getEditRequestContent,
+    getRequestContent
+} from "../../../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
 import { mockRequest } from "../../mocks/request.js";
-import { RequestStatus, RequestsSettings } from "@prisma/client";
 import { mockUser } from "@barry/testing";
 
 describe("Content", () => {

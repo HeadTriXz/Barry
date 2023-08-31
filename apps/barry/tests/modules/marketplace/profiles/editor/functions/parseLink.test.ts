@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import { parseLink } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/parseLink.js";
 
 describe("parseLink", () => {

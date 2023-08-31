@@ -7,7 +7,6 @@ import {
 } from "@barry/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MemberActivitySortBy, MemberActivitySortOrder } from "../../../../../../src/modules/leveling/database.js";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,

@@ -1,6 +1,5 @@
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockMessageComponentInteraction,
     mockPingInteraction
@@ -78,7 +77,7 @@ describe("Contact (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should ignore if the interaction is not the contact button", async () => {
+        it("should ignore if the interaction does not come from the 'Contact' button", async () => {
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
                 custom_id: ProfileActionButton.Report
@@ -106,7 +105,7 @@ describe("Contact (InteractionCreate) Event", () => {
 
             expect(createSpy).toHaveBeenCalledOnce();
             expect(createSpy).toHaveBeenCalledWith({
-                content: expect.stringContaining("I don't have access to that profile."),
+                content: expect.stringContaining("Failed to find the profile you're looking for."),
                 flags: MessageFlags.Ephemeral
             });
         });

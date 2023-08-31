@@ -1,6 +1,5 @@
 import { type API, InteractionResponseType } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Client, UpdatableInteraction } from "../../src/index.js";
 import { createMockModalSubmitInteraction } from "@barry/testing";
 

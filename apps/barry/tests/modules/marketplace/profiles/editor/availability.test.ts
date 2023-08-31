@@ -1,5 +1,4 @@
 import { ProfileAvailability, getEmoji } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/availability.js";
-import { describe, expect, it } from "vitest";
 
 describe("Availability", () => {
     describe("getEmoji", () => {
