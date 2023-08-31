@@ -135,7 +135,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should ignore if the interaction is not the post button", async () => {
+        it("should ignore if the interaction does not come from the 'Post' button", async () => {
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
                 custom_id: ManageProfileButton.Edit
@@ -150,7 +150,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should show an error message if the profiles are disabled in the guild", async () => {
+        it("should show an error message if the module is disabled in the guild", async () => {
             settings.enabled = false;
 
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(profile);
@@ -172,7 +172,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             });
         });
 
-        it("should show an error message if the guild has not set a channel for profiles", async () => {
+        it("should show an error message if the guild has not configured a channel for profiles", async () => {
             settings.channelID = null;
 
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(profile);

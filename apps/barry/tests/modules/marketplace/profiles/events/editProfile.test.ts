@@ -174,7 +174,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should ignore if the interaction is not the edit button", async () => {
+        it("should ignore if the interaction does not come from the 'Edit' button", async () => {
             const settingsSpy = vi.spyOn(event.module.profilesSettings, "get");
             interaction.data.customID = ManageProfileButton.Create;
 
@@ -183,7 +183,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should show an error message if the profiles are disabled in the guild", async () => {
+        it("should show an error message if the module is disabled in the guild", async () => {
             const createSpy = vi.spyOn(interaction, "createMessage");
             settings.enabled = false;
 
@@ -196,7 +196,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
             });
         });
 
-        it("should show an error message if the guild has not set a channel for profiles", async () => {
+        it("should show an error message if the guild has not configured a channel for profiles", async () => {
             const createSpy = vi.spyOn(interaction, "createMessage");
             settings.channelID = null;
 

@@ -123,7 +123,7 @@ describe("Create Request (InteractionCreate) Event", () => {
             });
         });
 
-        it("should show an error message if the guild has not set a channel for requests", async () => {
+        it("should show an error message if the guild has not configured a channel for requests", async () => {
             settings.channelID = null;
 
             vi.spyOn(event.module.requests, "getDraft").mockResolvedValue(null);

@@ -77,7 +77,7 @@ describe("Contact (InteractionCreate) Event", () => {
             expect(settingsSpy).not.toHaveBeenCalled();
         });
 
-        it("should ignore if the interaction is not the contact button", async () => {
+        it("should ignore if the interaction does not come from the 'Contact' button", async () => {
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
                 custom_id: ProfileActionButton.Report

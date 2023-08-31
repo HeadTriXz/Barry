@@ -1139,7 +1139,7 @@ describe("ProfileEditor", () => {
                 expect(module.postProfile).toHaveBeenCalledWith(mockUser, mockProfile, settings);
             });
 
-            it("should show an error message if the profiles are disabled in the guild", async () => {
+            it("should show an error message if the module is disabled in the guild", async () => {
                 const data = createMockMessageComponentInteraction({
                     component_type: ComponentType.Button,
                     custom_id: "publish"
@@ -1162,7 +1162,7 @@ describe("ProfileEditor", () => {
                 });
             });
 
-            it("should show an error message if the guild has not set a channel for profiles", async () => {
+            it("should show an error message if the guild has not configured a channel for profiles", async () => {
                 const data = createMockMessageComponentInteraction({
                     component_type: ComponentType.Button,
                     custom_id: "publish"
