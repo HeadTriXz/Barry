@@ -1,7 +1,7 @@
 /**
  * Utility class used to easily access emojis in the config.
  */
-class Emoji {
+export class Emoji {
     /**
      * Whether the emoji is animated.
      */

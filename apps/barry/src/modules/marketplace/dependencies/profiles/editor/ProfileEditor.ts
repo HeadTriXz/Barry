@@ -3,19 +3,16 @@ import type { UpdatableInteraction } from "@barry/core";
 import type ProfilesModule from "../index.js";
 
 import { ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core";
+import { INVITE_REGEX, retryComponents, timeoutContent } from "../../../constants.js";
+import { capitalizeEachSentence, displayContact } from "../../../utils.js";
 import {
     getEditAvailabilityContent,
     getEditContactContent,
     getEditProfileContent,
-    getProfileContent,
-    retryComponents,
-    timeoutContent
-} from "./content.js";
-import {
-    INVITE_REGEX,
-    capitalizeEachSentence,
-    parseProfileData
-} from "./functions/utils.js";
+    getProfileContent
+} from "./functions/content.js";
+
+import { parseProfileData } from "./functions/utils.js";
 import config from "../../../../../config.js";
 
 /**
@@ -305,7 +302,7 @@ export class ProfileEditor {
         }
 
         if (response.data.customID === "no") {
-            await this.module.profiles.upsert(interaction.user.id, {
+            this.profile = await this.module.profiles.upsert(interaction.user.id, {
                 creationStatus: ProfileCreationStatus.Preview
             });
 
@@ -492,7 +489,7 @@ export class ProfileEditor {
         if (response.data.customID === "contact") {
             await response.deferUpdate();
 
-            await this.module.displayContact(interaction, this.profile!);
+            await displayContact(interaction, this.profile!);
             await this.#awaitPreviewResponse(interaction, messageID, channelID);
         }
     }

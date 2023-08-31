@@ -1,11 +1,5 @@
 import { APIModalSubmitInteraction, ComponentType } from "@discordjs/core";
-import {
-    INVITE_REGEX,
-    URL_REGEX,
-    capitalizeEachSentence,
-    capitalizeEachWord,
-    parseProfileData
-} from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/utils.js";
+import { URL_REGEX, parseProfileData } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/utils.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Application } from "../../../../../../src/Application.js";
@@ -14,37 +8,6 @@ import { createMockApplication } from "../../../../../mocks/application.js";
 import { createMockModalSubmitInteraction } from "@barry/testing";
 
 describe("Utils", () => {
-    describe("INVITE_REGEX", () => {
-        it("should match valid invite links", () => {
-            expect(INVITE_REGEX.test("https://discord.gg/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("https://discord.com/invite/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("https://discordapp.com/invite/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("https://discord.io/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("https://discord.me/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("https://discord.plus/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("https://invite.gg/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("https://invite.ink/abcdef")).toBe(true);
-
-            expect(INVITE_REGEX.test("http://discord.gg/abcdef")).toBe(true);
-            expect(INVITE_REGEX.test("discord.gg/abcdef")).toBe(true);
-        });
-
-        it("should not match invalid invite links", () => {
-            expect(INVITE_REGEX.test("https://discord.gg/")).toBe(false);
-            expect(INVITE_REGEX.test("https://discord.com/invite/")).toBe(false);
-            expect(INVITE_REGEX.test("https://discordapp.com/invite/")).toBe(false);
-            expect(INVITE_REGEX.test("https://discord.io/")).toBe(false);
-            expect(INVITE_REGEX.test("https://discord.me/")).toBe(false);
-            expect(INVITE_REGEX.test("https://discord.plus/")).toBe(false);
-            expect(INVITE_REGEX.test("https://invite.gg/")).toBe(false);
-            expect(INVITE_REGEX.test("https://invite.ink/")).toBe(false);
-
-            expect(INVITE_REGEX.test("https://google.com/")).toBe(false);
-            expect(INVITE_REGEX.test("https://discord.com/blog")).toBe(false);
-            expect(INVITE_REGEX.test("https://headtrixz.dev/")).toBe(false);
-        });
-    });
-
     describe("URL_REGEX", () => {
         it("should match valid URLs", () => {
             expect(URL_REGEX.test("https://www.example.com")).toBe(true);
@@ -65,26 +28,6 @@ describe("Utils", () => {
             expect(URL_REGEX.test("https://localhost")).toBe(false);
             expect(URL_REGEX.test("https://google")).toBe(false);
             expect(URL_REGEX.test(".com")).toBe(false);
-        });
-    });
-
-    describe("capitalizeEachSentence", () => {
-        it("should capitalize each sentence in the string", () => {
-            const input = "hello. this is a test. how are you?";
-            const expected = "Hello. This is a test. How are you?";
-            const result = capitalizeEachSentence(input);
-
-            expect(result).toEqual(expected);
-        });
-    });
-
-    describe("capitalizeEachWord", () => {
-        it("should capitalize each word in the string", () => {
-            const input = "hello world! this is a test.";
-            const expected = "Hello World! This Is A Test.";
-
-            const result = capitalizeEachWord(input);
-            expect(result).toEqual(expected);
         });
     });
 

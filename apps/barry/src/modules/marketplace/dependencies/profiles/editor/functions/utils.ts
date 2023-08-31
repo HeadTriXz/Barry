@@ -1,48 +1,19 @@
 import type { ModalSubmitInteraction } from "@barry/core";
 import type { Prisma } from "@prisma/client";
 
+import {
+    capitalizeEachSentence,
+    capitalizeEachWord
+} from "../../../../utils.js";
+
+import { INVITE_REGEX } from "../../../../constants.js";
 import { MessageFlags } from "@discordjs/core";
 import config from "../../../../../../config.js";
-
-/**
- * Regular expression to match Discord invite links.
- */
-export const INVITE_REGEX = /(?:discord\.(?:gg|io|me|plus)|discord(?:app)?\.com\/invite|invite\.(?:gg|ink))\/[\w-]{2,}/i;
 
 /**
  * Regular expression to match URLs.
  */
 export const URL_REGEX = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/i;
-
-/**
- * Capitalizes the first letter of each sentence in a string.
- *
- * @param value The input string to be capitalized.
- * @returns The input string with each sentence's first letter capitalized.
- */
-export function capitalizeEachSentence(value: string): string {
-    const sentences = value.trim().split(/[.!?]\s+/);
-    const capitalizedSentences = sentences.map((sentence) => {
-        return sentence.charAt(0).toUpperCase() + sentence.slice(1);
-    });
-
-    return capitalizedSentences.join(". ");
-}
-
-/**
- * Capitalizes the first letter of each word in a string.
- *
- * @param value The input string to be capitalized.
- * @returns The input string with each word's first letter capitalized.
- */
-export function capitalizeEachWord(value: string): string {
-    const words = value.trim().split(/\s+/);
-    const capitalizedWords = words.map((word) => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-
-    return capitalizedWords.join(" ");
-}
 
 /**
  * Parses user-submitted profile data and formats it.

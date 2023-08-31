@@ -1,15 +1,18 @@
 import {
     type APIUser,
     ButtonStyle,
-    ComponentType,
-    MessageFlags
+    ComponentType
 } from "@discordjs/core";
 import type { Profile, ProfilesSettings } from "@prisma/client";
-import { type ReplyableInteraction, Module } from "@barry/core";
 import type { Application } from "../../../../Application.js";
 
-import { ProfileMessageRepository, ProfileRepository, ProfilesSettingsRepository } from "./database.js";
-import { getProfileContent } from "./editor/content.js";
+import {
+    ProfileMessageRepository,
+    ProfileRepository,
+    ProfilesSettingsRepository
+} from "./database.js";
+import { Module } from "@barry/core";
+import { getProfileContent } from "./editor/functions/content.js";
 import { loadEvents } from "../../../../utils/loadFolder.js";
 
 /**
@@ -64,44 +67,6 @@ export default class ProfilesModule extends Module<Application> {
         this.profileMessages = new ProfileMessageRepository(client.prisma);
         this.profiles = new ProfileRepository(client.prisma);
         this.profilesSettings = new ProfilesSettingsRepository(client.prisma);
-    }
-
-    /**
-     * Displays the contact information of a profile.
-     *
-     * @param interaction The interaction to reply to.
-     * @param profile The profile to display the contact information of.
-     */
-    async displayContact(interaction: ReplyableInteraction, profile: Profile): Promise<void> {
-        if (profile.contact === null) {
-            return interaction.createMessage({
-                components: [{
-                    components: [{
-                        label: "Send a DM",
-                        style: ButtonStyle.Link,
-                        type: ComponentType.Button,
-                        url: `https://discord.com/users/${profile.userID}`
-                    }],
-                    type: ComponentType.ActionRow
-                }],
-                content: `<@${profile.userID}> hasn't provided any contact information. You can reach out to them by sending a direct message.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        await interaction.createMessage({
-            components: [{
-                components: [{
-                    label: "Send a DM",
-                    style: ButtonStyle.Link,
-                    type: ComponentType.Button,
-                    url: `https://discord.com/users/${profile.userID}`
-                }],
-                type: ComponentType.ActionRow
-            }],
-            content: `<@${profile.userID}> prefers to be contacted using the following information:\n\`\`\`\n${profile.contact}\`\`\``,
-            flags: MessageFlags.Ephemeral
-        });
     }
 
     /**
