@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import { capitalize } from "../../src/utils/index.js";
 
 describe("utils", () => {

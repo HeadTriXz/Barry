@@ -10,7 +10,6 @@ import {
     ModalSubmitInteraction,
     PingInteraction
 } from "../../src/index.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockApplicationCommandInteraction,
     createMockAutocompleteInteraction,

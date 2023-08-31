@@ -1,6 +1,5 @@
 import { type API, InteractionType, ComponentType } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it } from "vitest";
 import { Client, ModalSubmitInteraction } from "../../src/index.js";
 import { createMockModalSubmitInteraction } from "@barry/testing";
 

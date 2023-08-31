@@ -1,6 +1,5 @@
 import { type API, InteractionResponseType, InteractionType } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Client, PingInteraction } from "../../src/index.js";
 import { mockPingInteraction } from "@barry/testing";
 

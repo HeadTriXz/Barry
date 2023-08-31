@@ -1,7 +1,10 @@
 import type { GatewayMessageCreateDispatchData } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mockMember, mockMessage, mockUser } from "@barry/testing";
+import {
+    mockMember,
+    mockMessage,
+    mockUser
+} from "@barry/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";

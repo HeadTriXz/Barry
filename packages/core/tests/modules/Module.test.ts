@@ -6,7 +6,6 @@ import {
     Event
 } from "../../src/index.js";
 
-import { beforeEach, describe, expect, it } from "vitest";
 import { MockSlashCommandBar, MockSlashCommandFoo } from "../mocks/commands.js";
 import { MockModule, mockModuleOptions } from "../mocks/index.js";
 

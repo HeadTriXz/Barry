@@ -1,6 +1,5 @@
 import { ComponentType, MessageFlags, TextInputStyle } from "@discordjs/core";
 import { ProfileAvailability, combinations } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/availability.js";
-import { afterEach, describe, expect, it, vi } from "vitest";
 import {
     getEditAvailabilityContent,
     getEditContactContent,

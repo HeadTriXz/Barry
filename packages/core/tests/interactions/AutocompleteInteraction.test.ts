@@ -4,7 +4,6 @@ import {
     InteractionResponseType
 } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AutocompleteInteraction, Client } from "../../src/index.js";
 import { createMockAutocompleteInteraction } from "@barry/testing";
 

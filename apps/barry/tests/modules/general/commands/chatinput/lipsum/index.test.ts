@@ -1,13 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { ApplicationCommandInteraction } from "@barry/core";
 import { createMockApplicationCommandInteraction } from "@barry/testing";
 import { createMockApplication } from "../../../../../mocks/index.js";
 
-import * as generator from "../../../../../../src/modules/general/commands/chatinput/lipsum/generator.js";
-
 import GeneralModule from "../../../../../../src/modules/general/index.js";
 import LipsumCommand from "../../../../../../src/modules/general/commands/chatinput/lipsum/index.js";
+
+import * as generator from "../../../../../../src/modules/general/commands/chatinput/lipsum/generator.js";
 
 describe("/lipsum", () => {
     let command: LipsumCommand;

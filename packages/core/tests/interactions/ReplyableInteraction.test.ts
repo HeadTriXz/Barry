@@ -1,7 +1,6 @@
 import { type API, GatewayDispatchEvents, InteractionResponseType } from "@discordjs/core";
 
 import { Client, InteractionFactory, ReplyableInteraction } from "../../src/index.js";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,

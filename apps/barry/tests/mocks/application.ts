@@ -1,10 +1,8 @@
-import { Module, UserCommand } from "@barry/core";
-
 import { Application } from "../../src/Application.js";
 import { GatewayIntentBits } from "@discordjs/core";
+import { MockModule } from "./common.js";
 import { prisma } from "./prisma.js";
 import { redis } from "./redis.js";
-import { vi } from "vitest";
 
 vi.mock("ioredis", () => ({
     Redis: vi.fn(() => redis)
@@ -18,33 +16,6 @@ vi.mock("@prisma/client", async (importOriginal) => {
         PrismaClient: vi.fn(() => prisma)
     };
 });
-
-export class MockCommand extends UserCommand {
-    constructor(module: Module) {
-        super(module, {
-            name: "Foo"
-        });
-    }
-
-    async execute(): Promise<void> {
-        // empty...
-    }
-}
-
-export class MockModule extends Module {
-    constructor(client: Application) {
-        super(client, {
-            id: "mock",
-            name: "Mock",
-            description: "Mock module for testing purposes",
-            commands: [MockCommand]
-        });
-    }
-
-    isEnabled(): boolean {
-        return true;
-    }
-}
 
 export const mockAppOptions = {
     discord: {

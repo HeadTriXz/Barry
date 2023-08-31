@@ -1,5 +1,4 @@
 import { type CooldownManager, MapCooldownManager } from "../../../src/index.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("MapCooldownManager", () => {
     const key = "cooldown";

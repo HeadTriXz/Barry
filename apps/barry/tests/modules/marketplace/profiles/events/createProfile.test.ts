@@ -1,5 +1,6 @@
+import type { ProfilesSettings } from "@prisma/client";
+
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockMessageComponentInteraction,
     mockChannel,
@@ -7,7 +8,6 @@ import {
 } from "@barry/testing";
 import { ComponentType } from "@discordjs/core";
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
-import { ProfilesSettings } from "@prisma/client";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockProfile } from "../mocks/profile.js";
 

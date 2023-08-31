@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import { INVITE_REGEX } from "../../../src/modules/marketplace/constants.js";
 
 describe("INVITE_REGEX", () => {

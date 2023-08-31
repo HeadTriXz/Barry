@@ -1,10 +1,8 @@
 import { type HeadersInit, fetch } from "undici";
 import { type Server, FastifyServer, StatusCodes } from "../src/index.js";
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-
-import nacl from "tweetnacl";
 import { File } from "node:buffer";
+import nacl from "tweetnacl";
 
 const SERVER_HOST = "localhost";
 const SERVER_PORT = 3000;

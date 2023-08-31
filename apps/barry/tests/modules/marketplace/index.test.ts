@@ -1,6 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
 import { createMockApplication } from "../../mocks/application.js";
-
 import MarketplaceModule from "../../../src/modules/marketplace/index.js";
 
 describe("MarketplaceModule", () => {

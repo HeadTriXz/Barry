@@ -1,8 +1,6 @@
 import type { GatewayVoiceState } from "@discordjs/core";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma, redis } from "../../../mocks/index.js";
-
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
 import { mockMember } from "@barry/testing";

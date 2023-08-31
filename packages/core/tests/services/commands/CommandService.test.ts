@@ -11,7 +11,6 @@ import {
     ApplicationCommandType
 } from "@discordjs/core";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     MockModule,
     MockMessageCommand,

@@ -1,7 +1,6 @@
 import { type Canvas, loadImage } from "canvas-constructor/napi-rs";
 import type { MemberActivity } from "@prisma/client";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mockMessage, mockUser } from "@barry/testing";
 
 import { LeaderboardCanvas } from "../../../../../../src/modules/leveling/commands/chatinput/leaderboard/LeaderboardCanvas.js";

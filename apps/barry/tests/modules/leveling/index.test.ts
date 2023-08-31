@@ -1,5 +1,4 @@
 import { type MemberActivity, LevelUpNotificationType } from "@prisma/client";
-
 import type { APIChannel } from "@discordjs/core";
 
 import {
@@ -7,7 +6,6 @@ import {
     LevelingSettingsRepository,
     MemberActivityRepository
 } from "../../../src/modules/leveling/database.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApplication } from "../../mocks/application.js";
 
 import LevelingModule from "../../../src/modules/leveling/index.js";

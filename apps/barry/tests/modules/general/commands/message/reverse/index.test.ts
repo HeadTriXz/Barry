@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ComponentType, MessageFlags } from "@discordjs/core";
 import {
     createMockApplicationCommandInteraction,
     mockAttachment,
@@ -6,7 +6,6 @@ import {
 } from "@barry/testing";
 
 import { ApplicationCommandInteraction } from "@barry/core";
-import { ComponentType, MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../src/modules/general/index.js";

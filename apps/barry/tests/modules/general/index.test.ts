@@ -1,5 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import { ApplicationCommandInteraction, Module } from "@barry/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplicationCommandInteraction } from "@barry/testing";

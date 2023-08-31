@@ -1,17 +1,16 @@
+import { type ProfilesSettings, ProfileCreationStatus } from "@prisma/client";
+import type { ProfileWithMessages } from "../../../../../src/modules/marketplace/dependencies/profiles/database.js";
+
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { ProfileCreationStatus, ProfilesSettings } from "@prisma/client";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     createMockMessageComponentInteraction,
     mockChannel,
     mockPingInteraction,
     mockUser
 } from "@barry/testing";
-
-import { ProfileWithMessages } from "../../../../../src/modules/marketplace/dependencies/profiles/database.js";
-import { mockProfile } from "../mocks/profile.js";
 import { createMockApplication } from "../../../../mocks/index.js";
+import { mockProfile } from "../mocks/profile.js";
 
 import ProfilesModule, { ManageProfileButton } from "../../../../../src/modules/marketplace/dependencies/profiles/index.js";
 import PostProfileEvent from "../../../../../src/modules/marketplace/dependencies/profiles/events/postProfile.js";

@@ -1,24 +1,37 @@
+import type { ProfilesSettings } from "@prisma/client";
+
 import { ButtonStyle, ComponentType } from "@discordjs/core";
 import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
 } from "../../../../src/modules/marketplace/dependencies/profiles/database.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockUser, mockMessage } from "@barry/testing";
-
 import { createMockApplication } from "../../../mocks/application.js";
 import { getProfileContent } from "../../../../src/modules/marketplace/dependencies/profiles/editor/functions/content.js";
 import { mockProfile } from "./mocks/profile.js";
 
-import ProfilesModule, { ManageProfileButton, ProfileActionButton } from "../../../../src/modules/marketplace/dependencies/profiles/index.js";
+import ProfilesModule, {
+    ManageProfileButton,
+    ProfileActionButton
+} from "../../../../src/modules/marketplace/dependencies/profiles/index.js";
 
 describe("ProfilesModule", () => {
     let module: ProfilesModule;
+    let settings: ProfilesSettings;
 
     beforeEach(() => {
         const client = createMockApplication();
         module = new ProfilesModule(client);
+
+        settings = {
+            channelID: "48527482987641760",
+            enabled: true,
+            guildID: "68239102456844360",
+            lastMessageID: null
+        };
+
+        vi.spyOn(module.profilesSettings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("constructor", () => {
@@ -31,33 +44,21 @@ describe("ProfilesModule", () => {
 
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
-            const settingsSpy = vi.spyOn(module.profilesSettings, "get").mockResolvedValue({
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
-
             const enabled = await module.isEnabled("68239102456844360");
 
-            expect(settingsSpy).toHaveBeenCalledOnce();
-            expect(settingsSpy).toHaveBeenCalledWith("68239102456844360");
             expect(enabled).toBe(true);
+            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledOnce();
+            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
         });
 
         it("should return false if the guild has the module disabled", async () => {
-            const settingsSpy = vi.spyOn(module.profilesSettings, "get").mockResolvedValue({
-                channelID: "48527482987641760",
-                enabled: false,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
+            settings.enabled = false;
 
             const enabled = await module.isEnabled("68239102456844360");
 
-            expect(settingsSpy).toHaveBeenCalledOnce();
-            expect(settingsSpy).toHaveBeenCalledWith("68239102456844360");
             expect(enabled).toBe(false);
+            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledOnce();
+            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
         });
     });
 
@@ -66,12 +67,7 @@ describe("ProfilesModule", () => {
             const createSpy = vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
             const content = getProfileContent(mockUser, mockProfile);
 
-            await module.postProfile(mockUser, mockProfile, {
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
+            await module.postProfile(mockUser, mockProfile, settings);
 
             expect(createSpy).toHaveBeenCalledTimes(2);
             expect(createSpy).toHaveBeenCalledWith("48527482987641760", {
@@ -99,12 +95,7 @@ describe("ProfilesModule", () => {
         it("should post the buttons after the profile", async () => {
             const createSpy = vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
 
-            await module.postProfile(mockUser, mockProfile, {
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: null
-            });
+            await module.postProfile(mockUser, mockProfile, settings);
 
             expect(createSpy).toHaveBeenCalledTimes(2);
             expect(createSpy).toHaveBeenCalledWith("48527482987641760", {
@@ -145,14 +136,11 @@ describe("ProfilesModule", () => {
         });
 
         it("should throw an error if the channel is unknown", async () => {
-            await expect(() =>
-                module.postProfile(mockUser, mockProfile, {
-                    channelID: null,
-                    enabled: true,
-                    guildID: "68239102456844360",
-                    lastMessageID: "91256340920236565"
-                })
-            ).rejects.toThrowError("Failed to post a profile, channel is unknown.");
+            settings.channelID = null;
+
+            await expect(() => module.postProfile(mockUser, mockProfile, settings)).rejects.toThrowError(
+                "Failed to post a profile, channel is unknown."
+            );
         });
 
         it("should handle errors when deleting the previous buttons message", async () => {
@@ -160,13 +148,9 @@ describe("ProfilesModule", () => {
             vi.spyOn(module.client.api.channels, "deleteMessage").mockRejectedValue(new Error());
 
             const loggerSpy = vi.spyOn(module.client.logger, "warn");
+            settings.lastMessageID = "91256340920236565";
 
-            await module.postProfile(mockUser, mockProfile, {
-                channelID: "48527482987641760",
-                enabled: true,
-                guildID: "68239102456844360",
-                lastMessageID: "91256340920236565"
-            });
+            await module.postProfile(mockUser, mockProfile, settings);
 
             expect(loggerSpy).toHaveBeenCalledOnce();
             expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining("Could not delete last message"));

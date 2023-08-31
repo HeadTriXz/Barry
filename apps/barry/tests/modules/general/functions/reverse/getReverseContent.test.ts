@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-
 import { MessageFlags } from "@discordjs/core";
 import { getReverseContent } from "../../../../../src/modules/general/functions/reverse/getReverseContent.js";
 import { mockAttachment } from "@barry/testing";

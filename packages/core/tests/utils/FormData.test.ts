@@ -1,4 +1,3 @@
-import { beforeEach, describe, expect, it } from "vitest";
 import { FormData } from "../../src/index.js";
 
 describe("FormData", () => {

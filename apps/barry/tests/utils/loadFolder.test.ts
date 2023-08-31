@@ -1,31 +1,17 @@
 import type { Dirent } from "node:fs";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { loadCommands, loadEvents, loadFolder, loadModules } from "../../src/utils/index.js";
-import { BaseCommand, Event, Module, SlashCommand } from "@barry/core";
-
-import fs from "node:fs/promises";
-
+import { MockCommand, MockEvent, MockModule } from "../mocks/index.js";
+import {
+    loadCommands,
+    loadEvents,
+    loadFolder,
+    loadModules
+} from "../../src/utils/index.js";
+import { BaseCommand } from "@barry/core";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
-class MockCommand extends SlashCommand {
-    async execute(): Promise<void> {
-        // empty.
-    }
-}
-
-class MockEvent extends Event {
-    async execute(): Promise<void> {
-        // empty.
-    }
-}
-
-class MockModule extends Module {
-    isEnabled(): boolean {
-        return true;
-    }
-}
+import fs from "node:fs/promises";
 
 vi.mock("node:fs/promises");
 

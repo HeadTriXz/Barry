@@ -1,7 +1,6 @@
-import { APIModalSubmitInteraction, ComponentType } from "@discordjs/core";
-import { URL_REGEX, parseProfileData } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/utils.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { type APIModalSubmitInteraction, ComponentType } from "@discordjs/core";
 
+import { URL_REGEX, parseProfileData } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/utils.js";
 import { Application } from "../../../../../../src/Application.js";
 import { ModalSubmitInteraction } from "@barry/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
