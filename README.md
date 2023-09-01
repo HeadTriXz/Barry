@@ -26,7 +26,6 @@
 - **[barry](/apps/barry)** - A versatile and user-friendly Discord bot designed to assist and enhance the workflow of creatives.
 - **[@barry/core](/packages/core)** - A toolkit for building advanced Discord bots.
 - **[@barry/logger](/packages/logger)** - An easy-to-use Node.js logger.
-- **[@barry/music](/packages/music)** - An easy-to-use Node.js wrapper around Lavalink.
 - **[@barry/testing](/packages/testing)** - A collection of mock data for testing Discord bots.
 
 ## Contributing
