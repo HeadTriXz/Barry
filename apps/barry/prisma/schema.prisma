@@ -153,3 +153,53 @@ model RequestsSettings {
 
   @@map("requests_settings")
 }
+
+// Moderation
+enum CaseType {
+  Note    @map("NOTE")
+  Warn    @map("WARN")
+  Mute    @map("MUTE")
+  Kick    @map("KICK")
+  Ban     @map("BAN")
+  Unmute  @map("UNMUTE")
+  Unban   @map("UNBAN")
+}
+
+model Case {
+  id        Int
+  guildID   String     @map("guild_id")
+  creatorID String     @map("creator_id")
+  notes     CaseNote[]
+  type      CaseType
+  userID    String     @map("user_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  @@id([guildID, id])
+  @@index([guildID, userID])
+  @@index([guildID, creatorID])
+  @@index([guildID, type])
+  @@map("cases")
+}
+
+model CaseNote {
+  id        Int
+  caseID    Int      @map("case_id")
+  guildID   String   @map("guild_id")
+  case      Case     @relation(references: [guildID, id], fields: [guildID, caseID], onDelete: Cascade)
+  content   String
+  creatorID String   @map("creator_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([guildID, caseID, id])
+  @@map("case_notes")
+}
+
+model ModerationSettings {
+  guildID   String  @id @map("guild_id")
+  channelID String? @map("channel_id")
+  dwcDays   Int     @map("dwc_days") @default(7)
+  dwcRoleID String? @map("dwc_role_id")
+  enabled   Boolean @default(false)
+
+  @@map("moderation_settings")
+}
