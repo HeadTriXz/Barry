@@ -1,5 +1,6 @@
 import {
     type APIAttachment,
+    type APIGuild,
     type APIGuildMember,
     type APIInteractionDataResolvedChannel,
     type APIInteractionGuildMember,
@@ -7,7 +8,14 @@ import {
     type APIPartialChannel,
     type APIRole,
     type APIUser,
-    ChannelType
+    ChannelType,
+    GuildDefaultMessageNotifications,
+    GuildExplicitContentFilter,
+    GuildMFALevel,
+    GuildNSFWLevel,
+    GuildPremiumTier,
+    GuildSystemChannelFlags,
+    GuildVerificationLevel
 } from "@discordjs/core";
 
 /**
@@ -30,6 +38,43 @@ export const mockChannel = {
     name: "general",
     type: ChannelType.GuildText
 } satisfies APIPartialChannel;
+
+/**
+ * Represents a guild.
+ */
+export const mockGuild = {
+    afk_channel_id: null,
+    afk_timeout: 900,
+    application_id: null,
+    banner: null,
+    default_message_notifications: GuildDefaultMessageNotifications.OnlyMentions,
+    description: null,
+    discovery_splash: null,
+    emojis: [],
+    explicit_content_filter: GuildExplicitContentFilter.AllMembers,
+    features: [],
+    hub_type: null,
+    icon: "9507a0067e219e749e74a678d14b791a",
+    id: "68239102456844360",
+    mfa_level: GuildMFALevel.None,
+    name: "Barry's Server",
+    nsfw_level: GuildNSFWLevel.Safe,
+    owner_id: "257522665441460225",
+    preferred_locale: "en-US",
+    premium_progress_bar_enabled: false,
+    premium_subscription_count: 10,
+    premium_tier: GuildPremiumTier.Tier2,
+    public_updates_channel_id: null,
+    region: "us-east",
+    roles: [],
+    rules_channel_id: null,
+    splash: null,
+    stickers: [],
+    system_channel_id: null,
+    system_channel_flags: GuildSystemChannelFlags.SuppressGuildReminderNotifications,
+    vanity_url_code: null,
+    verification_level: GuildVerificationLevel.Medium
+} satisfies APIGuild;
 
 /**
  * Represents a mock interaction channel.
