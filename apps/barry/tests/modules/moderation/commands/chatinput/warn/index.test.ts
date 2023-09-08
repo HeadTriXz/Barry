@@ -1,4 +1,4 @@
-import { type Case, CaseType } from "@prisma/client";
+import { type Case, type ModerationSettings, CaseType } from "@prisma/client";
 
 import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
 import { ApplicationCommandType, MessageFlags } from "@discordjs/core";
@@ -24,7 +24,9 @@ import * as permissions from "../../../../../../src/modules/moderation/functions
 describe("/warn", () => {
     let command: WarnCommand;
     let interaction: ApplicationCommandInteraction;
+    let mockCase: Case;
     let options: WarnOptions;
+    let settings: ModerationSettings;
 
     beforeEach(() => {
         const client = createMockApplication();
@@ -34,6 +36,15 @@ describe("/warn", () => {
 
         const data = createMockApplicationCommandInteraction();
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
+
+        mockCase = {
+            createdAt: new Date("1-1-2023"),
+            creatorID: mockUser.id,
+            guildID: mockGuild.id,
+            id: 34,
+            type: CaseType.Warn,
+            userID: "257522665437265920"
+        };
         options = {
             member: {
                 ...mockMember,
@@ -44,20 +55,21 @@ describe("/warn", () => {
             },
             reason: "Rude!"
         };
+        settings = {
+            channelID: "30527482987641765",
+            dwcDays: 7,
+            dwcRoleID: null,
+            enabled: true,
+            guildID: "68239102456844360"
+        };
 
-        vi.spyOn(command.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
-        vi.spyOn(command.client.api.guilds, "get").mockResolvedValue(mockGuild);
-        vi.spyOn(command.client.api.guilds, "getMember").mockResolvedValue(mockMember);
-        vi.spyOn(command.client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
-        vi.spyOn(command.module.cases, "create").mockResolvedValue({
-            createdAt: new Date("1-1-2023"),
-            creatorID: mockUser.id,
-            guildID: mockGuild.id,
-            id: 34,
-            type: CaseType.Warn,
-            userID: "257522665437265920"
-        });
-        vi.spyOn(command.module.cases, "getByUser").mockResolvedValue([]);
+        vi.spyOn(client.api.channels, "createMessage").mockResolvedValue(mockMessage);
+        vi.spyOn(client.api.guilds, "get").mockResolvedValue(mockGuild);
+        vi.spyOn(client.api.guilds, "getMember").mockResolvedValue(mockMember);
+        vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
+        vi.spyOn(module.cases, "create").mockResolvedValue(mockCase);
+        vi.spyOn(module.cases, "getByUser").mockResolvedValue([]);
+        vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
     });
 
     afterEach(() => {
@@ -133,7 +145,7 @@ describe("/warn", () => {
 
             await command.execute(interaction, options);
 
-            expect(createSpy).toHaveBeenCalledOnce();
+            expect(createSpy).toHaveBeenCalledTimes(2);
             expect(createSpy).toHaveBeenCalledWith(mockChannel.id, {
                 embeds: [{
                     color: expect.any(Number),
@@ -171,6 +183,21 @@ describe("/warn", () => {
                 type: CaseType.Warn,
                 userID: options.member.user.id
             });
+        });
+
+        it("should log the case in the configured log channel", async () => {
+            vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
+            const createSpy = vi.spyOn(command.module, "createLogMessage");
+
+            await command.execute(interaction, options);
+
+            expect(createSpy).toHaveBeenCalledOnce();
+            expect(createSpy).toHaveBeenCalledWith({
+                case: mockCase,
+                creator: interaction.user,
+                reason: options.reason,
+                user: options.member.user
+            }, settings);
         });
     });
 
