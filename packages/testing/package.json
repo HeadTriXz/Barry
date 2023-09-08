@@ -23,7 +23,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@discordjs/core": "^0.6.0"
+  "devDependencies": {
+    "@discordjs/core": "^1.0.1"
   }
 }

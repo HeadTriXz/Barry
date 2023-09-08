@@ -150,7 +150,12 @@ export class ApplicationCommandInteractionHandler implements InteractionHandler 
                 }
                 case ApplicationCommandOptionType.User: {
                     if (command.options.find((x) => x.name === option.name)?.isMember) {
-                        result[option.name] = resolved.members.get(option.value);
+                        const member = resolved.members.get(option.value);
+                        if (member === undefined) {
+                            throw new Error("Could not retrieve target member.");
+                        }
+
+                        result[option.name] = member;
                     } else {
                         result[option.name] = resolved.users.get(option.value);
                     }

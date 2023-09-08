@@ -563,5 +563,32 @@ describe("ApplicationCommandInteractionHandler", () => {
                 foo: "Hello World"
             });
         });
+
+        it("should throw an error if the member does not exist for a 'MEMBER' option", async () => {
+            client.logger.error = vi.fn();
+            const interaction = createMockInteractionWithOption({
+                name: "foo",
+                type: ApplicationCommandOptionType.User,
+                value: "257522665441460220"
+            });
+
+            const command = client.commands.get(interaction) as SlashCommand;
+            command.options = [{
+                description: "The description of the option",
+                isMember: true,
+                name: "foo",
+                type: ApplicationCommandOptionType.User
+            }];
+
+            await handler.handle(interaction);
+
+            expect(client.logger.error).toHaveBeenCalledOnce();
+            expect(client.logger.error).toHaveBeenCalledWith(
+                "An error occurred while executing the command:",
+                expect.objectContaining({
+                    message: "Could not retrieve target member."
+                })
+            );
+        });
     });
 });
