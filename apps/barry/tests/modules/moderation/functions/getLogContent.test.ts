@@ -50,6 +50,7 @@ describe("getLogContent", () => {
     it("should generate the correct content for a log message with a duration", () => {
         options.duration = 1000 * 60 * 60 * 24 * 7;
         const content = getLogContent(options);
+        const expiresAt = Math.trunc((options.case.createdAt.getTime() + options.duration) / 1000);
 
         expect(content).toEqual({
             embeds: [{
@@ -67,7 +68,7 @@ describe("getLogContent", () => {
                     },
                     {
                         name: "**Duration**",
-                        value: "Expires <t:2277327600:R>"
+                        value: `Expires <t:${expiresAt}:R>`
                     }
                 ],
                 footer: {

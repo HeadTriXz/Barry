@@ -93,7 +93,7 @@ export function getLogContent(options: CaseLogOptions): APIInteractionResponseCa
     if (options.duration !== undefined) {
         embed.fields?.push({
             name: "**Duration**",
-            value: `Expires <t:${Math.floor(options.case.createdAt.getTime() / 1000 + options.duration)}:R>`
+            value: `Expires <t:${Math.trunc((options.case.createdAt.getTime() + options.duration) / 1000)}:R>`
         });
     }
 
