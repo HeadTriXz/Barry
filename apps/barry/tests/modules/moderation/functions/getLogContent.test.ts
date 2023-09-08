@@ -1,5 +1,6 @@
+import { type CaseLogOptions, getLogContent } from "../../../../src/modules/moderation/functions/getLogContent.js";
+
 import { mockGuild, mockUser } from "@barry/testing";
-import { getLogContent, type CaseLogOptions } from "../../../../src/modules/moderation/functions/getLogContent.js";
 import { CaseType } from "@prisma/client";
 import { getAvatarURL } from "@barry/core";
 

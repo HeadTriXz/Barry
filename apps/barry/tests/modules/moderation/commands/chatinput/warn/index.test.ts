@@ -1,4 +1,4 @@
-import { type Case, CaseType, type ModerationSettings } from "@prisma/client";
+import { type Case, type ModerationSettings, CaseType } from "@prisma/client";
 
 import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
 import { ApplicationCommandType, MessageFlags } from "@discordjs/core";
