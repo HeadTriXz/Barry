@@ -47,19 +47,33 @@ export class Emoji {
 
 export default {
     emotes: {
+        // Moderation
+        ban: new Emoji("ban", "1149399269531459616"),
+        kick: new Emoji("kick", "1149399337412071484"),
+        mute: new Emoji("mute", "1149399536381477006"),
+        note: new Emoji("note", "1149399622398255188"),
+        unban: new Emoji("unban", "1149399596372607127"),
+        unmute: new Emoji("unmute", "1149399568446914670"),
+        warn: new Emoji("warn", "1149399652504977508"),
+
+        // Marketplace
         add: new Emoji("add", "1013212104628645888"),
         available: new Emoji("check", "1004436175307669659"),
-        bing: new Emoji("bing", "1127741749016657980"),
         busy: new Emoji("busy", "1138853050539323584"),
+        unavailable: new Emoji("unavailable", "1138853052460322897"),
+
+        // Reverse Image Search
+        bing: new Emoji("bing", "1127741749016657980"),
+        googleLens: new Emoji("googlelens", "1127735623948705852"),
+        yandex: new Emoji("yandex", "1005213772199251988"),
+
+        // Other
         check: new Emoji("check", "1004436175307669659"),
         error: new Emoji("error", "1004436176859578510"),
-        googleLens: new Emoji("googlelens", "1127735623948705852"),
         loading: new Emoji("loading", "1135668500728397855", true),
         menu: new Emoji("hamburger", "1136294229405077564"),
         next: new Emoji("next", "1124406938738905098"),
-        previous: new Emoji("previous", "1124406936188768357"),
-        unavailable: new Emoji("unavailable", "1138853052460322897"),
-        yandex: new Emoji("yandex", "1005213772199251988")
+        previous: new Emoji("previous", "1124406936188768357")
     },
     defaultColor: 0xFFC331,
     embedColor: 0x2B2D31

@@ -15,7 +15,8 @@ import {
     GuildNSFWLevel,
     GuildPremiumTier,
     GuildSystemChannelFlags,
-    GuildVerificationLevel
+    GuildVerificationLevel,
+    RoleFlags
 } from "@discordjs/core";
 
 /**
@@ -68,6 +69,7 @@ export const mockGuild = {
     region: "us-east",
     roles: [],
     rules_channel_id: null,
+    safety_alerts_channel_id: null,
     splash: null,
     stickers: [],
     system_channel_id: null,
@@ -89,6 +91,7 @@ export const mockInteractionChannel = {
  */
 export const mockRole = {
     color: 0xFF0000,
+    flags: RoleFlags.InPrompt,
     hoist: true,
     id: "68239102456844360",
     managed: false,

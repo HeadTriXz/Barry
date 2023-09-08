@@ -1,7 +1,9 @@
 import type { FastifyInstance } from "fastify";
+import type { RawFile } from "@discordjs/rest";
+
+import { FormData } from "./utils/FormData.js";
 import fastify from "fastify";
 import nacl from "tweetnacl";
-import { FormData } from "./utils/FormData.js";
 
 /**
  * HTTP response status codes.
@@ -50,26 +52,6 @@ export type ResponseHandler<T = any> = (options: ResponseOptions<T>) => Promise<
 export type ServerRequestHandler<T = unknown> = (body: T, respond: ResponseHandler) => Promise<void>;
 
 /**
- * Represents a file.
- */
-export interface FileContent {
-    /**
-     * The data of the file.
-     */
-    data: FileContentData;
-
-    /**
-     * An optional key for the file. Will default to the index.
-     */
-    key?: string;
-
-    /**
-     * The name of the file.
-     */
-    name: string;
-}
-
-/**
  * Represents the options for an HTTP response.
  */
 export interface ResponseOptions<T = Record<string, any>> {
@@ -81,7 +63,7 @@ export interface ResponseOptions<T = Record<string, any>> {
     /**
      * An array of files to be sent in the response.
      */
-    files?: FileContent[];
+    files?: RawFile[];
 
     /**
      * The headers to be sent in the response.
