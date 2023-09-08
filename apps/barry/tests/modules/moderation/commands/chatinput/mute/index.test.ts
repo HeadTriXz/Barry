@@ -38,7 +38,7 @@ describe("/mute", () => {
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
 
         mockCase = {
-            createdAt: new Date("1-1-2023"),
+            createdAt: new Date(),
             creatorID: mockUser.id,
             guildID: mockGuild.id,
             id: 34,
@@ -97,7 +97,7 @@ describe("/mute", () => {
                         },
                         {
                             name: "**Duration**",
-                            value: "Expires <t:1672527900:R>"
+                            value: `Expires <t:${Math.trunc((Date.now() / 1000) + 300)}:R>`
                         }
                     ]
                 }]
@@ -112,7 +112,7 @@ describe("/mute", () => {
 
             expect(editSpy).toHaveBeenCalledOnce();
             expect(editSpy).toHaveBeenCalledWith(mockGuild.id, options.member.user.id, {
-                communication_disabled_until: new Date("1-1-2023 00:05:00").toISOString()
+                communication_disabled_until: new Date(Date.now() + 300000).toISOString()
             });
         });
 
