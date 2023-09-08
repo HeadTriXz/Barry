@@ -49,9 +49,9 @@ describe("getLogContent", () => {
     });
 
     it("should generate the correct content for a log message with a duration", () => {
-        options.duration = 1000 * 60 * 60 * 24 * 7;
+        options.duration = 60 * 60 * 24 * 7;
         const content = getLogContent(options);
-        const expiresAt = Math.trunc((options.case.createdAt.getTime() + options.duration) / 1000);
+        const expiresAt = Math.trunc((options.case.createdAt.getTime() / 1000) + options.duration);
 
         expect(content).toEqual({
             embeds: [{

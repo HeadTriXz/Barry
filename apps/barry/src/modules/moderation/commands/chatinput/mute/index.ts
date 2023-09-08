@@ -7,53 +7,68 @@ import { type PartialGuildMember, isAboveMember } from "../../../functions/permi
 import type ModerationModule from "../../../index.js";
 
 import { MessageFlags, PermissionFlagsBits } from "@discordjs/core";
-import { COMMON_SEVERE_REASONS } from "../../../constants.js";
+import { COMMON_MINOR_REASONS } from "../../../constants.js";
 import { CaseType } from "@prisma/client";
 import { DiscordAPIError } from "@discordjs/rest";
+import { getDuration } from "../../../functions/getDuration.js";
 
 import config from "../../../../../config.js";
 
 /**
- * Options for the kick command.
+ * Options for the mute command.
  */
-export interface KickOptions {
+export interface MuteOptions {
     /**
-     * The member to kick.
+     * The duration of the mute.
+     */
+    duration: string;
+
+    /**
+     * The member to mute.
      */
     member: PartialGuildMember;
 
     /**
-     * The reason for the kick.
+     * The reason for the mute.
      */
     reason: string;
 }
 
 /**
- * Represents a slash command that kicks a user.
+ * The maximum duration in seconds (28 days).
+ */
+const MAX_DURATION = 2419200;
+
+/**
+ * Represents a slash command that times out a user.
  */
 export default class extends SlashCommand<ModerationModule> {
     /**
-     * Represents a slash command that kicks a user.
+     * Represents a slash command that times out a user.
      *
      * @param module The module this command belongs to.
      */
     constructor(module: ModerationModule) {
         super(module, {
-            name: "kick",
-            description: "Kick a user from the server.",
-            appPermissions: PermissionFlagsBits.KickMembers,
-            defaultMemberPermissions: PermissionFlagsBits.KickMembers,
+            name: "mute",
+            description: "Mute a member.",
+            appPermissions: PermissionFlagsBits.ModerateMembers,
+            defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
             guildOnly: true,
             options: {
                 member: SlashCommandOptionBuilder.member({
-                    description: "The member to kick.",
+                    description: "The member to mute.",
+                    required: true
+                }),
+                duration: SlashCommandOptionBuilder.string({
+                    description: "The duration of the mute.",
                     required: true
                 }),
                 reason: SlashCommandOptionBuilder.string({
-                    description: "The reason for the kick (type to enter a custom reason)",
+                    description: "The reason for the mute (type to enter a custom reason)",
                     maximum: 200,
                     required: true,
-                    autocomplete: (value) => COMMON_SEVERE_REASONS
+                    autocomplete: (value) => COMMON_MINOR_REASONS
                         .filter((x) => x.toLowerCase().startsWith(value.toLowerCase()))
                         .map((x) => ({ name: x, value: x }))
                 })
@@ -62,26 +77,41 @@ export default class extends SlashCommand<ModerationModule> {
     }
 
     /**
-     * Kicks the user from the server.
+     * Times out the user.
      *
      * @param interaction The interaction that triggered the command.
      * @param options The options for the command.
      */
-    async execute(interaction: ApplicationCommandInteraction, options: KickOptions): Promise<void> {
+    async execute(interaction: ApplicationCommandInteraction, options: MuteOptions): Promise<void> {
         if (!interaction.isInvokedInGuild()) {
             return;
         }
 
+        const duration = getDuration(options.duration);
+        if (duration < 10) {
+            return interaction.createMessage({
+                content: `${config.emotes.error} The duration must at least be 10 seconds.`,
+                flags: MessageFlags.Ephemeral
+            });
+        }
+
+        if (duration > MAX_DURATION) {
+            return interaction.createMessage({
+                content: `${config.emotes.error} The duration must not exceed 28 days.`,
+                flags: MessageFlags.Ephemeral
+            });
+        }
+
         if (options.member.user.id === interaction.user.id) {
             return interaction.createMessage({
-                content: `${config.emotes.error} You cannot kick yourself.`,
+                content: `${config.emotes.error} You cannot mute yourself.`,
                 flags: MessageFlags.Ephemeral
             });
         }
 
         if (options.member.user.id === this.client.applicationID) {
             return interaction.createMessage({
-                content: `${config.emotes.error} Your attempt to kick me has been classified as a failed comedy show audition.`,
+                content: `${config.emotes.error} Your attempt to mute me has been classified as a failed comedy show audition.`,
                 flags: MessageFlags.Ephemeral
             });
         }
@@ -89,7 +119,7 @@ export default class extends SlashCommand<ModerationModule> {
         const guild = await this.client.api.guilds.get(interaction.guildID);
         if (!isAboveMember(guild, interaction.member, options.member)) {
             return interaction.createMessage({
-                content: `${config.emotes.error} You cannot kick this member.`,
+                content: `${config.emotes.error} You cannot mute this member.`,
                 flags: MessageFlags.Ephemeral
             });
         }
@@ -97,7 +127,7 @@ export default class extends SlashCommand<ModerationModule> {
         const self = await this.client.api.guilds.getMember(interaction.guildID, this.client.applicationID);
         if (!isAboveMember(guild, self as PartialGuildMember, options.member)) {
             return interaction.createMessage({
-                content: `${config.emotes.error} I cannot kick this member.`,
+                content: `${config.emotes.error} I cannot mute this member.`,
                 flags: MessageFlags.Ephemeral
             });
         }
@@ -107,11 +137,17 @@ export default class extends SlashCommand<ModerationModule> {
             await this.client.api.channels.createMessage(channel.id, {
                 embeds: [{
                     color: config.defaultColor,
-                    description: `${config.emotes.error} You have been kicked from **${guild.name}**`,
-                    fields: [{
-                        name: "**Reason**",
-                        value: options.reason
-                    }]
+                    description: `${config.emotes.error} You have been muted in **${guild.name}**`,
+                    fields: [
+                        {
+                            name: "**Reason**",
+                            value: options.reason
+                        },
+                        {
+                            name: "**Duration**",
+                            value: `Expires <t:${Math.trunc(((Date.now() / 1000) + duration))}:R>`
+                        }
+                    ]
                 }]
             });
         } catch (error: unknown) {
@@ -121,14 +157,14 @@ export default class extends SlashCommand<ModerationModule> {
         }
 
         try {
-            await this.client.api.guilds.removeMember(interaction.guildID, options.member.user.id, {
-                reason: options.reason
+            await this.client.api.guilds.editMember(interaction.guildID, options.member.user.id, {
+                communication_disabled_until: new Date(Date.now() + 1000 * duration).toISOString()
             });
         } catch (error: unknown) {
             this.client.logger.error(error);
 
             return interaction.createMessage({
-                content: `${config.emotes.error} Failed to kick this member.`,
+                content: `${config.emotes.error} Failed to mute this member.`,
                 flags: MessageFlags.Ephemeral
             });
         }
@@ -137,12 +173,12 @@ export default class extends SlashCommand<ModerationModule> {
             creatorID: interaction.user.id,
             guildID: interaction.guildID,
             note: options.reason,
-            type: CaseType.Kick,
+            type: CaseType.Mute,
             userID: options.member.user.id
         });
 
         await interaction.createMessage({
-            content: `${config.emotes.check} Case \`${entity.id}\` | Successfully kicked \`${options.member.user.username}\`.`,
+            content: `${config.emotes.check} Case \`${entity.id}\` | Successfully muted \`${options.member.user.username}\`.`,
             flags: MessageFlags.Ephemeral
         });
 
@@ -150,6 +186,7 @@ export default class extends SlashCommand<ModerationModule> {
         await this.module.createLogMessage({
             case: entity,
             creator: interaction.user,
+            duration: duration,
             reason: options.reason,
             user: options.member.user
         }, settings);

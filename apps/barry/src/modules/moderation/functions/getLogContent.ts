@@ -23,7 +23,7 @@ export interface CaseLogOptions {
     creator: APIUser;
 
     /**
-     * The duration of the case, if applicable.
+     * The duration in seconds of the case, if applicable.
      */
     duration?: number;
 
@@ -93,7 +93,7 @@ export function getLogContent(options: CaseLogOptions): APIInteractionResponseCa
     if (options.duration !== undefined) {
         embed.fields?.push({
             name: "**Duration**",
-            value: `Expires <t:${Math.trunc((options.case.createdAt.getTime() + options.duration) / 1000)}:R>`
+            value: `Expires <t:${Math.trunc((options.case.createdAt.getTime() / 1000) + options.duration)}:R>`
         });
     }
 
