@@ -13,7 +13,6 @@ import type ModerationModule from "../../../index.js";
 
 import { COMMON_SEVERE_REASONS } from "../../../constants.js";
 import { CaseType } from "@prisma/client";
-import { DiscordAPIError } from "@discordjs/rest";
 import { getDuration } from "../../../functions/getDuration.js";
 
 import config from "../../../../../config.js";
@@ -174,32 +173,13 @@ export default class extends SlashCommand<ModerationModule> {
         }
 
         if (member !== undefined) {
-            try {
-                const channel = await this.client.api.users.createDM(options.user.id);
-                const fields = [{
-                    name: "**Reason**",
-                    value: options.reason
-                }];
-
-                if (duration !== undefined) {
-                    fields.push({
-                        name: "**Duration**",
-                        value: `Expires <t:${Math.trunc(((Date.now() / 1000) + duration))}:R>`
-                    });
-                }
-
-                await this.client.api.channels.createMessage(channel.id, {
-                    embeds: [{
-                        color: config.defaultColor,
-                        description: `${config.emotes.error} You have been banned from **${guild.name}**`,
-                        fields: fields
-                    }]
-                });
-            } catch (error: unknown) {
-                if (!(error instanceof DiscordAPIError) || error.code !== 50007) {
-                    this.client.logger.error(error);
-                }
-            }
+            await this.module.notifyUser({
+                duration: duration,
+                guild: guild,
+                reason: options.reason,
+                type: CaseType.Ban,
+                userID: options.user.id
+            });
         }
 
         if (!isBanned) {

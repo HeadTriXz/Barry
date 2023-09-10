@@ -7,7 +7,12 @@ import {
     ModerationSettingsRepository,
     TempBanRepository
 } from "../../../src/modules/moderation/database.js";
-import { mockGuild, mockUser } from "@barry/testing";
+import {
+    mockChannel,
+    mockGuild,
+    mockMessage,
+    mockUser
+} from "@barry/testing";
 import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
 import { createMockApplication } from "../../mocks/application.js";
@@ -46,6 +51,9 @@ describe("ModerationModule", () => {
     });
 
     describe("checkExpiredBans", () => {
+        const guildID = "68239102456844360";
+        const userID = "257522665437265920";
+
         beforeEach(() => {
             module.createLogMessage = vi.fn();
             vi.spyOn(module.client.api.guilds, "unbanUser").mockResolvedValue();
@@ -56,16 +64,16 @@ describe("ModerationModule", () => {
             vi.spyOn(module.cases, "create").mockResolvedValue({
                 createdAt: new Date(),
                 creatorID: module.client.applicationID,
-                guildID: "68239102456844360",
+                guildID: guildID,
                 id: 1,
                 type: CaseType.Unban,
-                userID: "30527482987641765"
+                userID: userID
             });
             vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
             vi.spyOn(module.tempBans, "getExpired").mockResolvedValue([{
                 expiresAt: new Date(),
-                guildID: "68239102456844360",
-                userID: "30527482987641765"
+                guildID: guildID,
+                userID: userID
             }]);
 
             settings.channelID = "30527482987641765";
@@ -75,7 +83,7 @@ describe("ModerationModule", () => {
             await module.checkExpiredBans();
 
             expect(module.client.api.guilds.unbanUser).toHaveBeenCalledOnce();
-            expect(module.client.api.guilds.unbanUser).toHaveBeenCalledWith("68239102456844360", "30527482987641765");
+            expect(module.client.api.guilds.unbanUser).toHaveBeenCalledWith(guildID, userID);
             expect(module.tempBans.getExpired).toHaveBeenCalledOnce();
             expect(module.tempBans.getExpired).toHaveBeenCalledWith();
         });
@@ -86,7 +94,7 @@ describe("ModerationModule", () => {
             await module.checkExpiredBans();
 
             expect(deleteSpy).toHaveBeenCalledOnce();
-            expect(deleteSpy).toHaveBeenCalledWith("68239102456844360", "30527482987641765");
+            expect(deleteSpy).toHaveBeenCalledWith(guildID, userID);
         });
 
         it("should log an error if the unban fails due to an unknown error", async () => {
@@ -128,16 +136,17 @@ describe("ModerationModule", () => {
             expect(module.cases.create).toHaveBeenCalledOnce();
             expect(module.cases.create).toHaveBeenCalledWith({
                 creatorID: module.client.applicationID,
-                guildID: "68239102456844360",
+                guildID: guildID,
                 note: "Temporary ban expired.",
                 type: CaseType.Unban,
-                userID: "30527482987641765"
+                userID: userID
             });
         });
     });
 
     describe("createLogMessage", () => {
         const channelID = "30527482987641765";
+
         beforeEach(() => {
             vi.spyOn(content, "getLogContent").mockReturnValue({
                 content: "Hello World!"
@@ -217,16 +226,19 @@ describe("ModerationModule", () => {
     });
 
     describe("isBanned", () => {
+        const guildID = "68239102456844360";
+        const userID = "257522665437265920";
+
         it("should return true if the user is banned", async () => {
             const getSpy = vi.spyOn(module.client.api.guilds, "getMemberBan").mockResolvedValue({
                 reason: "Temporary ban expired.",
                 user: mockUser
             });
 
-            const banned = await module.isBanned("68239102456844360", "30527482987641765");
+            const banned = await module.isBanned(guildID, userID);
 
             expect(getSpy).toHaveBeenCalledOnce();
-            expect(getSpy).toHaveBeenCalledWith("68239102456844360", "30527482987641765");
+            expect(getSpy).toHaveBeenCalledWith(guildID, userID);
             expect(banned).toBe(true);
         });
 
@@ -239,22 +251,24 @@ describe("ModerationModule", () => {
             const error = new DiscordAPIError(response, 10026, 404, "GET", "", {});
             const getSpy = vi.spyOn(module.client.api.guilds, "getMemberBan").mockRejectedValue(error);
 
-            const banned = await module.isBanned("68239102456844360", "30527482987641765");
+            const banned = await module.isBanned(guildID, userID);
 
             expect(getSpy).toHaveBeenCalledOnce();
-            expect(getSpy).toHaveBeenCalledWith("68239102456844360", "30527482987641765");
+            expect(getSpy).toHaveBeenCalledWith(guildID, userID);
             expect(banned).toBe(false);
         });
     });
 
     describe("isEnabled", () => {
+        const guildID = "68239102456844360";
+
         it("should return true if the guild has the module enabled", async () => {
             const settingsSpy = vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
 
-            const enabled = await module.isEnabled("68239102456844360");
+            const enabled = await module.isEnabled(guildID);
 
             expect(settingsSpy).toHaveBeenCalledOnce();
-            expect(settingsSpy).toHaveBeenCalledWith("68239102456844360");
+            expect(settingsSpy).toHaveBeenCalledWith(guildID);
             expect(enabled).toBe(true);
         });
 
@@ -262,11 +276,110 @@ describe("ModerationModule", () => {
             const settingsSpy = vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
             settings.enabled = false;
 
-            const enabled = await module.isEnabled("68239102456844360");
+            const enabled = await module.isEnabled(guildID);
 
             expect(settingsSpy).toHaveBeenCalledOnce();
-            expect(settingsSpy).toHaveBeenCalledWith("68239102456844360");
+            expect(settingsSpy).toHaveBeenCalledWith(guildID);
             expect(enabled).toBe(false);
+        });
+    });
+
+    describe("notifyUser", () => {
+        beforeEach(() => {
+            vi.useFakeTimers().setSystemTime("01-01-2023");
+            vi.spyOn(module.client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
+            vi.spyOn(module.client.api.channels, "createMessage").mockResolvedValue(mockMessage);
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it("should send a message to the user", async () => {
+            await module.notifyUser({
+                guild: mockGuild,
+                reason: "Rude!",
+                type: CaseType.Warn,
+                userID: mockUser.id
+            });
+
+            expect(module.client.api.users.createDM).toHaveBeenCalledOnce();
+            expect(module.client.api.users.createDM).toHaveBeenCalledWith(mockUser.id);
+            expect(module.client.api.channels.createMessage).toHaveBeenCalledOnce();
+            expect(module.client.api.channels.createMessage).toHaveBeenCalledWith(mockChannel.id, {
+                embeds: [{
+                    color: expect.any(Number),
+                    description: expect.stringContaining(`You have been warned in **${mockGuild.name}**`),
+                    fields: [{
+                        name: "**Reason**",
+                        value: "Rude!"
+                    }]
+                }]
+            });
+        });
+
+        it("should include the duration if the action is temporary", async () => {
+            const expiresAt = Math.trunc((Date.now() / 1000) + 600);
+
+            await module.notifyUser({
+                duration: 600,
+                guild: mockGuild,
+                reason: "Rude!",
+                type: CaseType.Ban,
+                userID: mockUser.id
+            });
+
+            expect(module.client.api.channels.createMessage).toHaveBeenCalledOnce();
+            expect(module.client.api.channels.createMessage).toHaveBeenCalledWith(mockChannel.id, {
+                embeds: [{
+                    color: expect.any(Number),
+                    description: expect.stringContaining(`You have been banned from **${mockGuild.name}**`),
+                    fields: [
+                        {
+                            name: "**Reason**",
+                            value: "Rude!"
+                        },
+                        {
+                            name: "**Duration**",
+                            value: `Expires <t:${expiresAt}:R>`
+                        }
+                    ]
+                }]
+            });
+        });
+
+        it("should log an error if the message fails due to an unknown error", async () => {
+            const error = new Error("Oh no!");
+            vi.spyOn(module.client.api.channels, "createMessage").mockRejectedValue(error);
+
+            await module.notifyUser({
+                guild: mockGuild,
+                reason: "Rude!",
+                type: CaseType.Warn,
+                userID: mockUser.id
+            });
+
+            expect(module.client.logger.error).toHaveBeenCalledOnce();
+            expect(module.client.logger.error).toHaveBeenCalledWith(error);
+        });
+
+        it("should not log an error if the message fails due to the user's DMs being disabled", async () => {
+            const response = {
+                code: 50007,
+                message: "Cannot send messages to this user"
+            };
+
+            const error = new DiscordAPIError(response, 50007, 403, "POST", "", {});
+            vi.spyOn(module.client.api.channels, "createMessage").mockRejectedValue(error);
+
+            await module.notifyUser({
+                guild: mockGuild,
+                reason: "Rude!",
+                type: CaseType.Warn,
+                userID: mockUser.id
+            });
+
+            expect(module.client.logger.error).not.toHaveBeenCalled();
         });
     });
 });

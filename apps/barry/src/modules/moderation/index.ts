@@ -1,5 +1,6 @@
 import { type CaseLogOptions, getLogContent } from "./functions/getLogContent.js";
 import { type ModerationSettings, CaseType } from "@prisma/client";
+import type { APIGuild } from "@discordjs/core";
 import type { Application } from "../../Application.js";
 
 import {
@@ -11,6 +12,49 @@ import {
 import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
 import { loadCommands } from "../../utils/loadFolder.js";
+import config from "../../config.js";
+
+/**
+ * Options for the 'notifyUser' function.
+ */
+export interface NotifyOptions {
+    /**
+     * The duration of the action in seconds, if applicable.
+     */
+    duration?: number;
+
+    /**
+     * The guild the action was taken in.
+     */
+    guild: APIGuild;
+
+    /**
+     * The reason for the action.
+     */
+    reason: string;
+
+    /**
+     * The type of action taken.
+     */
+    type: Exclude<CaseType, "Note">;
+
+    /**
+     * The ID of the user to notify.
+     */
+    userID: string;
+}
+
+/**
+ * The words to use for each case type.
+ */
+const NOTIFY_WORDS: Record<Exclude<CaseType, "Note">, string> = {
+    [CaseType.Ban]: "banned from",
+    [CaseType.Kick]: "kicked from",
+    [CaseType.Mute]: "muted in",
+    [CaseType.Unban]: "unbanned from",
+    [CaseType.Unmute]: "unmuted from",
+    [CaseType.Warn]: "warned in"
+};
 
 /**
  * How often to check for expired temporary bans.
@@ -156,5 +200,39 @@ export default class ModerationModule extends Module<Application> {
     async isEnabled(guildID: string): Promise<boolean> {
         const settings = await this.moderationSettings.getOrCreate(guildID);
         return settings.enabled;
+    }
+
+    /**
+     * Notifies a user that an action has been taken against them.
+     *
+     * @param options The options for the notification.
+     */
+    async notifyUser(options: NotifyOptions): Promise<void> {
+        try {
+            const channel = await this.client.api.users.createDM(options.userID);
+            const fields = [{
+                name: "**Reason**",
+                value: options.reason
+            }];
+
+            if (options.duration !== undefined) {
+                fields.push({
+                    name: "**Duration**",
+                    value: `Expires <t:${Math.trunc(((Date.now() / 1000) + options.duration))}:R>`
+                });
+            }
+
+            await this.client.api.channels.createMessage(channel.id, {
+                embeds: [{
+                    color: config.defaultColor,
+                    description: `${config.emotes.error} You have been ${NOTIFY_WORDS[options.type]} **${options.guild.name}**`,
+                    fields: fields
+                }]
+            });
+        } catch (error: unknown) {
+            if (!(error instanceof DiscordAPIError) || error.code !== 50007) {
+                this.client.logger.error(error);
+            }
+        }
     }
 }

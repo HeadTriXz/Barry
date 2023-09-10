@@ -9,7 +9,6 @@ import type ModerationModule from "../../../index.js";
 import { MessageFlags, PermissionFlagsBits } from "@discordjs/core";
 import { COMMON_SEVERE_REASONS } from "../../../constants.js";
 import { CaseType } from "@prisma/client";
-import { DiscordAPIError } from "@discordjs/rest";
 
 import config from "../../../../../config.js";
 
@@ -102,23 +101,12 @@ export default class extends SlashCommand<ModerationModule> {
             });
         }
 
-        try {
-            const channel = await this.client.api.users.createDM(options.member.user.id);
-            await this.client.api.channels.createMessage(channel.id, {
-                embeds: [{
-                    color: config.defaultColor,
-                    description: `${config.emotes.error} You have been kicked from **${guild.name}**`,
-                    fields: [{
-                        name: "**Reason**",
-                        value: options.reason
-                    }]
-                }]
-            });
-        } catch (error: unknown) {
-            if (!(error instanceof DiscordAPIError) || error.code !== 50007) {
-                this.client.logger.error(error);
-            }
-        }
+        await this.module.notifyUser({
+            guild: guild,
+            reason: options.reason,
+            type: CaseType.Kick,
+            userID: options.member.user.id
+        });
 
         try {
             await this.client.api.guilds.removeMember(interaction.guildID, options.member.user.id, {

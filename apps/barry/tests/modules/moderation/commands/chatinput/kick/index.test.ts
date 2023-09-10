@@ -11,7 +11,6 @@ import {
     mockUser
 } from "@barry/testing";
 
-import { DiscordAPIError } from "@discordjs/rest";
 import { COMMON_SEVERE_REASONS } from "../../../../../../src/modules/moderation/constants.js";
 import { createMockApplication } from "../../../../../mocks/application.js";
 
@@ -61,6 +60,7 @@ describe("/kick", () => {
             guildID: "68239102456844360"
         };
 
+        module.notifyUser = vi.fn();
         vi.spyOn(client.api.channels, "createMessage").mockResolvedValue(mockMessage);
         vi.spyOn(client.api.guilds, "get").mockResolvedValue(mockGuild);
         vi.spyOn(client.api.guilds, "getMember").mockResolvedValue(mockMember);
@@ -135,47 +135,16 @@ describe("/kick", () => {
 
         it("should send a direct message to the target", async () => {
             vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-            const createSpy = vi.spyOn(command.client.api.channels, "createMessage");
 
             await command.execute(interaction, options);
 
-            expect(createSpy).toHaveBeenCalledTimes(2);
-            expect(createSpy).toHaveBeenCalledWith(mockChannel.id, {
-                embeds: [{
-                    color: expect.any(Number),
-                    description: expect.stringContaining("You have been kicked from **Barry's Server**"),
-                    fields: [{
-                        name: "**Reason**",
-                        value: options.reason
-                    }]
-                }]
+            expect(command.module.notifyUser).toHaveBeenCalledOnce();
+            expect(command.module.notifyUser).toHaveBeenCalledWith({
+                guild: mockGuild,
+                reason: options.reason,
+                type: CaseType.Kick,
+                userID: options.member.user.id
             });
-        });
-
-        it("should log an error if the direct message fails due to an unknown error", async () => {
-            const error = new Error("Oh no!");
-            vi.spyOn(command.client.api.channels, "createMessage").mockRejectedValueOnce(error);
-            vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-
-            await command.execute(interaction, options);
-
-            expect(command.client.logger.error).toHaveBeenCalledOnce();
-            expect(command.client.logger.error).toHaveBeenCalledWith(error);
-        });
-
-        it("should ignore an error if the direct message fails due to the user disabling DMs", async () => {
-            const response = {
-                code: 50007,
-                message: "Cannot send messages to this user"
-            };
-
-            const error = new DiscordAPIError(response, 50007, 200, "GET", "", {});
-            vi.spyOn(command.client.api.channels, "createMessage").mockRejectedValueOnce(error);
-            vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-
-            await command.execute(interaction, options);
-
-            expect(command.client.logger.error).not.toHaveBeenCalledOnce();
         });
 
         it("should kick the member from the guild", async () => {
