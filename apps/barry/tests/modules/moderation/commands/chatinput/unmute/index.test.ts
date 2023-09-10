@@ -135,5 +135,21 @@ describe("/unmute", () => {
                 flags: MessageFlags.Ephemeral
             });
         });
+
+        it("should show an error message if the unmute failed", async () => {
+            const error = new Error("Oh no!");
+            const createSpy = vi.spyOn(interaction, "createMessage");
+            vi.spyOn(command.client.api.guilds, "editMember").mockRejectedValue(error);
+
+            await command.execute(interaction, options);
+
+            expect(createSpy).toHaveBeenCalledOnce();
+            expect(createSpy).toHaveBeenCalledWith({
+                content: expect.stringContaining("Failed to unmute this member"),
+                flags: MessageFlags.Ephemeral
+            });
+            expect(command.client.logger.error).toHaveBeenCalledOnce();
+            expect(command.client.logger.error).toHaveBeenCalledWith(error);
+        });
     });
 });
