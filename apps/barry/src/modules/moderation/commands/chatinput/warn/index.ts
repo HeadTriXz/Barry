@@ -32,7 +32,7 @@ export interface WarnOptions {
  */
 export default class extends SlashCommand<ModerationModule> {
     /**
-     * Represents the constructor of this slash command.
+     * Represents a slash command that warns a user.
      *
      * @param module The module this command belongs to.
      */
