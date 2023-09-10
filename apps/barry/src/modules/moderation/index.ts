@@ -1,15 +1,21 @@
 import { type CaseLogOptions, getLogContent } from "./functions/getLogContent.js";
+import { type ModerationSettings, CaseType } from "@prisma/client";
 import type { Application } from "../../Application.js";
-import type { ModerationSettings } from "@prisma/client";
 
 import {
     CaseNoteRepository,
     CaseRepository,
-    ModerationSettingsRepository
+    ModerationSettingsRepository,
+    TempBanRepository
 } from "./database.js";
 import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
 import { loadCommands } from "../../utils/loadFolder.js";
+
+/**
+ * How often to check for expired temporary bans.
+ */
+const UNBAN_INTERVAL = 600000;
 
 /**
  * Represents the moderation module.
@@ -31,6 +37,11 @@ export default class ModerationModule extends Module<Application> {
     moderationSettings: ModerationSettingsRepository;
 
     /**
+     * Repository class for managing temporary bans.
+     */
+    tempBans: TempBanRepository;
+
+    /**
      * Represents the moderation module.
      *
      * @param client The client that initialized this module.
@@ -46,6 +57,47 @@ export default class ModerationModule extends Module<Application> {
         this.caseNotes = new CaseNoteRepository(client.prisma);
         this.cases = new CaseRepository(client.prisma);
         this.moderationSettings = new ModerationSettingsRepository(client.prisma);
+        this.tempBans = new TempBanRepository(client.prisma);
+    }
+
+    /**
+     * Checks for expired temporary bans and unbans the users.
+     */
+    async checkExpiredBans(): Promise<void> {
+        const bans = await this.tempBans.getExpired();
+        if (bans.length === 0) {
+            return;
+        }
+
+        const self = await this.client.api.users.get(this.client.applicationID);
+        for (const ban of bans) {
+            try {
+                await this.client.api.guilds.unbanUser(ban.guildID, ban.userID);
+            } catch (error: unknown) {
+                if (!(error instanceof DiscordAPIError) || error.code !== 10026) {
+                    this.client.logger.error(error);
+                }
+            }
+
+            await this.tempBans.delete(ban.guildID, ban.userID);
+            const entity = await this.cases.create({
+                creatorID: this.client.applicationID,
+                guildID: ban.guildID,
+                note: "Temporary ban expired.",
+                type: CaseType.Unban,
+                userID: ban.userID
+            });
+
+            const settings = await this.moderationSettings.getOrCreate(ban.guildID);
+            const user = await this.client.api.users.get(ban.userID);
+
+            await this.createLogMessage({
+                case: entity,
+                creator: self,
+                reason: "Temporary ban expired.",
+                user: user
+            }, settings);
+        }
     }
 
     /**
@@ -69,6 +121,30 @@ export default class ModerationModule extends Module<Application> {
                 this.client.logger.error(error);
             }
         }
+    }
+
+    /**
+     * Initializes the module.
+     */
+    override async initialize(): Promise<void> {
+        await super.initialize();
+
+        setInterval(() => {
+            return this.checkExpiredBans();
+        }, UNBAN_INTERVAL);
+    }
+
+    /**
+     * Checks whether a user is banned from a guild.
+     *
+     * @param guildID The ID of the guild.
+     * @param userID The ID of the user.
+     * @returns Whether the user is banned.
+     */
+    async isBanned(guildID: string, userID: string): Promise<boolean> {
+        return this.client.api.guilds.getMemberBan(guildID, userID)
+            .then(() => true)
+            .catch(() => false);
     }
 
     /**
