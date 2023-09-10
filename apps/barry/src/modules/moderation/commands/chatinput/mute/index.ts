@@ -131,14 +131,6 @@ export default class extends SlashCommand<ModerationModule> {
             });
         }
 
-        await this.module.notifyUser({
-            duration: duration,
-            guild: guild,
-            reason: options.reason,
-            type: CaseType.Mute,
-            userID: options.member.user.id
-        });
-
         try {
             await this.client.api.guilds.editMember(interaction.guildID, options.member.user.id, {
                 communication_disabled_until: new Date(Date.now() + 1000 * duration).toISOString()
@@ -151,6 +143,14 @@ export default class extends SlashCommand<ModerationModule> {
                 flags: MessageFlags.Ephemeral
             });
         }
+
+        await this.module.notifyUser({
+            duration: duration,
+            guild: guild,
+            reason: options.reason,
+            type: CaseType.Mute,
+            userID: options.member.user.id
+        });
 
         const entity = await this.module.cases.create({
             creatorID: interaction.user.id,
