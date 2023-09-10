@@ -203,3 +203,12 @@ model ModerationSettings {
 
   @@map("moderation_settings")
 }
+
+model TempBan {
+  guildID   String   @map("guild_id")
+  userID    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+
+  @@id([guildID, userID])
+  @@map("temp_bans")
+}
