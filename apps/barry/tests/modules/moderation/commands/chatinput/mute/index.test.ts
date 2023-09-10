@@ -11,7 +11,6 @@ import {
     mockUser
 } from "@barry/testing";
 
-import { DiscordAPIError } from "@discordjs/rest";
 import { COMMON_MINOR_REASONS } from "../../../../../../src/modules/moderation/constants.js";
 import { createMockApplication } from "../../../../../mocks/application.js";
 
@@ -64,6 +63,7 @@ describe("/mute", () => {
             guildID: "68239102456844360"
         };
 
+        module.notifyUser = vi.fn();
         vi.spyOn(client.api.channels, "createMessage").mockResolvedValue(mockMessage);
         vi.spyOn(client.api.guilds, "get").mockResolvedValue(mockGuild);
         vi.spyOn(client.api.guilds, "getMember").mockResolvedValue(mockMember);
@@ -81,26 +81,16 @@ describe("/mute", () => {
     describe("execute", () => {
         it("should send a direct message to the target", async () => {
             vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-            const createSpy = vi.spyOn(command.client.api.channels, "createMessage");
 
             await command.execute(interaction, options);
 
-            expect(createSpy).toHaveBeenCalledTimes(2);
-            expect(createSpy).toHaveBeenCalledWith(mockChannel.id, {
-                embeds: [{
-                    color: expect.any(Number),
-                    description: expect.stringContaining("You have been muted in **Barry's Server**"),
-                    fields: [
-                        {
-                            name: "**Reason**",
-                            value: options.reason
-                        },
-                        {
-                            name: "**Duration**",
-                            value: `Expires <t:${Math.trunc((Date.now() / 1000) + 300)}:R>`
-                        }
-                    ]
-                }]
+            expect(command.module.notifyUser).toHaveBeenCalledOnce();
+            expect(command.module.notifyUser).toHaveBeenCalledWith({
+                duration: 300,
+                guild: mockGuild,
+                reason: options.reason,
+                type: CaseType.Mute,
+                userID: options.member.user.id
             });
         });
 
@@ -252,32 +242,6 @@ describe("/mute", () => {
         });
 
         describe("Error handling", () => {
-            it("should log an error if the direct message fails due to an unknown error", async () => {
-                const error = new Error("Oh no!");
-                vi.spyOn(command.client.api.channels, "createMessage").mockRejectedValueOnce(error);
-                vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-
-                await command.execute(interaction, options);
-
-                expect(command.client.logger.error).toHaveBeenCalledOnce();
-                expect(command.client.logger.error).toHaveBeenCalledWith(error);
-            });
-
-            it("should ignore an error if the direct message fails due to the user disabling DMs", async () => {
-                const response = {
-                    code: 50007,
-                    message: "Cannot send messages to this user"
-                };
-
-                const error = new DiscordAPIError(response, 50007, 200, "GET", "", {});
-                vi.spyOn(command.client.api.channels, "createMessage").mockRejectedValueOnce(error);
-                vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-
-                await command.execute(interaction, options);
-
-                expect(command.client.logger.error).not.toHaveBeenCalledOnce();
-            });
-
             it("should log an error if the mute fails due to an unknown error", async () => {
                 const error = new Error("Oh no!");
                 vi.spyOn(command.client.api.guilds, "editMember").mockRejectedValueOnce(error);

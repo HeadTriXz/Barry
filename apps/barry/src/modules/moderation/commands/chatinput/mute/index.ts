@@ -9,7 +9,6 @@ import type ModerationModule from "../../../index.js";
 import { MessageFlags, PermissionFlagsBits } from "@discordjs/core";
 import { COMMON_MINOR_REASONS } from "../../../constants.js";
 import { CaseType } from "@prisma/client";
-import { DiscordAPIError } from "@discordjs/rest";
 import { getDuration } from "../../../functions/getDuration.js";
 
 import config from "../../../../../config.js";
@@ -132,29 +131,13 @@ export default class extends SlashCommand<ModerationModule> {
             });
         }
 
-        try {
-            const channel = await this.client.api.users.createDM(options.member.user.id);
-            await this.client.api.channels.createMessage(channel.id, {
-                embeds: [{
-                    color: config.defaultColor,
-                    description: `${config.emotes.error} You have been muted in **${guild.name}**`,
-                    fields: [
-                        {
-                            name: "**Reason**",
-                            value: options.reason
-                        },
-                        {
-                            name: "**Duration**",
-                            value: `Expires <t:${Math.trunc(((Date.now() / 1000) + duration))}:R>`
-                        }
-                    ]
-                }]
-            });
-        } catch (error: unknown) {
-            if (!(error instanceof DiscordAPIError) || error.code !== 50007) {
-                this.client.logger.error(error);
-            }
-        }
+        await this.module.notifyUser({
+            duration: duration,
+            guild: guild,
+            reason: options.reason,
+            type: CaseType.Mute,
+            userID: options.member.user.id
+        });
 
         try {
             await this.client.api.guilds.editMember(interaction.guildID, options.member.user.id, {
