@@ -9,6 +9,16 @@ import type {
 } from "@prisma/client";
 
 /**
+ * Represents a case with its notes.
+ */
+export interface CaseWithNotes extends Case {
+    /**
+     * The notes for the case.
+     */
+    notes: CaseNote[];
+}
+
+/**
  * Options for creating a case.
  */
 export interface CreateCaseOptions {
@@ -126,6 +136,16 @@ export class CaseRepository {
     }
 
     /**
+     * Retrieves a case by its ID with its notes.
+     *
+     * @param guildID The ID of the guild.
+     * @param caseID The ID of the case.
+     * @param withNotes Whether to include the notes.
+     * @returns The case record with its notes, or null if not found.
+     */
+    async get(guildID: string, caseID: number, withNotes: true): Promise<CaseWithNotes | null>;
+
+    /**
      * Retrieves a case by its ID.
      *
      * @param guildID The ID of the guild.
@@ -133,9 +153,14 @@ export class CaseRepository {
      * @param withNotes Whether to include the notes.
      * @returns The case record, or null if not found.
      */
-    async get(guildID: string, caseID: number, withNotes: boolean = false): Promise<Case | null> {
+    async get(guildID: string, caseID: number, withNotes?: false): Promise<Case | null>;
+    async get(guildID: string, caseID: number, withNotes: boolean = false): Promise<Case | CaseWithNotes | null> {
         return this.#prisma.case.findUnique({
-            include: { notes: withNotes },
+            include: {
+                notes: withNotes
+                    ? { orderBy: { createdAt: "desc" } }
+                    : undefined
+            },
             where: {
                 guildID_id: {
                     guildID: guildID,
@@ -154,6 +179,7 @@ export class CaseRepository {
      */
     async getAll(guildID: string, type?: CaseType): Promise<Case[]> {
         return this.#prisma.case.findMany({
+            orderBy: { createdAt: "desc" },
             where: { guildID, type }
         });
     }
@@ -168,6 +194,7 @@ export class CaseRepository {
      */
     async getByUser(guildID: string, userID: string, type?: CaseType): Promise<Case[]> {
         return this.#prisma.case.findMany({
+            orderBy: { createdAt: "desc" },
             where: { guildID, type, userID }
         });
     }
