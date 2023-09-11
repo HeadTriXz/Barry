@@ -1,3 +1,32 @@
+import { CaseType } from "@prisma/client";
+import config, { type Emoji } from "../../config.js";
+
+/**
+ * The emojis to use for each case type.
+ */
+export const CASE_EMOJIS: Record<CaseType, Emoji> = {
+    [CaseType.Ban]: config.emotes.ban,
+    [CaseType.Kick]: config.emotes.kick,
+    [CaseType.Mute]: config.emotes.mute,
+    [CaseType.Note]: config.emotes.note,
+    [CaseType.Unban]: config.emotes.unban,
+    [CaseType.Unmute]: config.emotes.unmute,
+    [CaseType.Warn]: config.emotes.warn
+};
+
+/**
+ * The titles to use for each case type.
+ */
+export const CASE_TITLES: Record<CaseType, string> = {
+    [CaseType.Ban]: "Ban",
+    [CaseType.Kick]: "Kick",
+    [CaseType.Mute]: "Mute",
+    [CaseType.Note]: "Note",
+    [CaseType.Unban]: "Unban",
+    [CaseType.Unmute]: "Unmute",
+    [CaseType.Warn]: "Warn"
+};
+
 export const COMMON_SEVERE_REASONS = [
     "Suspicious or spam account",
     "Compromised or hacked account",

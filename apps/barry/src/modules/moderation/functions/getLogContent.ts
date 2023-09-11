@@ -3,10 +3,11 @@ import type {
     APIInteractionResponseCallbackData,
     APIUser
 } from "@discordjs/core";
-import { type Case, CaseType } from "@prisma/client";
+import type { Case } from "@prisma/client";
 
+import { CASE_EMOJIS, CASE_TITLES } from "../constants.js";
 import { getAvatarURL } from "@barry/core";
-import config, { type Emoji } from "../../../config.js";
+import config from "../../../config.js";
 
 /**
  * Options for the getLogContent function.
@@ -37,32 +38,6 @@ export interface CaseLogOptions {
      */
     user: APIUser;
 }
-
-/**
- * The emojis to use for each case type.
- */
-const CASE_EMOJIS: Record<CaseType, Emoji> = {
-    [CaseType.Ban]: config.emotes.ban,
-    [CaseType.Kick]: config.emotes.kick,
-    [CaseType.Mute]: config.emotes.mute,
-    [CaseType.Note]: config.emotes.note,
-    [CaseType.Unban]: config.emotes.unban,
-    [CaseType.Unmute]: config.emotes.unmute,
-    [CaseType.Warn]: config.emotes.warn
-};
-
-/**
- * The titles to use for each case type.
- */
-const CASE_TITLES: Record<CaseType, string> = {
-    [CaseType.Ban]: "Ban",
-    [CaseType.Kick]: "Kick",
-    [CaseType.Mute]: "Mute",
-    [CaseType.Note]: "Note",
-    [CaseType.Unban]: "Unban",
-    [CaseType.Unmute]: "Unmute",
-    [CaseType.Warn]: "Warn"
-};
 
 /**
  * Generates the log message content for a case.

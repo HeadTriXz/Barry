@@ -99,7 +99,7 @@ describe("CaseRepository", () => {
             expect(entity).toEqual(mockCase);
             expect(prisma.case.findUnique).toHaveBeenCalledOnce();
             expect(prisma.case.findUnique).toHaveBeenCalledWith({
-                include: { notes: false },
+                include: {},
                 where: {
                     guildID_id: {
                         guildID: guildID,
@@ -125,7 +125,11 @@ describe("CaseRepository", () => {
             expect(entity).toEqual(mockCase);
             expect(prisma.case.findUnique).toHaveBeenCalledOnce();
             expect(prisma.case.findUnique).toHaveBeenCalledWith({
-                include: { notes: true },
+                include: {
+                    notes: {
+                        orderBy: { createdAt: "desc" }
+                    }
+                },
                 where: {
                     guildID_id: {
                         guildID: guildID,
@@ -173,6 +177,7 @@ describe("CaseRepository", () => {
             expect(entities).toEqual(mockCases);
             expect(prisma.case.findMany).toHaveBeenCalledOnce();
             expect(prisma.case.findMany).toHaveBeenCalledWith({
+                orderBy: { createdAt: "desc" },
                 where: { guildID }
             });
         });
@@ -185,6 +190,7 @@ describe("CaseRepository", () => {
             expect(entities).toEqual(mockCases);
             expect(prisma.case.findMany).toHaveBeenCalledOnce();
             expect(prisma.case.findMany).toHaveBeenCalledWith({
+                orderBy: { createdAt: "desc" },
                 where: {
                     guildID: guildID,
                     type: CaseType.Ban
@@ -230,6 +236,7 @@ describe("CaseRepository", () => {
             expect(entities).toEqual(mockCases);
             expect(prisma.case.findMany).toHaveBeenCalledOnce();
             expect(prisma.case.findMany).toHaveBeenCalledWith({
+                orderBy: { createdAt: "desc" },
                 where: { guildID, userID }
             });
         });
@@ -242,6 +249,7 @@ describe("CaseRepository", () => {
             expect(entities).toEqual(mockCases);
             expect(prisma.case.findMany).toHaveBeenCalledOnce();
             expect(prisma.case.findMany).toHaveBeenCalledWith({
+                orderBy: { createdAt: "desc" },
                 where: {
                     guildID: guildID,
                     type: CaseType.Ban,
