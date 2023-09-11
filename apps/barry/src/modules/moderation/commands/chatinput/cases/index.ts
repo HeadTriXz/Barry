@@ -1,6 +1,7 @@
 import type ModerationModule from "../../../index.js";
 
 import { SlashCommand } from "@barry/core";
+import DeleteCommand from "./delete/index.js";
 import ViewCommand from "./view/index.js";
 
 /**
@@ -17,7 +18,7 @@ export default class extends SlashCommand<ModerationModule> {
             name: "cases",
             description: "Manage or view a case.",
             guildOnly: true,
-            children: [ViewCommand]
+            children: [DeleteCommand, ViewCommand]
         });
     }
 

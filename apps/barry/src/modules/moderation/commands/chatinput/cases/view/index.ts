@@ -1,5 +1,4 @@
 import {
-    type APIEmbedField,
     type APIGuild,
     type APIUser,
     MessageFlags,
@@ -17,6 +16,7 @@ import type ModerationModule from "../../../../index.js";
 import { CASE_EMOJIS, CASE_TITLES } from "../../../../constants.js";
 import { CaseType } from "@prisma/client";
 import { PaginationMessage } from "../../../../../../utils/pagination.js";
+import { getCaseContent } from "../content.js";
 import config from "../../../../../../config.js";
 
 /**
@@ -123,46 +123,11 @@ export default class extends SlashCommand<ModerationModule> {
      * @param entity The case to show.
      */
     async #showCase(interaction: ApplicationCommandInteraction, entity: CaseWithNotes): Promise<void> {
-        const title = CASE_TITLES[entity.type];
-        const emoji = CASE_EMOJIS[entity.type];
+        const creator = await this.client.api.users.get(entity.creatorID);
+        const user = await this.client.api.users.get(entity.userID);
 
         await PaginationMessage.create({
-            content: async (notes) => {
-                const fields: APIEmbedField[] = [];
-                if (notes.length > 0) {
-                    fields.push({
-                        name: "**Notes**",
-                        value: notes
-                            .map((n) => `\`${n.id}\` <@${n.creatorID}> — <t:${Math.trunc(n.createdAt.getTime() / 1000)}:R>\n${n.content}`)
-                            .join("\n\n")
-                    });
-                }
-
-                const creator = await this.client.api.users.get(entity.creatorID);
-                const user = await this.client.api.users.get(entity.userID);
-
-                return {
-                    embeds: [{
-                        author: {
-                            icon_url: getAvatarURL(user, { size: 128 }),
-                            name: user.username
-                        },
-                        color: config.defaultColor,
-                        description: `**Target:** <@${entity.userID}> \`${user.username}\``
-                            + `\n**Creator:** <@${entity.creatorID}> \`${creator.username}\``
-                            + `\n**Date:** <t:${Math.trunc(entity.createdAt.getTime() / 1000)}:R>`,
-                        fields: fields,
-                        footer: {
-                            text: `User ID: ${entity.userID}`
-                        },
-                        thumbnail: {
-                            url: getAvatarURL(user, { size: 256 })
-                        },
-                        timestamp: entity.createdAt.toISOString(),
-                        title: `${emoji} ${title} | Inspecting case #${entity.id}`
-                    }]
-                };
-            },
+            content: (notes) => getCaseContent(entity, notes, creator, user),
             interaction: interaction,
             pageSize: NOTE_PAGE_SIZE,
             values: entity.notes
