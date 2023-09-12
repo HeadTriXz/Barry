@@ -5,12 +5,12 @@ import {
 } from "@prisma/client";
 import {
     createMockApplicationCommandInteraction,
-    mockGuild,
     mockUser
 } from "@barry/testing";
 import { ApplicationCommandInteraction } from "@barry/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
+import { mockCase } from "../../../mocks/case.js";
 
 import NoteCommand, { type NoteOptions } from "../../../../../../src/modules/moderation/commands/chatinput/note/index.js";
 import ModerationModule from "../../../../../../src/modules/moderation/index.js";
@@ -18,7 +18,7 @@ import ModerationModule from "../../../../../../src/modules/moderation/index.js"
 describe("/note", () => {
     let command: NoteCommand;
     let interaction: ApplicationCommandInteraction;
-    let mockCase: Case;
+    let entity: Case;
     let options: NoteOptions;
     let settings: ModerationSettings;
 
@@ -30,14 +30,7 @@ describe("/note", () => {
         const data = createMockApplicationCommandInteraction();
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
 
-        mockCase = {
-            createdAt: new Date("1-1-2023"),
-            creatorID: mockUser.id,
-            guildID: mockGuild.id,
-            id: 34,
-            type: CaseType.Note,
-            userID: "257522665437265920"
-        };
+        entity = { ...mockCase, type: CaseType.Note };
         options = {
             note: "This is a note.",
             user: {
@@ -54,7 +47,7 @@ describe("/note", () => {
         };
 
         module.createLogMessage = vi.fn();
-        vi.spyOn(module.cases, "create").mockResolvedValue(mockCase);
+        vi.spyOn(module.cases, "create").mockResolvedValue(entity);
         vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
     });
 
@@ -77,7 +70,7 @@ describe("/note", () => {
 
             expect(command.module.createLogMessage).toHaveBeenCalledOnce();
             expect(command.module.createLogMessage).toHaveBeenCalledWith({
-                case: mockCase,
+                case: entity,
                 creator: interaction.user,
                 reason: options.note,
                 user: options.user

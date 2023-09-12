@@ -13,6 +13,7 @@ import { ApplicationCommandInteraction } from "@barry/core";
 import { DiscordAPIError } from "@discordjs/rest";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
+import { mockCase } from "../../../mocks/case.js";
 
 import UnbanCommand, { type UnbanOptions } from "../../../../../../src/modules/moderation/commands/chatinput/unban/index.js";
 import ModerationModule from "../../../../../../src/modules/moderation/index.js";
@@ -20,7 +21,7 @@ import ModerationModule from "../../../../../../src/modules/moderation/index.js"
 describe("/unban", () => {
     let command: UnbanCommand;
     let interaction: ApplicationCommandInteraction;
-    let mockCase: Case;
+    let entity: Case;
     let options: UnbanOptions;
     let settings: ModerationSettings;
 
@@ -32,14 +33,7 @@ describe("/unban", () => {
         const data = createMockApplicationCommandInteraction();
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
 
-        mockCase = {
-            createdAt: new Date("1-1-2023"),
-            creatorID: mockUser.id,
-            guildID: mockGuild.id,
-            id: 34,
-            type: CaseType.Unban,
-            userID: "257522665437265920"
-        };
+        entity = { ...mockCase, type: CaseType.Unban };
         options = {
             reason: "Oops",
             user: {
@@ -59,7 +53,7 @@ describe("/unban", () => {
         module.notifyUser = vi.fn();
         vi.spyOn(client.api.guilds, "unbanUser").mockResolvedValue();
         vi.spyOn(client.api.guilds, "get").mockResolvedValue(mockGuild);
-        vi.spyOn(module.cases, "create").mockResolvedValue(mockCase);
+        vi.spyOn(module.cases, "create").mockResolvedValue(entity);
         vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
     });
 
@@ -92,7 +86,7 @@ describe("/unban", () => {
 
             expect(command.module.createLogMessage).toHaveBeenCalledOnce();
             expect(command.module.createLogMessage).toHaveBeenCalledWith({
-                case: mockCase,
+                case: entity,
                 creator: interaction.user,
                 reason: options.reason,
                 user: options.user

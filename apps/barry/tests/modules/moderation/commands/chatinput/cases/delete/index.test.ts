@@ -12,11 +12,10 @@ import {
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,
-    mockGuild,
     mockUser
 } from "@barry/testing";
 
-import { CaseType } from "@prisma/client";
+import { mockCase, mockCaseNote } from "../../../../mocks/case.js";
 import { createMockApplication } from "../../../../../../mocks/application.js";
 
 import DeleteCommand, { type DeleteCasesOptions } from "../../../../../../../src/modules/moderation/commands/chatinput/cases/delete/index.js";
@@ -25,7 +24,7 @@ import ModerationModule from "../../../../../../../src/modules/moderation/index.
 describe("/cases delete", () => {
     let command: DeleteCommand;
     let interaction: ApplicationCommandInteraction;
-    let mockCase: CaseWithNotes;
+    let entity: CaseWithNotes;
     let options: DeleteCasesOptions;
 
     beforeEach(() => {
@@ -37,27 +36,12 @@ describe("/cases delete", () => {
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
         interaction.editOriginalMessage = vi.fn();
 
-        mockCase = {
-            createdAt: new Date("01-01-2023"),
-            creatorID: mockUser.id,
-            guildID: mockGuild.id,
-            id: 34,
-            notes: [{
-                caseID: 34,
-                content: "Rude!",
-                createdAt: new Date("01-01-2023"),
-                creatorID: mockUser.id,
-                guildID: mockGuild.id,
-                id: 1
-            }],
-            type: CaseType.Note,
-            userID: "257522665437265920"
-        };
+        entity = { ...mockCase, notes: [mockCaseNote] };
         options = {
             case: 34
         };
 
-        vi.spyOn(module.cases, "get").mockResolvedValue(mockCase);
+        vi.spyOn(module.cases, "get").mockResolvedValue(entity);
 
         vi.spyOn(client.api.users, "get")
             .mockResolvedValueOnce(mockUser)
@@ -126,7 +110,7 @@ describe("/cases delete", () => {
             const response = new MessageComponentInteraction(data, command.client, vi.fn());
 
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
-            const deleteSpy = vi.spyOn(command.module.cases, "delete").mockResolvedValue(mockCase);
+            const deleteSpy = vi.spyOn(command.module.cases, "delete").mockResolvedValue(entity);
             const editSpy = vi.spyOn(response, "editParent");
 
             await command.execute(interaction, options);
@@ -150,7 +134,7 @@ describe("/cases delete", () => {
             const response = new MessageComponentInteraction(data, command.client, vi.fn());
 
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
-            const deleteSpy = vi.spyOn(command.module.cases, "delete").mockResolvedValue(mockCase);
+            const deleteSpy = vi.spyOn(command.module.cases, "delete").mockResolvedValue(entity);
             const editSpy = vi.spyOn(response, "editParent");
 
             await command.execute(interaction, options);
@@ -167,7 +151,7 @@ describe("/cases delete", () => {
 
         it("should show a timeout message if the user does not respond", async () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
-            const deleteSpy = vi.spyOn(command.module.cases, "delete").mockResolvedValue(mockCase);
+            const deleteSpy = vi.spyOn(command.module.cases, "delete").mockResolvedValue(entity);
             const editSpy = vi.spyOn(interaction, "editOriginalMessage");
 
             await command.execute(interaction, options);
