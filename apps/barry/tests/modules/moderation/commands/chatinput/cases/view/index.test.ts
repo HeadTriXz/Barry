@@ -1,10 +1,11 @@
-import type { CaseWithNotes } from "../../../../../../../src/modules/moderation/database.js";
-
+import type { CaseWithNotes } from "../../../../../../../dist/modules/moderation/database.js";
 import {
     createMockApplicationCommandInteraction,
     mockGuild,
     mockUser
 } from "@barry/testing";
+import { mockCase, mockCaseNote } from "../../../../mocks/case.js";
+
 import { ApplicationCommandInteraction } from "@barry/core";
 import { CaseType } from "@prisma/client";
 import { MessageFlags } from "@discordjs/core";
@@ -47,18 +48,7 @@ describe("/cases view", () => {
             };
 
             vi.spyOn(command.module.cases, "get").mockResolvedValue({
-                createdAt: new Date("01-01-2023"),
-                creatorID: mockUser.id,
-                guildID: mockGuild.id,
-                id: 34,
-                notes: [{
-                    content: "Rude!",
-                    createdAt: new Date("01-01-2023"),
-                    creatorID: mockUser.id,
-                    id: 1
-                }],
-                type: CaseType.Note,
-                userID: userID
+                ...mockCase, notes: [mockCaseNote]
             } as CaseWithNotes);
             vi.spyOn(command.client.api.users, "get")
                 .mockResolvedValueOnce(mockUser)
@@ -117,22 +107,8 @@ describe("/cases view", () => {
         beforeEach(() => {
             vi.spyOn(command.client.api.guilds, "get").mockResolvedValue(mockGuild);
             vi.spyOn(command.module.cases, "getAll").mockResolvedValue([
-                {
-                    createdAt: new Date("01-02-2023"),
-                    creatorID: mockUser.id,
-                    guildID: mockGuild.id,
-                    id: 35,
-                    type: CaseType.Note,
-                    userID: "257522665437265920"
-                },
-                {
-                    createdAt: new Date("01-01-2023"),
-                    creatorID: mockUser.id,
-                    guildID: mockGuild.id,
-                    id: 34,
-                    type: CaseType.Note,
-                    userID: "257522665437265920"
-                }
+                { ...mockCase, id: 35 },
+                { ...mockCase, id: 33 }
             ]);
         });
 
@@ -204,22 +180,8 @@ describe("/cases view", () => {
 
             vi.spyOn(command.client.api.guilds, "get").mockResolvedValue(mockGuild);
             vi.spyOn(command.module.cases, "getByUser").mockResolvedValue([
-                {
-                    createdAt: new Date("01-02-2023"),
-                    creatorID: mockUser.id,
-                    guildID: mockGuild.id,
-                    id: 35,
-                    type: CaseType.Note,
-                    userID: "257522665437265920"
-                },
-                {
-                    createdAt: new Date("01-01-2023"),
-                    creatorID: mockUser.id,
-                    guildID: mockGuild.id,
-                    id: 34,
-                    type: CaseType.Note,
-                    userID: "257522665437265920"
-                }
+                { ...mockCase, id: 35 },
+                { ...mockCase, id: 33 }
             ]);
         });
 

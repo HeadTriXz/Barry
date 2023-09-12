@@ -13,6 +13,7 @@ import {
 
 import { COMMON_SEVERE_REASONS } from "../../../../../../src/modules/moderation/constants.js";
 import { createMockApplication } from "../../../../../mocks/application.js";
+import { mockCase } from "../../../mocks/case.js";
 
 import KickCommand, { type KickOptions } from "../../../../../../src/modules/moderation/commands/chatinput/kick/index.js";
 import ModerationModule from "../../../../../../src/modules/moderation/index.js";
@@ -21,7 +22,7 @@ import * as permissions from "../../../../../../src/modules/moderation/functions
 describe("/kick", () => {
     let command: KickCommand;
     let interaction: ApplicationCommandInteraction;
-    let mockCase: Case;
+    let entity: Case;
     let options: KickOptions;
     let settings: ModerationSettings;
 
@@ -34,14 +35,7 @@ describe("/kick", () => {
         const data = createMockApplicationCommandInteraction();
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
 
-        mockCase = {
-            createdAt: new Date("1-1-2023"),
-            creatorID: mockUser.id,
-            guildID: mockGuild.id,
-            id: 34,
-            type: CaseType.Kick,
-            userID: "257522665437265920"
-        };
+        entity = { ...mockCase, type: CaseType.Kick };
         options = {
             member: {
                 ...mockMember,
@@ -66,7 +60,7 @@ describe("/kick", () => {
         vi.spyOn(client.api.guilds, "getMember").mockResolvedValue(mockMember);
         vi.spyOn(client.api.guilds, "removeMember").mockResolvedValue(undefined);
         vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
-        vi.spyOn(module.cases, "create").mockResolvedValue(mockCase);
+        vi.spyOn(module.cases, "create").mockResolvedValue(entity);
         vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
     });
 
@@ -207,7 +201,7 @@ describe("/kick", () => {
 
             expect(createSpy).toHaveBeenCalledOnce();
             expect(createSpy).toHaveBeenCalledWith({
-                case: mockCase,
+                case: entity,
                 creator: interaction.user,
                 reason: options.reason,
                 user: options.member.user

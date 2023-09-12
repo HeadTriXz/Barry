@@ -13,6 +13,7 @@ import {
 import { ApplicationCommandInteraction } from "@barry/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
+import { mockCase } from "../../../mocks/case.js";
 
 import UnmuteCommand, { type UnmuteOptions } from "../../../../../../src/modules/moderation/commands/chatinput/unmute/index.js";
 import ModerationModule from "../../../../../../src/modules/moderation/index.js";
@@ -20,7 +21,7 @@ import ModerationModule from "../../../../../../src/modules/moderation/index.js"
 describe("/unmute", () => {
     let command: UnmuteCommand;
     let interaction: ApplicationCommandInteraction;
-    let mockCase: Case;
+    let entity: Case;
     let options: UnmuteOptions;
     let settings: ModerationSettings;
 
@@ -32,14 +33,7 @@ describe("/unmute", () => {
         const data = createMockApplicationCommandInteraction();
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
 
-        mockCase = {
-            createdAt: new Date("1-1-2023"),
-            creatorID: mockUser.id,
-            guildID: mockGuild.id,
-            id: 34,
-            type: CaseType.Unmute,
-            userID: "257522665437265920"
-        };
+        entity = { ...mockCase, type: CaseType.Unmute };
         options = {
             member: {
                 ...mockMember,
@@ -63,7 +57,7 @@ describe("/unmute", () => {
         module.notifyUser = vi.fn();
         vi.spyOn(client.api.guilds, "editMember").mockResolvedValue(mockMember);
         vi.spyOn(client.api.guilds, "get").mockResolvedValue(mockGuild);
-        vi.spyOn(module.cases, "create").mockResolvedValue(mockCase);
+        vi.spyOn(module.cases, "create").mockResolvedValue(entity);
         vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
     });
 
@@ -108,7 +102,7 @@ describe("/unmute", () => {
 
             expect(command.module.createLogMessage).toHaveBeenCalledOnce();
             expect(command.module.createLogMessage).toHaveBeenCalledWith({
-                case: mockCase,
+                case: entity,
                 creator: interaction.user,
                 reason: options.reason,
                 user: options.member.user
