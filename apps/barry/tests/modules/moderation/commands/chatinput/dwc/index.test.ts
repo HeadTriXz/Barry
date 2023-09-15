@@ -13,6 +13,7 @@ import {
 } from "@discordjs/core";
 import {
     createMockApplicationCommandInteraction,
+    createMockAutocompleteInteraction,
     mockChannel,
     mockGuild,
     mockMember,
@@ -21,7 +22,7 @@ import {
     mockUser
 } from "@barry/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../../../mocks/application.js";
 import { mockCase } from "../../../mocks/case.js";
@@ -32,6 +33,7 @@ import ModerationModule from "../../../../../../src/modules/moderation/index.js"
 import ProfilesModule from "../../../../../../src/modules/marketplace/dependencies/profiles/index.js";
 import RequestsModule from "../../../../../../src/modules/marketplace/dependencies/requests/index.js";
 import * as permissions from "../../../../../../src/modules/moderation/functions/permissions.js";
+import { COMMON_DWC_REASONS } from "../../../../../../src/modules/moderation/constants.js";
 
 describe("/dwc", () => {
     let command: DWCCommand;
@@ -394,6 +396,10 @@ describe("/dwc", () => {
     });
 
     describe("getOrCreateRole", () => {
+        beforeEach(() => {
+            command.client.api.channels.editPermissionOverwrite = vi.fn();
+        });
+
         it("should return the existing DWC role if it exists", async () => {
             vi.spyOn(command.client.api.guilds, "getRoles").mockResolvedValue([mockRole]);
 
@@ -509,6 +515,42 @@ describe("/dwc", () => {
 
             expect(command.client.logger.error).toHaveBeenCalledOnce();
             expect(command.client.logger.error).toHaveBeenCalledWith(error);
+        });
+    });
+
+    describe("Autocomplete 'reason'", () => {
+        it("should show a predefined list of reasons if no value is provided", async () => {
+            const data = createMockAutocompleteInteraction({
+                id: "49072635294295155",
+                name: "warn",
+                options: [],
+                type: ApplicationCommandType.ChatInput
+            });
+            const interaction = new AutocompleteInteraction(data, command.client, vi.fn());
+
+            const result = await command.options[1].autocomplete?.("" as never, interaction);
+
+            expect(result).toEqual(COMMON_DWC_REASONS.map((x) => ({ name: x, value: x })));
+        });
+
+        it("should show a matching predefined option if the option starts with the value", async () => {
+            const data = createMockAutocompleteInteraction({
+                id: "49072635294295155",
+                name: "warn",
+                options: [],
+                type: ApplicationCommandType.ChatInput
+            });
+            const interaction = new AutocompleteInteraction(data, command.client, vi.fn());
+
+            const result = await command.options[1].autocomplete?.(
+                COMMON_DWC_REASONS[0].slice(0, 5) as never,
+                interaction
+            );
+
+            expect(result).toEqual([{
+                name: COMMON_DWC_REASONS[0],
+                value: COMMON_DWC_REASONS[0]
+            }]);
         });
     });
 });
