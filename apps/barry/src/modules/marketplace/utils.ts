@@ -1,5 +1,11 @@
 import type { ReplyableInteraction } from "@barry/core";
-import { ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core";
+import {
+    type APIEmbed,
+    ButtonStyle,
+    ComponentType,
+    MessageFlags
+} from "@discordjs/core";
+import config from "../../config.js";
 
 /**
  * Represents a user that can be contacted.
@@ -82,4 +88,20 @@ export async function displayContact(interaction: ReplyableInteraction, contacta
        content: `<@${contactable.userID}> prefers to be contacted using the following information:\n\`\`\`\n${contactable.contact}\`\`\``,
        flags: MessageFlags.Ephemeral
    });
+}
+
+/**
+ * Returns the DWC embed for the user.
+ *
+ * @param reason The reason the user has been marked as DWC.
+ */
+export function getDWCEmbed(reason: string): APIEmbed {
+    return {
+        author: {
+            name: "Deal With Caution",
+            icon_url: config.emotes.error.imageURL
+        },
+        description: "This user has been marked as `Deal With Caution`. If you have a business relationship with this person, proceed with caution.\n\n**Reason:**\n" + reason,
+        color: config.embedColor
+    };
 }

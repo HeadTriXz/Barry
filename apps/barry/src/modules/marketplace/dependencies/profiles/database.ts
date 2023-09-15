@@ -136,6 +136,38 @@ export class ProfileRepository {
     }
 
     /**
+     * Retrieves the profile record with the flaggable messages for the specified user.
+     *
+     * @param guildID The ID of the guild.
+     * @param userID The ID of the user.
+     * @param maxDays The amount of days to get profiles for.
+     * @returns The profile record with messages, or null if not found.
+     */
+    async getWithFlaggableMessages(
+        guildID: string,
+        userID: string,
+        maxDays: number = 14
+    ): Promise<ProfileWithMessages | null> {
+        const milliseconds = maxDays * 86400000;
+        const timestamp = BigInt(Date.now() - milliseconds - 1420070400000);
+        const minimumID = String(timestamp << 22n);
+
+        return this.#prisma.profile.findUnique({
+            include: {
+                messages: {
+                    where: {
+                        guildID: guildID,
+                        messageID: {
+                            gte: minimumID
+                        }
+                    }
+                }
+            },
+            where: { userID }
+        });
+    }
+
+    /**
      * Retrieves the profile record with its messages for the specified user.
      *
      * @param guildID The ID of the guild.

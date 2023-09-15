@@ -185,12 +185,22 @@ describe("/warn", () => {
             await command.execute(interaction, options);
 
             expect(createSpy).toHaveBeenCalledOnce();
-            expect(createSpy).toHaveBeenCalledWith({
+            expect(createSpy).toHaveBeenCalledWith(settings.channelID, {
                 case: entity,
                 creator: interaction.user,
                 reason: options.reason,
                 user: options.member.user
-            }, settings);
+            });
+        });
+
+        it("should not log the case if there is no log channel configured", async () => {
+            vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
+            const createSpy = vi.spyOn(command.module, "createLogMessage");
+            settings.channelID = null;
+
+            await command.execute(interaction, options);
+
+            expect(createSpy).not.toHaveBeenCalled();
         });
     });
 

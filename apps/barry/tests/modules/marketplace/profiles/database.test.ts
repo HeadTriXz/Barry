@@ -176,6 +176,42 @@ describe("ProfileRepository", () => {
         });
     });
 
+    describe("getWithFlaggableMessages", () => {
+        it("should retrieve the profile record for the specified user", async () => {
+            vi.useFakeTimers().setSystemTime("01-01-2023");
+            vi.mocked(prisma.profile.findUnique).mockResolvedValue(mockProfile);
+
+            const timestamp = BigInt(Date.now() - 1421280000000);
+            const minimumID = String(timestamp << 22n);
+
+            const entity = await repository.getWithFlaggableMessages(guildID, userID);
+
+            expect(entity).toEqual(mockProfile);
+            expect(prisma.profile.findUnique).toHaveBeenCalledOnce();
+            expect(prisma.profile.findUnique).toHaveBeenCalledWith({
+                include: {
+                    messages: {
+                        where: {
+                            guildID: guildID,
+                            messageID: {
+                                gte: minimumID
+                            }
+                        }
+                    }
+                },
+                where: { userID }
+            });
+        });
+
+        it("should return null when no profile record is found", async () => {
+            vi.mocked(prisma.profile.findUnique).mockResolvedValue(null);
+
+            const entity = await repository.getWithFlaggableMessages(guildID, userID);
+
+            expect(entity).toBeNull();
+        });
+    });
+
     describe("getWithMessages", () => {
         it("should retrieve the profile record for the specified user", async () => {
             vi.mocked(prisma.profile.findUnique).mockResolvedValue(mockProfile);

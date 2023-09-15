@@ -7,6 +7,8 @@ import {
     RequestsSettingsRepository
 } from "../../../../src/modules/marketplace/dependencies/requests/database.js";
 import { mockUser, mockMessage } from "@barry/testing";
+
+import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
 import { getRequestContent } from "../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
 import { mockRequest } from "./mocks/request.js";
@@ -17,6 +19,9 @@ import RequestsModule, {
 } from "../../../../src/modules/marketplace/dependencies/requests/index.js";
 
 describe("RequestsModule", () => {
+    const channelID = "48527482987641760";
+    const guildID = "68239102456844360";
+
     let module: RequestsModule;
     let settings: RequestsSettings;
 
@@ -38,6 +43,27 @@ describe("RequestsModule", () => {
             expect(module.requestMessages).toBeInstanceOf(RequestMessageRepository);
             expect(module.requests).toBeInstanceOf(RequestRepository);
             expect(module.requestsSettings).toBeInstanceOf(RequestsSettingsRepository);
+        });
+    });
+
+    describe("flagUser", () => {
+        beforeEach(() => {
+            vi.spyOn(module.client.api.channels, "editMessage").mockResolvedValue(mockMessage);
+            vi.spyOn(module.requests, "getFlaggableByUser").mockResolvedValueOnce([{
+                ...mockRequest,
+                messages: [{
+                    guildID: guildID,
+                    messageID: "30527482987641765",
+                    requestID: 1
+                }]
+            }]);
+        });
+
+        it("should flag all requests that are newer than 14 days", async () => {
+            await module.flagUser(guildID, channelID, mockUser, "Hello World!");
+
+            expect(module.requests.getFlaggableByUser).toHaveBeenCalledOnce();
+            expect(module.requests.getFlaggableByUser).toHaveBeenCalledWith(guildID, mockUser.id, 14);
         });
     });
 
@@ -178,6 +204,86 @@ describe("RequestsModule", () => {
 
             expect(loggerSpy).toHaveBeenCalledOnce();
             expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining("Could not delete last message"));
+        });
+    });
+
+    describe("unflagUser", () => {
+        beforeEach(() => {
+            vi.spyOn(module.client.api.channels, "editMessage").mockResolvedValue(mockMessage);
+            vi.spyOn(module.requests, "getFlaggableByUser").mockResolvedValueOnce([{
+                ...mockRequest,
+                messages: [{
+                    guildID: guildID,
+                    messageID: "30527482987641765",
+                    requestID: 1
+                }]
+            }]);
+        });
+
+        it("should flag all requests that are newer than 21 days", async () => {
+            await module.unflagUser(guildID, channelID, mockUser);
+
+            expect(module.requests.getFlaggableByUser).toHaveBeenCalledOnce();
+            expect(module.requests.getFlaggableByUser).toHaveBeenCalledWith(guildID, mockUser.id, 21);
+        });
+    });
+
+    describe("#resetRequests", () => {
+        beforeEach(() => {
+            vi.spyOn(module.client.api.channels, "editMessage").mockResolvedValue(mockMessage);
+            vi.spyOn(module.requests, "getFlaggableByUser").mockResolvedValueOnce([{
+                ...mockRequest,
+                messages: [{
+                    guildID: guildID,
+                    messageID: mockMessage.id,
+                    requestID: 1
+                }]
+            }]);
+        });
+
+        it("should get all flaggable requests within the specified days", async () => {
+            await module.flagUser(guildID, channelID, mockUser, "Hello World!");
+
+            expect(module.requests.getFlaggableByUser).toHaveBeenCalledOnce();
+            expect(module.requests.getFlaggableByUser).toHaveBeenCalledWith(guildID, mockUser.id, 14);
+        });
+
+        it("should append the provided embeds to the request content", async () => {
+            const editSpy = vi.spyOn(module.client.api.channels, "editMessage");
+
+            await module.flagUser(guildID, channelID, mockUser, "Hello World!");
+
+            expect(editSpy).toHaveBeenCalledOnce();
+            expect(editSpy).toHaveBeenCalledWith(channelID, mockMessage.id, {
+                content: expect.any(String),
+                embeds: [
+                    expect.any(Object),
+                    expect.any(Object)
+                ]
+            });
+        });
+
+        it("should log an error if the message could not be edited", async () => {
+            const error = new Error("Oh no!");
+            vi.spyOn(module.client.api.channels, "editMessage").mockRejectedValue(error);
+
+            await module.flagUser(guildID, channelID, mockUser, "Hello World!");
+
+            expect(module.client.logger.error).toHaveBeenCalledOnce();
+            expect(module.client.logger.error).toHaveBeenCalledWith(error);
+        });
+
+        it("should not log an error if the message could not be edited because it was deleted", async () => {
+            const response = {
+                code: 10008,
+                message: "Unknown message"
+            };
+            const error = new DiscordAPIError(response, 10008, 404, "DELETE", "", {});
+            vi.spyOn(module.client.api.channels, "editMessage").mockRejectedValue(error);
+
+            await module.flagUser(guildID, channelID, mockUser, "Hello World!");
+
+            expect(module.client.logger.error).not.toHaveBeenCalled();
         });
     });
 });

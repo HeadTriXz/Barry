@@ -19,6 +19,16 @@ export interface RequestWithAttachments extends Request {
 }
 
 /**
+ * Represents a request with messages.
+ */
+export interface RequestWithMessages extends Request {
+    /**
+     * The messages for the request.
+     */
+    messages: RequestMessage[];
+}
+
+/**
  * Repository class for managing requests.
  */
 export class RequestRepository {
@@ -117,6 +127,49 @@ export class RequestRepository {
                         RequestStatus.Available,
                         RequestStatus.Taken
                     ]
+                },
+                userID: userID
+            }
+        });
+    }
+
+    /**
+     * Retrieves the requests that can be flagged for the specified user.
+     *
+     * @param guildID The ID of the guild.
+     * @param userID The ID of the user.
+     * @param maxDays The amount of days to get requests for.
+     * @returns The flaggable request records.
+     */
+    async getFlaggableByUser(
+        guildID: string,
+        userID: string,
+        maxDays: number = 14
+    ): Promise<Array<RequestWithAttachments & RequestWithMessages>> {
+        const milliseconds = maxDays * 86400000;
+        const timestamp = BigInt(Date.now() - milliseconds - 1420070400000);
+        const minimumID = String(timestamp << 22n);
+
+        return this.#prisma.request.findMany({
+            include: {
+                attachments: true,
+                messages: {
+                    where: {
+                        guildID: guildID,
+                        messageID: {
+                            gte: minimumID
+                        }
+                    }
+                }
+            },
+            where: {
+                messages: {
+                    some: {
+                        guildID: guildID,
+                        messageID: {
+                            gte: minimumID
+                        }
+                    }
                 },
                 userID: userID
             }

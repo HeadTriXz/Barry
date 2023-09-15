@@ -49,10 +49,12 @@ export default {
     emotes: {
         // Moderation
         ban: new Emoji("ban", "1149399269531459616"),
+        dwc: new Emoji("dwc", "1151425609487106101"),
         kick: new Emoji("kick", "1149399337412071484"),
         mute: new Emoji("mute", "1149399536381477006"),
         note: new Emoji("note", "1149399622398255188"),
         unban: new Emoji("unban", "1149399596372607127"),
+        undwc: new Emoji("undwc", "1151870611203821628"),
         unmute: new Emoji("unmute", "1149399568446914670"),
         warn: new Emoji("warn", "1149399652504977508"),
 
@@ -76,5 +78,6 @@ export default {
         previous: new Emoji("previous", "1124406936188768357")
     },
     defaultColor: 0xFFC331,
+    defaultDWCColor: 0xFFFF58,
     embedColor: 0x2B2D31
 };
