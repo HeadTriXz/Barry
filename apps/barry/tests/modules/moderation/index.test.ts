@@ -37,6 +37,7 @@ import * as content from "../../../src/modules/moderation/functions/getLogConten
 describe("ModerationModule", () => {
     const guildID = "68239102456844360";
     const userID = "257522665437265920";
+    const reason = "The DWC role was removed manually. The user will not be banned.";
 
     let mockBan: ExpiredDWCScheduledBan;
     let module: ModerationModule;
@@ -218,7 +219,13 @@ describe("ModerationModule", () => {
             await module.checkScheduledBans();
 
             expect(module.unflagUser).toHaveBeenCalledOnce();
-            expect(module.unflagUser).toHaveBeenCalledWith(creator, member.user, mockBan);
+            expect(module.unflagUser).toHaveBeenCalledWith({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
         });
 
         it("should unflag the user if the role has been manually removed", async () => {
@@ -227,7 +234,13 @@ describe("ModerationModule", () => {
             await module.checkScheduledBans();
 
             expect(module.unflagUser).toHaveBeenCalledOnce();
-            expect(module.unflagUser).toHaveBeenCalledWith(creator, member.user, mockBan);
+            expect(module.unflagUser).toHaveBeenCalledWith({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
         });
 
         it("should punish the user if the user not being in the guild", async () => {
@@ -565,7 +578,7 @@ describe("ModerationModule", () => {
             await module.punishFlaggedUser(creator, mockUser, mockBan);
 
             expect(module.client.api.guilds.banUser).toHaveBeenCalledOnce();
-            expect(module.client.api.guilds.banUser).toHaveBeenCalledWith(guildID, userID, {}, {
+            expect(module.client.api.guilds.banUser).toHaveBeenCalledWith(guildID, mockUser.id, {}, {
                 reason: "User did not resolve issue."
             });
         });
@@ -580,7 +593,7 @@ describe("ModerationModule", () => {
                 guildID: guildID,
                 note: "User did not resolve issue.",
                 type: CaseType.Ban,
-                userID: userID
+                userID: mockUser.id
             });
         });
 
@@ -592,7 +605,7 @@ describe("ModerationModule", () => {
                 guild: mockGuild,
                 reason: "User did not resolve issue.",
                 type: CaseType.Ban,
-                userID: userID
+                userID: mockUser.id
             });
         });
 
@@ -670,21 +683,39 @@ describe("ModerationModule", () => {
         });
 
         it("should unflag the user's profile", async () => {
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(profilesModule.unflagUser).toHaveBeenCalledOnce();
             expect(profilesModule.unflagUser).toHaveBeenCalledWith(guildID, channelID, mockUser);
         });
 
         it("should unflag the user's requests", async () => {
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(requestsModule.unflagUser).toHaveBeenCalledOnce();
             expect(requestsModule.unflagUser).toHaveBeenCalledWith(guildID, channelID, mockUser);
         });
 
         it("should create a case for the unflag", async () => {
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(module.cases.create).toHaveBeenCalledOnce();
             expect(module.cases.create).toHaveBeenCalledWith({
@@ -697,7 +728,13 @@ describe("ModerationModule", () => {
         });
 
         it("should log the case in the configured log channel", async () => {
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(module.createLogMessage).toHaveBeenCalledOnce();
             expect(module.createLogMessage).toHaveBeenCalledWith(channelID, {
@@ -711,7 +748,13 @@ describe("ModerationModule", () => {
         it("should not log the case if the guild has not configured a log channel", async () => {
             mockBan.channel_id = null;
 
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(module.createLogMessage).not.toHaveBeenCalled();
         });
@@ -719,7 +762,13 @@ describe("ModerationModule", () => {
         it("should not unflag the profile if the module is not found", async () => {
             marketplaceModule.dependencies.delete(profilesModule.id);
 
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(profilesModule.unflagUser).not.toHaveBeenCalled();
         });
@@ -727,7 +776,13 @@ describe("ModerationModule", () => {
         it("should not unflag the requests if the module is not found", async () => {
             marketplaceModule.dependencies.delete(requestsModule.id);
 
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(requestsModule.unflagUser).not.toHaveBeenCalled();
         });
@@ -735,7 +790,13 @@ describe("ModerationModule", () => {
         it("should not unflag the profile if the channel is unknown", async () => {
             profilesSettings.channelID = null;
 
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(profilesModule.unflagUser).not.toHaveBeenCalled();
         });
@@ -743,7 +804,13 @@ describe("ModerationModule", () => {
         it("should not unflag the requests if the channel is unknown", async () => {
             requestsSettings.channelID = null;
 
-            await module.unflagUser(creator, mockUser, mockBan);
+            await module.unflagUser({
+                channelID: mockBan.channel_id,
+                creator: creator,
+                guildID: mockBan.guild_id,
+                reason: reason,
+                user: mockUser
+            });
 
             expect(requestsModule.unflagUser).not.toHaveBeenCalled();
         });

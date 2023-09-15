@@ -23,6 +23,7 @@ import {
 } from "@barry/testing";
 
 import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
+import { COMMON_DWC_REASONS } from "../../../../../../src/modules/moderation/constants.js";
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../../../mocks/application.js";
 import { mockCase } from "../../../mocks/case.js";
@@ -33,7 +34,6 @@ import ModerationModule from "../../../../../../src/modules/moderation/index.js"
 import ProfilesModule from "../../../../../../src/modules/marketplace/dependencies/profiles/index.js";
 import RequestsModule from "../../../../../../src/modules/marketplace/dependencies/requests/index.js";
 import * as permissions from "../../../../../../src/modules/moderation/functions/permissions.js";
-import { COMMON_DWC_REASONS } from "../../../../../../src/modules/moderation/constants.js";
 
 describe("/dwc", () => {
     let command: DWCCommand;

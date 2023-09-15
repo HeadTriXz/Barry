@@ -54,5 +54,6 @@ export function isAboveMember(guild: APIGuild, a: PartialGuildMember, b: Partial
         return true;
     }
 
+    console.log(highestA.position, highestB.position);
     return highestA.position > highestB.position;
 }

@@ -11,7 +11,7 @@ import {
 import type { ProfilesModule, RequestsModule } from "./types.js";
 import type { Application } from "../../Application.js";
 
-import { CaseType } from "@prisma/client";
+import { CaseType, type Case } from "@prisma/client";
 import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
 import { loadCommands } from "../../utils/loadFolder.js";
@@ -45,6 +45,36 @@ export interface NotifyOptions {
      * The ID of the user to notify.
      */
     userID: string;
+}
+
+/**
+ * Options for the 'unflagUser' function.
+ */
+export interface UnflagOptions {
+    /**
+     * The ID of the configured log channel.
+     */
+    channelID: string | null;
+
+    /**
+     * The creator of the case.
+     */
+    creator: APIUser;
+
+    /**
+     * The ID of the guild.
+     */
+    guildID: string;
+
+    /**
+     * The reason for removing the flag.
+     */
+    reason: string;
+
+    /**
+     * The user to remove the flag of.
+     */
+    user: APIUser;
 }
 
 /**
@@ -187,7 +217,13 @@ export default class ModerationModule extends Module<Application> {
                 }
 
                 if (ban.dwc_role_id === null || !member.roles.includes(ban.dwc_role_id)) {
-                    await this.unflagUser(creator, member.user, ban);
+                    await this.unflagUser({
+                        channelID: ban.channel_id,
+                        creator: creator,
+                        guildID: ban.guild_id,
+                        reason: UNKNOWN_UNDWC_REASON,
+                        user: member.user
+                    });
                 } else {
                     await this.punishFlaggedUser(creator, member.user, ban);
                 }
@@ -307,7 +343,7 @@ export default class ModerationModule extends Module<Application> {
      * @param ban The scheduled ban.
      */
     async punishFlaggedUser(self: APIUser, user: APIUser, ban: ExpiredDWCScheduledBan): Promise<void> {
-        await this.client.api.guilds.banUser(ban.guild_id, ban.user_id, {}, {
+        await this.client.api.guilds.banUser(ban.guild_id, user.id, {}, {
             reason: DWC_BAN_REASON
         });
 
@@ -316,7 +352,7 @@ export default class ModerationModule extends Module<Application> {
             guildID: ban.guild_id,
             note: DWC_BAN_REASON,
             type: CaseType.Ban,
-            userID: ban.user_id
+            userID: user.id
         });
 
         const guild = await this.client.api.guilds.get(ban.guild_id);
@@ -324,7 +360,7 @@ export default class ModerationModule extends Module<Application> {
             guild: guild,
             reason: DWC_BAN_REASON,
             type: CaseType.Ban,
-            userID: ban.user_id
+            userID: user.id
         });
 
         if (ban.channel_id !== null) {
@@ -340,17 +376,15 @@ export default class ModerationModule extends Module<Application> {
     /**
      * Removes the flag from the user.
      *
-     * @param self The client user.
-     * @param user The user to remove the flag of.
-     * @param ban The scheduled ban.
+     * @param options The options for removing the flag.
      */
-    async unflagUser(self: APIUser, user: APIUser, ban: ExpiredDWCScheduledBan): Promise<void> {
+    async unflagUser(options: UnflagOptions): Promise<Case> {
         const entity = await this.cases.create({
-            creatorID: this.client.applicationID,
-            guildID: ban.guild_id,
-            note: UNKNOWN_UNDWC_REASON,
+            creatorID: options.creator.id,
+            guildID: options.guildID,
+            note: options.reason,
             type: CaseType.UnDWC,
-            userID: user.id
+            userID: options.user.id
         });
 
         const marketplace = this.client.modules.get("marketplace");
@@ -358,26 +392,28 @@ export default class ModerationModule extends Module<Application> {
         const requests = marketplace?.dependencies.get("requests") as RequestsModule;
 
         if (profiles !== undefined) {
-            const profilesSettings = await profiles.profilesSettings.getOrCreate(ban.guild_id);
+            const profilesSettings = await profiles.profilesSettings.getOrCreate(options.guildID);
             if (profilesSettings.channelID !== null) {
-                await profiles.unflagUser(ban.guild_id, profilesSettings.channelID, user);
+                await profiles.unflagUser(options.guildID, profilesSettings.channelID, options.user);
             }
         }
 
         if (requests !== undefined) {
-            const requestsSettings = await requests.requestsSettings.getOrCreate(ban.guild_id);
+            const requestsSettings = await requests.requestsSettings.getOrCreate(options.guildID);
             if (requestsSettings.channelID !== null) {
-                await requests.unflagUser(ban.guild_id, requestsSettings.channelID, user);
+                await requests.unflagUser(options.guildID, requestsSettings.channelID, options.user);
             }
         }
 
-        if (ban.channel_id !== null) {
-            await this.createLogMessage(ban.channel_id, {
+        if (options.channelID !== null) {
+            await this.createLogMessage(options.channelID, {
                 case: entity,
-                creator: self,
-                reason: UNKNOWN_UNDWC_REASON,
-                user: user
+                creator: options.creator,
+                reason: options.reason,
+                user: options.user
             });
         }
+
+        return entity;
     }
 }
