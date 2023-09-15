@@ -161,8 +161,10 @@ enum CaseType {
   Mute    @map("MUTE")
   Kick    @map("KICK")
   Ban     @map("BAN")
+  DWC
   Unmute  @map("UNMUTE")
   Unban   @map("UNBAN")
+  UnDWC   @map("UNDWC")
 }
 
 model Case {
@@ -211,4 +213,13 @@ model TempBan {
 
   @@id([guildID, userID])
   @@map("temp_bans")
+}
+
+model DWCScheduledBan {
+  guildID   String   @map("guild_id")
+  userID    String   @map("user_id")
+  createdAt DateTime @map("created_at") @default(now())
+
+  @@id([guildID, userID])
+  @@map("dwc_scheduled_bans")
 }

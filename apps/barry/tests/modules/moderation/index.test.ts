@@ -1,33 +1,60 @@
-import { type ModerationSettings, CaseType } from "@prisma/client";
-import type { CaseLogOptions } from "../../../dist/modules/moderation/functions/getLogContent.js";
-
+import type { APIGuildMember, APIUser } from "@discordjs/core";
 import {
+    type ExpiredDWCScheduledBan,
     CaseNoteRepository,
     CaseRepository,
+    DWCScheduledBanRepository,
     ModerationSettingsRepository,
     TempBanRepository
 } from "../../../src/modules/moderation/database.js";
 import {
+    type ModerationSettings,
+    type ProfilesSettings,
+    type RequestsSettings,
+    CaseType
+} from "@prisma/client";
+import type { CaseLogOptions } from "../../../dist/modules/moderation/functions/getLogContent.js";
+
+import {
     mockChannel,
     mockGuild,
+    mockMember,
     mockMessage,
+    mockRole,
     mockUser
 } from "@barry/testing";
 import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
 import { createMockApplication } from "../../mocks/application.js";
+import { mockCase } from "./mocks/case.js";
 
+import MarketplaceModule from "../../../src/modules/marketplace/index.js";
 import ModerationModule from "../../../src/modules/moderation/index.js";
+import ProfilesModule from "../../../src/modules/marketplace/dependencies/profiles/index.js";
+import RequestsModule from "../../../src/modules/marketplace/dependencies/requests/index.js";
 import * as content from "../../../src/modules/moderation/functions/getLogContent.js";
 
 describe("ModerationModule", () => {
+    const guildID = "68239102456844360";
+    const userID = "257522665437265920";
+
+    let mockBan: ExpiredDWCScheduledBan;
     let module: ModerationModule;
     let settings: ModerationSettings;
 
     beforeEach(() => {
+        vi.useFakeTimers().setSystemTime("01-01-2023");
+
         const client = createMockApplication();
         module = new ModerationModule(client);
 
+        mockBan = {
+            channel_id: mockChannel.id,
+            created_at: new Date(),
+            dwc_role_id: mockRole.id,
+            guild_id: guildID,
+            user_id: userID
+        };
         settings = {
             channelID: null,
             dwcDays: 7,
@@ -35,6 +62,14 @@ describe("ModerationModule", () => {
             enabled: true,
             guildID: mockGuild.id
         };
+
+        vi.spyOn(module.tempBans, "getExpired").mockResolvedValue([{
+            expiresAt: new Date(),
+            guildID: guildID,
+            userID: userID
+        }]);
+
+        vi.spyOn(module.dwcScheduledBans, "getExpired").mockResolvedValue([mockBan]);
     });
 
     afterEach(() => {
@@ -45,15 +80,13 @@ describe("ModerationModule", () => {
         it("should set up the repositories correctly", () => {
             expect(module.caseNotes).toBeInstanceOf(CaseNoteRepository);
             expect(module.cases).toBeInstanceOf(CaseRepository);
+            expect(module.dwcScheduledBans).toBeInstanceOf(DWCScheduledBanRepository);
             expect(module.moderationSettings).toBeInstanceOf(ModerationSettingsRepository);
             expect(module.tempBans).toBeInstanceOf(TempBanRepository);
         });
     });
 
     describe("checkExpiredBans", () => {
-        const guildID = "68239102456844360";
-        const userID = "257522665437265920";
-
         beforeEach(() => {
             module.createLogMessage = vi.fn();
             vi.spyOn(module.client.api.guilds, "unbanUser").mockResolvedValue();
@@ -70,11 +103,6 @@ describe("ModerationModule", () => {
                 userID: userID
             });
             vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
-            vi.spyOn(module.tempBans, "getExpired").mockResolvedValue([{
-                expiresAt: new Date(),
-                guildID: guildID,
-                userID: userID
-            }]);
 
             settings.channelID = "30527482987641765";
         });
@@ -144,26 +172,139 @@ describe("ModerationModule", () => {
         });
     });
 
+    describe("checkScheduledBans", () => {
+        let creator: APIUser;
+        let member: APIGuildMember;
+
+        beforeEach(() => {
+            module.createLogMessage = vi.fn();
+            module.punishFlaggedUser = vi.fn();
+            module.unflagUser = vi.fn();
+
+            creator = { ...mockUser, id: module.client.applicationID };
+            member = { ...mockMember, roles: [mockRole.id] };
+
+            vi.spyOn(module.client.api.guilds, "banUser").mockResolvedValue();
+            vi.spyOn(module.client.api.guilds, "getMember").mockResolvedValue(member);
+            vi.spyOn(module.client.api.users, "get")
+                .mockResolvedValueOnce(creator)
+                .mockResolvedValue(mockUser);
+
+            vi.spyOn(module.cases, "create").mockResolvedValue({
+                createdAt: new Date(),
+                creatorID: module.client.applicationID,
+                guildID: guildID,
+                id: 1,
+                type: CaseType.Ban,
+                userID: userID
+            });
+            vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+
+            settings.channelID = "30527482987641765";
+        });
+
+        it("should ban users whose scheduled ban has expired", async () => {
+            await module.checkScheduledBans();
+
+            expect(module.punishFlaggedUser).toHaveBeenCalledOnce();
+            expect(module.punishFlaggedUser).toHaveBeenCalledWith(creator, member.user, mockBan);
+            expect(module.dwcScheduledBans.getExpired).toHaveBeenCalledOnce();
+            expect(module.dwcScheduledBans.getExpired).toHaveBeenCalledWith();
+        });
+
+        it("should unflag the user if the guild has not configured the DWC role", async () => {
+            mockBan.dwc_role_id = null;
+
+            await module.checkScheduledBans();
+
+            expect(module.unflagUser).toHaveBeenCalledOnce();
+            expect(module.unflagUser).toHaveBeenCalledWith(creator, member.user, mockBan);
+        });
+
+        it("should unflag the user if the role has been manually removed", async () => {
+            vi.mocked(module.client.api.guilds.getMember).mockResolvedValue({ ...mockMember, roles: [] });
+
+            await module.checkScheduledBans();
+
+            expect(module.unflagUser).toHaveBeenCalledOnce();
+            expect(module.unflagUser).toHaveBeenCalledWith(creator, member.user, mockBan);
+        });
+
+        it("should punish the user if the user not being in the guild", async () => {
+            const response = {
+                code: 10007,
+                message: "Unknown Member"
+            };
+
+            const error = new DiscordAPIError(response, 10007, 404, "PUT", "", {});
+            vi.mocked(module.client.api.guilds.getMember).mockRejectedValue(error);
+
+            await module.checkScheduledBans();
+
+            expect(module.punishFlaggedUser).toHaveBeenCalledOnce();
+            expect(module.punishFlaggedUser).toHaveBeenCalledWith(creator, mockUser, mockBan);
+        });
+
+        it("should delete the scheduled ban from the database", async () => {
+            const deleteSpy = vi.spyOn(module.dwcScheduledBans, "delete");
+
+            await module.checkScheduledBans();
+
+            expect(deleteSpy).toHaveBeenCalledOnce();
+            expect(deleteSpy).toHaveBeenCalledWith(guildID, userID);
+        });
+
+        it("should ignore if there are no expired scheduled bans", async () => {
+            vi.spyOn(module.dwcScheduledBans, "getExpired").mockResolvedValue([]);
+
+            await module.checkScheduledBans();
+
+            expect(module.punishFlaggedUser).not.toHaveBeenCalled();
+        });
+
+        it("should throw an error if 'user' is missing on the member", async () => {
+            vi.mocked(module.client.api.guilds.getMember).mockResolvedValue({ ...mockMember, user: undefined });
+
+            await module.checkScheduledBans();
+
+            expect(module.client.logger.error).toHaveBeenCalledOnce();
+            expect(module.client.logger.error).toHaveBeenCalledWith(
+                expect.objectContaining({ message: "Missing required property 'user' on member." })
+            );
+        });
+
+        it("should log an error if the ban fails due to an unknown error", async () => {
+            const error = new Error("Oh no!");
+            vi.mocked(module.punishFlaggedUser).mockRejectedValue(error);
+
+            await module.checkScheduledBans();
+
+            expect(module.client.logger.error).toHaveBeenCalledOnce();
+            expect(module.client.logger.error).toHaveBeenCalledWith(error);
+        });
+    });
+
     describe("createLogMessage", () => {
         const channelID = "30527482987641765";
+        let options: CaseLogOptions;
 
         beforeEach(() => {
             vi.spyOn(content, "getLogContent").mockReturnValue({
                 content: "Hello World!"
             });
-        });
 
-        it("should ignore if the log channel is not configured", async () => {
-            await module.createLogMessage({} as CaseLogOptions, settings);
-
-            expect(content.getLogContent).not.toHaveBeenCalled();
+            options = {
+                case: mockCase,
+                creator: mockUser,
+                reason: "Hello World!",
+                user: mockUser
+            };
         });
 
         it("should create a new message in the configured channel", async () => {
             const createSpy = vi.spyOn(module.client.api.channels, "createMessage");
-            settings.channelID = channelID;
 
-            await module.createLogMessage({} as CaseLogOptions, settings);
+            await module.createLogMessage(channelID, options);
 
             expect(createSpy).toHaveBeenCalledOnce();
             expect(createSpy).toHaveBeenCalledWith(channelID, {
@@ -177,12 +318,11 @@ describe("ModerationModule", () => {
                 message: "Unknown channel"
             };
 
-            settings.channelID = channelID;
             const error = new DiscordAPIError(response, 10003, 404, "POST", "", {});
             const updateSpy = vi.spyOn(module.moderationSettings, "upsert");
             vi.spyOn(module.client.api.channels, "createMessage").mockRejectedValue(error);
 
-            await module.createLogMessage({} as CaseLogOptions, settings);
+            await module.createLogMessage(channelID, options);
 
             expect(updateSpy).toHaveBeenCalledOnce();
             expect(updateSpy).toHaveBeenCalledWith(settings.guildID, {
@@ -193,9 +333,8 @@ describe("ModerationModule", () => {
         it("should log an error if the message fails due to an unknown error", async () => {
             const error = new Error("Oh no!");
             vi.spyOn(module.client.api.channels, "createMessage").mockRejectedValue(error);
-            settings.channelID = channelID;
 
-            await module.createLogMessage({} as CaseLogOptions, settings);
+            await module.createLogMessage(channelID, options);
 
             expect(module.client.logger.error).toHaveBeenCalledOnce();
             expect(module.client.logger.error).toHaveBeenCalledWith(error);
@@ -203,6 +342,11 @@ describe("ModerationModule", () => {
     });
 
     describe("initialize", () => {
+        beforeEach(() => {
+            module.checkExpiredBans = vi.fn();
+            module.checkScheduledBans = vi.fn();
+        });
+
         it("should call super.initialize", async () => {
             const initSpy = vi.spyOn(Module.prototype, "initialize").mockResolvedValue();
 
@@ -213,15 +357,26 @@ describe("ModerationModule", () => {
 
         it("should set up the interval to check for expired bans", async () => {
             vi.useFakeTimers();
-            const checkSpy = vi.spyOn(module, "checkExpiredBans").mockResolvedValue();
             const intervalSpy = vi.spyOn(global, "setInterval");
 
             await module.initialize();
             vi.advanceTimersByTime(600000);
 
-            expect(intervalSpy).toHaveBeenCalledOnce();
+            expect(intervalSpy).toHaveBeenCalledTimes(2);
             expect(intervalSpy).toHaveBeenCalledWith(expect.any(Function), 600000);
-            expect(checkSpy).toHaveBeenCalledOnce();
+            expect(module.checkExpiredBans).toHaveBeenCalledOnce();
+        });
+
+        it("should set up the interval to check for expired scheduled bans", async () => {
+            vi.useFakeTimers();
+            const intervalSpy = vi.spyOn(global, "setInterval");
+
+            await module.initialize();
+            vi.advanceTimersByTime(600000);
+
+            expect(intervalSpy).toHaveBeenCalledTimes(2);
+            expect(intervalSpy).toHaveBeenCalledWith(expect.any(Function), 600000);
+            expect(module.checkScheduledBans).toHaveBeenCalledOnce();
         });
     });
 
@@ -380,6 +535,217 @@ describe("ModerationModule", () => {
             });
 
             expect(module.client.logger.error).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("punishFlaggedUser", () => {
+        let creator: APIUser;
+
+        beforeEach(() => {
+            module.createLogMessage = vi.fn();
+            module.notifyUser = vi.fn();
+            module.unflagUser = vi.fn();
+
+            creator = { ...mockUser, id: module.client.applicationID };
+
+            vi.spyOn(module.client.api.guilds, "banUser").mockResolvedValue();
+            vi.spyOn(module.client.api.guilds, "get").mockResolvedValue(mockGuild);
+
+            vi.spyOn(module.cases, "create").mockResolvedValue({
+                createdAt: new Date(),
+                creatorID: module.client.applicationID,
+                guildID: guildID,
+                id: 1,
+                type: CaseType.Ban,
+                userID: userID
+            });
+        });
+
+        it("should ban the user", async () => {
+            await module.punishFlaggedUser(creator, mockUser, mockBan);
+
+            expect(module.client.api.guilds.banUser).toHaveBeenCalledOnce();
+            expect(module.client.api.guilds.banUser).toHaveBeenCalledWith(guildID, userID, {}, {
+                reason: "User did not resolve issue."
+            });
+        });
+
+        it("should create a case for the ban", async () => {
+            await module.punishFlaggedUser(creator, mockUser, mockBan);
+
+            expect(module.createLogMessage).toHaveBeenCalledOnce();
+            expect(module.cases.create).toHaveBeenCalledOnce();
+            expect(module.cases.create).toHaveBeenCalledWith({
+                creatorID: module.client.applicationID,
+                guildID: guildID,
+                note: "User did not resolve issue.",
+                type: CaseType.Ban,
+                userID: userID
+            });
+        });
+
+        it("should notify the user", async () => {
+            await module.punishFlaggedUser(creator, mockUser, mockBan);
+
+            expect(module.notifyUser).toHaveBeenCalledOnce();
+            expect(module.notifyUser).toHaveBeenCalledWith({
+                guild: mockGuild,
+                reason: "User did not resolve issue.",
+                type: CaseType.Ban,
+                userID: userID
+            });
+        });
+
+        it("should log the case in the configured log channel", async () => {
+            await module.punishFlaggedUser(creator, mockUser, mockBan);
+
+            expect(module.createLogMessage).toHaveBeenCalledOnce();
+            expect(module.createLogMessage).toHaveBeenCalledWith(mockBan.channel_id, {
+                case: expect.any(Object),
+                creator: creator,
+                reason: "User did not resolve issue.",
+                user: mockUser
+            });
+        });
+
+        it("should not log the case if the guild has not configured a log channel", async () => {
+            mockBan.channel_id = null;
+
+            await module.punishFlaggedUser(creator, mockUser, mockBan);
+
+            expect(module.createLogMessage).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("unflagUser", () => {
+        const channelID = "30527482987641765";
+
+        let creator: APIUser;
+
+        let marketplaceModule: MarketplaceModule;
+        let profilesModule: ProfilesModule;
+        let profilesSettings: ProfilesSettings;
+        let requestsModule: RequestsModule;
+        let requestsSettings: RequestsSettings;
+
+        beforeEach(async () => {
+            module.createLogMessage = vi.fn();
+
+            marketplaceModule = new MarketplaceModule(module.client);
+            profilesModule = new ProfilesModule(module.client);
+            requestsModule = new RequestsModule(module.client);
+
+            profilesModule.unflagUser = vi.fn();
+            requestsModule.unflagUser = vi.fn();
+
+            await marketplaceModule.dependencies.add(profilesModule);
+            await marketplaceModule.dependencies.add(requestsModule);
+            await module.client.modules.add(marketplaceModule);
+
+            creator = { ...mockUser, id: module.client.applicationID };
+            profilesSettings = {
+                channelID: channelID,
+                enabled: true,
+                guildID: guildID,
+                lastMessageID: null
+            };
+            requestsSettings = {
+                channelID: channelID,
+                enabled: true,
+                guildID: guildID,
+                lastMessageID: null,
+                minCompensation: 50
+            };
+
+            vi.spyOn(module.cases, "create").mockResolvedValue({
+                createdAt: new Date(),
+                creatorID: module.client.applicationID,
+                guildID: guildID,
+                id: 1,
+                type: CaseType.UnDWC,
+                userID: userID
+            });
+            vi.spyOn(profilesModule.profilesSettings, "getOrCreate").mockResolvedValue(profilesSettings);
+            vi.spyOn(requestsModule.requestsSettings, "getOrCreate").mockResolvedValue(requestsSettings);
+        });
+
+        it("should unflag the user's profile", async () => {
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(profilesModule.unflagUser).toHaveBeenCalledOnce();
+            expect(profilesModule.unflagUser).toHaveBeenCalledWith(guildID, channelID, mockUser);
+        });
+
+        it("should unflag the user's requests", async () => {
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(requestsModule.unflagUser).toHaveBeenCalledOnce();
+            expect(requestsModule.unflagUser).toHaveBeenCalledWith(guildID, channelID, mockUser);
+        });
+
+        it("should create a case for the unflag", async () => {
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(module.cases.create).toHaveBeenCalledOnce();
+            expect(module.cases.create).toHaveBeenCalledWith({
+                creatorID: module.client.applicationID,
+                guildID: guildID,
+                note: "The DWC role was removed manually. The user will not be banned.",
+                type: CaseType.UnDWC,
+                userID: mockUser.id
+            });
+        });
+
+        it("should log the case in the configured log channel", async () => {
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(module.createLogMessage).toHaveBeenCalledOnce();
+            expect(module.createLogMessage).toHaveBeenCalledWith(channelID, {
+                case: expect.any(Object),
+                creator: creator,
+                reason: "The DWC role was removed manually. The user will not be banned.",
+                user: mockUser
+            });
+        });
+
+        it("should not log the case if the guild has not configured a log channel", async () => {
+            mockBan.channel_id = null;
+
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(module.createLogMessage).not.toHaveBeenCalled();
+        });
+
+        it("should not unflag the profile if the module is not found", async () => {
+            marketplaceModule.dependencies.delete(profilesModule.id);
+
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(profilesModule.unflagUser).not.toHaveBeenCalled();
+        });
+
+        it("should not unflag the requests if the module is not found", async () => {
+            marketplaceModule.dependencies.delete(requestsModule.id);
+
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(requestsModule.unflagUser).not.toHaveBeenCalled();
+        });
+
+        it("should not unflag the profile if the channel is unknown", async () => {
+            profilesSettings.channelID = null;
+
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(profilesModule.unflagUser).not.toHaveBeenCalled();
+        });
+
+        it("should not unflag the requests if the channel is unknown", async () => {
+            requestsSettings.channelID = null;
+
+            await module.unflagUser(creator, mockUser, mockBan);
+
+            expect(requestsModule.unflagUser).not.toHaveBeenCalled();
         });
     });
 });

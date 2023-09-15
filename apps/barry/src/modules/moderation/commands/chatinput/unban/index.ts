@@ -103,11 +103,13 @@ export default class extends SlashCommand<ModerationModule> {
         });
 
         const settings = await this.module.moderationSettings.getOrCreate(interaction.guildID);
-        await this.module.createLogMessage({
-            case: entity,
-            creator: interaction.user,
-            reason: options.reason,
-            user: options.user
-        }, settings);
+        if (settings.channelID !== null) {
+            await this.module.createLogMessage(settings.channelID, {
+                case: entity,
+                creator: interaction.user,
+                reason: options.reason,
+                user: options.user
+            });
+        }
     }
 }

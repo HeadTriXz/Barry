@@ -65,16 +65,24 @@ describe("/note", () => {
             });
         });
 
-        it("should create a log message", async () => {
+        it("should log the case in the configured log channel", async () => {
             await command.execute(interaction, options);
 
             expect(command.module.createLogMessage).toHaveBeenCalledOnce();
-            expect(command.module.createLogMessage).toHaveBeenCalledWith({
+            expect(command.module.createLogMessage).toHaveBeenCalledWith(settings.channelID, {
                 case: entity,
                 creator: interaction.user,
                 reason: options.note,
                 user: options.user
-            }, settings);
+            });
+        });
+
+        it("should not log the case if there is no log channel configured", async () => {
+            settings.channelID = null;
+
+            await command.execute(interaction, options);
+
+            expect(command.module.createLogMessage).not.toHaveBeenCalled();
         });
 
         it("should send a success message", async () => {

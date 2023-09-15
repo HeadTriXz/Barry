@@ -1,4 +1,9 @@
-import { type APIUser, ButtonStyle, ComponentType } from "@discordjs/core";
+import {
+    type APIEmbed,
+    type APIUser,
+    ButtonStyle,
+    ComponentType
+} from "@discordjs/core";
 import {
     type RequestWithAttachments,
     RequestMessageRepository,
@@ -8,7 +13,9 @@ import {
 import type { Application } from "../../../../Application.js";
 import type { RequestsSettings } from "@prisma/client";
 
+import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
+import { getDWCEmbed } from "../../utils.js";
 import { getRequestContent } from "./editor/functions/content.js";
 import { loadEvents } from "../../../../utils/loadFolder.js";
 
@@ -53,6 +60,18 @@ export default class RequestsModule extends Module<Application> {
         this.requestMessages = new RequestMessageRepository(client.prisma);
         this.requests = new RequestRepository(client.prisma);
         this.requestsSettings = new RequestsSettingsRepository(client.prisma);
+    }
+
+    /**
+     * Flags all requests for the specified user.
+     *
+     * @param guildID The ID of the guild.
+     * @param channelID The ID of the channel.
+     * @param user The user to flag the requests of.
+     * @param reason The reason to flag the user.
+     */
+    async flagUser(guildID: string, channelID: string, user: APIUser, reason: string): Promise<void> {
+        return this.#resetRequests(guildID, channelID, user, 14, [getDWCEmbed(reason)]);
     }
 
     /**
@@ -147,6 +166,54 @@ export default class RequestsModule extends Module<Application> {
                 await this.client.api.channels.deleteMessage(settings.channelID, settings.lastMessageID);
             } catch {
                 this.client.logger.warn(`Could not delete last message (${settings.lastMessageID}) in the channel ${settings.channelID} of guild ${settings.guildID}`);
+            }
+        }
+    }
+
+    /**
+     * Removes the flag from all requests for the specified user.
+     *
+     * @param guildID The ID of the guild.
+     * @param channelID The ID of the channel.
+     * @param user The user to remove the flag of.
+     */
+    async unflagUser(guildID: string, channelID: string, user: APIUser): Promise<void> {
+        return this.#resetRequests(guildID, channelID, user, 21);
+    }
+
+    /**
+     * Resets flagged requests for a user in a specific guild's channel.
+     *
+     * @param guildID The ID of the guild.
+     * @param channelID The ID of the channel.
+     * @param user The user for whom the requests are being reset.
+     * @param maxDays The maximum number of days ago a request can be to be reset.
+     * @param embeds Optional array of embed objects to include in the updated messages.
+     */
+    async #resetRequests(
+        guildID: string,
+        channelID: string,
+        user: APIUser,
+        maxDays: number = 14,
+        embeds: APIEmbed[] = []
+    ): Promise<void> {
+        const requests = await this.requests.getFlaggableByUser(guildID, user.id, maxDays);
+        for (const request of requests) {
+            const content = getRequestContent(user, request);
+            if (embeds.length > 0) {
+                content.embeds?.push(...embeds);
+            }
+
+            for (const message of request.messages) {
+                try {
+                    await this.client.api.channels.editMessage(channelID, message.messageID, content);
+                } catch (error: unknown) {
+                    if (error instanceof DiscordAPIError && error.code === 10008) {
+                        continue;
+                    }
+
+                    this.client.logger.error(error);
+                }
             }
         }
     }

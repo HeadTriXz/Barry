@@ -1,4 +1,5 @@
 import {
+    type APIEmbed,
     type APIUser,
     ButtonStyle,
     ComponentType
@@ -11,7 +12,10 @@ import {
     ProfileRepository,
     ProfilesSettingsRepository
 } from "./database.js";
+
+import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
+import { getDWCEmbed } from "../../utils.js";
 import { getProfileContent } from "./editor/functions/content.js";
 import { loadEvents } from "../../../../utils/loadFolder.js";
 
@@ -67,6 +71,18 @@ export default class ProfilesModule extends Module<Application> {
         this.profileMessages = new ProfileMessageRepository(client.prisma);
         this.profiles = new ProfileRepository(client.prisma);
         this.profilesSettings = new ProfilesSettingsRepository(client.prisma);
+    }
+
+    /**
+     * Flags all requests for the specified user.
+     *
+     * @param guildID The ID of the guild.
+     * @param channelID The ID of the channel.
+     * @param user The user to flag the requests of.
+     * @param reason The reason to flag the user.
+     */
+    async flagUser(guildID: string, channelID: string, user: APIUser, reason: string): Promise<void> {
+        return this.#resetProfiles(guildID, channelID, user, 14, [getDWCEmbed(reason)]);
     }
 
     /**
@@ -145,6 +161,54 @@ export default class ProfilesModule extends Module<Application> {
                 await this.client.api.channels.deleteMessage(settings.channelID, settings.lastMessageID);
             } catch {
                 this.client.logger.warn(`Could not delete last message (${settings.lastMessageID}) in the channel ${settings.channelID} of guild ${settings.guildID}`);
+            }
+        }
+    }
+
+    /**
+     * Removes the flag from all profiles for the specified user.
+     *
+     * @param guildID The ID of the guild.
+     * @param channelID The ID of the channel.
+     * @param user The user to remove the flag of.
+     */
+    async unflagUser(guildID: string, channelID: string, user: APIUser): Promise<void> {
+        return this.#resetProfiles(guildID, channelID, user, 21);
+    }
+
+    /**
+     * Resets flagged profiles for a user in a specific guild's channel.
+     *
+     * @param guildID The ID of the guild.
+     * @param channelID The ID of the channel.
+     * @param user The user for whom the profiles are being reset.
+     * @param maxDays The maximum number of days ago a request can be to be reset.
+     * @param embeds Optional array of embed objects to include in the updated messages.
+     */
+    async #resetProfiles(
+        guildID: string,
+        channelID: string,
+        user: APIUser,
+        maxDays: number = 14,
+        embeds: APIEmbed[] = []
+    ): Promise<void> {
+        const profile = await this.profiles.getWithFlaggableMessages(guildID, user.id, maxDays);
+        if (profile !== null) {
+            const content = getProfileContent(user, profile);
+            if (embeds.length > 0) {
+                content.embeds?.push(...embeds);
+            }
+
+            for (const message of profile.messages) {
+                try {
+                    await this.client.api.channels.editMessage(channelID, message.messageID, content);
+                } catch (error: unknown) {
+                    if (error instanceof DiscordAPIError && error.code === 10008) {
+                        continue;
+                    }
+
+                    this.client.logger.error(error);
+                }
             }
         }
     }

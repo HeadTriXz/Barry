@@ -10,6 +10,7 @@ import { mockRequest } from "./mocks/request.js";
 import { prisma } from "../../../mocks/index.js";
 
 describe("RequestRepository", () => {
+    const guildID = "68239102456844360";
     const userID = "257522665441460225";
     const requestID = 1;
 
@@ -142,6 +143,53 @@ describe("RequestRepository", () => {
             vi.mocked(prisma.request.findMany).mockResolvedValue([]);
 
             const entities = await repository.getEditableByUser(userID);
+
+            expect(entities).toEqual([]);
+        });
+    });
+
+    describe("getFlaggableByUser", () => {
+        it("should return the flaggable requests for the specified user", async () => {
+            vi.useFakeTimers().setSystemTime("01-01-2023");
+            vi.mocked(prisma.request.findMany).mockResolvedValue([mockRequest]);
+
+            const timestamp = BigInt(Date.now() - 1421280000000);
+            const minimumID = String(timestamp << 22n);
+
+            const entities = await repository.getFlaggableByUser("68239102456844360", userID);
+
+            expect(entities).toEqual([mockRequest]);
+            expect(prisma.request.findMany).toHaveBeenCalledOnce();
+            expect(prisma.request.findMany).toHaveBeenCalledWith({
+                include: {
+                    attachments: true,
+                    messages: {
+                        where: {
+                            guildID: guildID,
+                            messageID: {
+                                gte: minimumID
+                            }
+                        }
+                    }
+                },
+                where: {
+                    messages: {
+                        some: {
+                            guildID: guildID,
+                            messageID: {
+                                gte: minimumID
+                            }
+                        }
+                    },
+                    userID: userID
+                }
+            });
+        });
+
+        it("should return an empty array if the user has no flaggable requests", async () => {
+            vi.mocked(prisma.request.findMany).mockResolvedValue([]);
+
+            const entities = await repository.getFlaggableByUser("68239102456844360", userID, 7);
 
             expect(entities).toEqual([]);
         });

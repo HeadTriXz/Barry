@@ -6,9 +6,11 @@ import config, { type Emoji } from "../../config.js";
  */
 export const CASE_EMOJIS: Record<CaseType, Emoji> = {
     [CaseType.Ban]: config.emotes.ban,
+    [CaseType.DWC]: config.emotes.dwc,
     [CaseType.Kick]: config.emotes.kick,
     [CaseType.Mute]: config.emotes.mute,
     [CaseType.Note]: config.emotes.note,
+    [CaseType.UnDWC]: config.emotes.undwc,
     [CaseType.Unban]: config.emotes.unban,
     [CaseType.Unmute]: config.emotes.unmute,
     [CaseType.Warn]: config.emotes.warn
@@ -19,9 +21,11 @@ export const CASE_EMOJIS: Record<CaseType, Emoji> = {
  */
 export const CASE_TITLES: Record<CaseType, string> = {
     [CaseType.Ban]: "Ban",
+    [CaseType.DWC]: "DWC",
     [CaseType.Kick]: "Kick",
     [CaseType.Mute]: "Mute",
     [CaseType.Note]: "Note",
+    [CaseType.UnDWC]: "UnDWC",
     [CaseType.Unban]: "Unban",
     [CaseType.Unmute]: "Unmute",
     [CaseType.Warn]: "Warn"
