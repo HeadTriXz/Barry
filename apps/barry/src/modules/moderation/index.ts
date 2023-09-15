@@ -1,4 +1,5 @@
 import type { APIGuild, APIUser } from "@discordjs/core";
+import { type Case, CaseType } from "@prisma/client";
 import { type CaseLogOptions, getLogContent } from "./functions/getLogContent.js";
 import {
     type ExpiredDWCScheduledBan,
@@ -11,7 +12,6 @@ import {
 import type { ProfilesModule, RequestsModule } from "./types.js";
 import type { Application } from "../../Application.js";
 
-import { CaseType, type Case } from "@prisma/client";
 import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
 import { loadCommands } from "../../utils/loadFolder.js";
