@@ -3,6 +3,8 @@ import { type Server, FastifyServer, StatusCodes } from "../src/index.js";
 
 import { File } from "node:buffer";
 import nacl from "tweetnacl";
+import type { ServerRequestHandler } from "../src/Server.js";
+import type { MockedFunction } from "vitest";
 
 const SERVER_HOST = "localhost";
 const SERVER_PORT = 3000;
@@ -35,26 +37,29 @@ function getSignatureHeaders(privateKey: string, payload?: any): HeadersInit {
 describe("FastifyServer", () => {
     let server: Server;
     let secretKey: string;
+    let callback: MockedFunction<ServerRequestHandler>;
 
-    beforeEach(() => {
+    beforeAll(async () => {
         const pair = nacl.sign.keyPair();
         const publicKey = Buffer.from(pair.publicKey).toString("hex");
 
+        callback = vi.fn();
         secretKey = Buffer.from(pair.secretKey).toString("hex");
         server = new FastifyServer({ publicKey });
+        server.post("/", callback);
+
+        await server.listen(SERVER_PORT, SERVER_HOST);
     });
 
-    afterEach(async () => {
+    afterAll(async () => {
         await server.close();
     });
 
     describe("Receive request", () => {
         it("should accept requests with a valid key", async () => {
-            await server
-                .post("/", (body, respond) => {
-                    return respond({ status: StatusCodes.OK });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({ status: StatusCodes.OK });
+            });
 
             const response = await fetch(SERVER_URL, {
                 method: "POST",
@@ -65,11 +70,9 @@ describe("FastifyServer", () => {
         });
 
         it("should reject requests with an invalid key", async () => {
-            await server
-                .post("/", (body, respond) => {
-                    return respond({ status: StatusCodes.OK });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({ status: StatusCodes.OK });
+            });
 
             const response = await fetch(SERVER_URL, {
                 method: "POST",
@@ -83,11 +86,9 @@ describe("FastifyServer", () => {
         });
 
         it("should reject requests without a key", async () => {
-            await server
-                .post("/", (body, respond) => {
-                    return respond({ status: StatusCodes.OK });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({ status: StatusCodes.OK });
+            });
 
             const response = await fetch(SERVER_URL, {
                 method: "POST"
@@ -97,11 +98,9 @@ describe("FastifyServer", () => {
         });
 
         it("should receive the right request body", async () => {
-            await server
-                .post("/", (body, respond) => {
-                    return respond({ body });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({ body });
+            });
 
             const body = { message: "Hello World" };
             const response = await fetch(SERVER_URL, {
@@ -125,16 +124,14 @@ describe("FastifyServer", () => {
             const fileContent = "Hello World";
             const fileName = "file.txt";
 
-            await server
-                .post("/", async (body, respond) => {
-                    return respond({
-                        files: [{
-                            name: fileName,
-                            data: Buffer.from(fileContent)
-                        }]
-                    });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({
+                    files: [{
+                        name: fileName,
+                        data: Buffer.from(fileContent)
+                    }]
+                });
+            });
 
             const response = await fetch(SERVER_URL, {
                 method: "POST",
@@ -157,16 +154,14 @@ describe("FastifyServer", () => {
             const fileContent = "Hello World";
             const fileName = "file.txt";
 
-            await server
-                .post("/", async (body, respond) => {
-                    return respond({
-                        files: [{
-                            name: fileName,
-                            data: Buffer.from(fileContent)
-                        }]
-                    });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({
+                    files: [{
+                        name: fileName,
+                        data: Buffer.from(fileContent)
+                    }]
+                });
+            });
 
             const response = await fetch(SERVER_URL, {
                 method: "POST",
@@ -191,17 +186,15 @@ describe("FastifyServer", () => {
 
             const payload = { message: "Hello World" };
 
-            await server
-                .post("/", async (body, respond) => {
-                    return respond({
-                        body: payload,
-                        files: [{
-                            name: fileName,
-                            data: Buffer.from(fileContent)
-                        }]
-                    });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({
+                    body: payload,
+                    files: [{
+                        name: fileName,
+                        data: Buffer.from(fileContent)
+                    }]
+                });
+            });
 
             const response = await fetch(SERVER_URL, {
                 method: "POST",
@@ -218,15 +211,13 @@ describe("FastifyServer", () => {
         });
 
         it("should respond with the specified headers", async () => {
-            await server
-                .post("/", async (body, respond) => {
-                    return respond({
-                        headers: {
-                            "x-custom-header": "Hello World"
-                        }
-                    });
-                })
-                .listen(SERVER_PORT, SERVER_HOST);
+            callback.mockImplementation((body, respond) => {
+                return respond({
+                    headers: {
+                        "x-custom-header": "Hello World"
+                    }
+                });
+            });
 
             const response = await fetch(SERVER_URL, {
                 method: "POST",
