@@ -33,7 +33,7 @@ interface LipsumOptions {
 }
 
 /**
- * Represents a slash command that shogenerates lorem ipsum text.
+ * Represents a slash command that generates lorem ipsum text.
  */
 export default class extends SlashCommand<GeneralModule> {
     /**
