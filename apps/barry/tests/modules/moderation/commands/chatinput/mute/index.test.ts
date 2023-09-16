@@ -97,6 +97,8 @@ describe("/mute", () => {
             expect(editSpy).toHaveBeenCalledOnce();
             expect(editSpy).toHaveBeenCalledWith(mockGuild.id, options.member.user.id, {
                 communication_disabled_until: new Date(Date.now() + 300000).toISOString()
+            }, {
+                reason: options.reason
             });
         });
 

@@ -134,6 +134,8 @@ export default class extends SlashCommand<ModerationModule> {
         try {
             await this.client.api.guilds.editMember(interaction.guildID, options.member.user.id, {
                 communication_disabled_until: new Date(Date.now() + 1000 * duration).toISOString()
+            }, {
+                reason: options.reason
             });
         } catch (error: unknown) {
             this.client.logger.error(error);
