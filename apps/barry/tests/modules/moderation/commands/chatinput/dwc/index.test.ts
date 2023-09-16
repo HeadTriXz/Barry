@@ -101,10 +101,15 @@ describe("/dwc", () => {
 
         profilesModule.flagUser = vi.fn();
         requestsModule.flagUser = vi.fn();
+        vi.spyOn(module.dwcScheduledBans, "get").mockResolvedValue(null);
         vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
         vi.spyOn(module.cases, "create").mockResolvedValue(entity);
         vi.spyOn(profilesModule.profilesSettings, "getOrCreate").mockResolvedValue(profilesSettings);
         vi.spyOn(requestsModule.requestsSettings, "getOrCreate").mockResolvedValue(requestsSettings);
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     describe("execute", () => {
@@ -285,6 +290,19 @@ describe("/dwc", () => {
                 await command.execute(interaction, options);
 
                 expect(interaction.acknowledged).toBe(false);
+            });
+
+            it("should show an error message if the user is already flagged", async () => {
+                vi.spyOn(command.module.dwcScheduledBans, "get").mockResolvedValue(entity);
+                const createSpy = vi.spyOn(interaction, "createMessage");
+
+                await command.execute(interaction, options);
+
+                expect(createSpy).toHaveBeenCalledOnce();
+                expect(createSpy).toHaveBeenCalledWith({
+                    content: expect.stringContaining("That user is already flagged."),
+                    flags: MessageFlags.Ephemeral
+                });
             });
 
             it("should show an error message if the user is trying to flag themselves", async () => {
