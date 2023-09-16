@@ -70,6 +70,8 @@ describe("/unmute", () => {
             expect(editSpy).toHaveBeenCalledOnce();
             expect(editSpy).toHaveBeenCalledWith(mockGuild.id, options.member.user.id, {
                 communication_disabled_until: null
+            }, {
+                reason: options.reason
             });
         });
 
