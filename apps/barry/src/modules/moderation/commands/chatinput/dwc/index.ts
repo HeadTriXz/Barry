@@ -1,4 +1,10 @@
-import { type APIUser, PermissionFlagsBits, MessageFlags, type APIRole, OverwriteType } from "@discordjs/core";
+import {
+    type APIUser,
+    type APIRole,
+    MessageFlags,
+    OverwriteType,
+    PermissionFlagsBits
+} from "@discordjs/core";
 import {
     type ApplicationCommandInteraction,
     SlashCommand,
@@ -86,6 +92,14 @@ export default class extends SlashCommand<ModerationModule> {
         if (options.user.id === this.client.applicationID) {
             return interaction.createMessage({
                 content: `${config.emotes.error} Your attempt to flag me has been classified as a failed comedy show audition.`,
+                flags: MessageFlags.Ephemeral
+            });
+        }
+
+        const dwc = await this.module.dwcScheduledBans.get(interaction.guildID, options.user.id);
+        if (dwc !== null) {
+            return interaction.createMessage({
+                content: `${config.emotes.error} That user is already flagged.`,
                 flags: MessageFlags.Ephemeral
             });
         }
