@@ -40,8 +40,19 @@ export enum RequestActionButton {
  * Represents the requests module.
  */
 export default class RequestsModule extends Module<Application> {
+    /**
+     * Repository class for managing request messages.
+    */
     requestMessages: RequestMessageRepository;
+
+    /**
+     * Repository class for managing requests.
+     */
     requests: RequestRepository;
+
+    /**
+     * Repository class for managing settings for this module.
+     */
     requestsSettings: RequestsSettingsRepository;
 
     /**
