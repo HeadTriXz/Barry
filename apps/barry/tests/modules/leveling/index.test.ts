@@ -5,7 +5,7 @@ import {
     LevelUpSettingsRepository,
     LevelingSettingsRepository,
     MemberActivityRepository
-} from "../../../src/modules/leveling/database.js";
+} from "../../../src/modules/leveling/database/index.js";
 import { createMockApplication } from "../../mocks/application.js";
 
 import LevelingModule from "../../../src/modules/leveling/index.js";

@@ -1,5 +1,5 @@
 import type { MemberActivity } from "@prisma/client";
-import type { MemberActivitySortBy } from "../../../database.js";
+import type { MemberActivitySortBy } from "../../../database/index.js";
 import type { LeaderboardCanvas } from "./LeaderboardCanvas.js";
 import {
     BACKGROUND_COLOR,

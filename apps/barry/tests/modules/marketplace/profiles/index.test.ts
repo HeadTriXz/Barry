@@ -5,7 +5,7 @@ import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
-} from "../../../../src/modules/marketplace/dependencies/profiles/database.js";
+} from "../../../../src/modules/marketplace/dependencies/profiles/database/index.js";
 import { mockUser, mockMessage } from "@barry/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";

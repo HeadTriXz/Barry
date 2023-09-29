@@ -7,7 +7,7 @@ import {
     TextInputStyle
 } from "@discordjs/core";
 import { type Request, type RequestsSettings, RequestStatus } from "@prisma/client";
-import type { RequestWithAttachments } from "../../database.js";
+import type { RequestWithAttachments } from "../../database/index.js";
 
 import { getAvatarURL } from "@barry/core";
 import config from "../../../../../../config.js";

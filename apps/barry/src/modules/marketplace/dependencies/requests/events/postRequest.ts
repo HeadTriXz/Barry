@@ -45,7 +45,7 @@ export default class extends Event<RequestsModule> {
             return;
         }
 
-        const settings = await this.module.requestsSettings.getOrCreate(interaction.guildID);
+        const settings = await this.module.settings.getOrCreate(interaction.guildID);
         if (!settings.enabled) {
             return interaction.createMessage({
                 content: `${config.emotes.error} Requests are currently disabled for this guild.`,

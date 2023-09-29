@@ -10,7 +10,7 @@ import {
     SlashCommandOptionBuilder,
     getAvatarURL
 } from "@barry/core";
-import type { CaseWithNotes } from "../../../../database.js";
+import type { CaseWithNotes } from "../../../../database/index.js";
 import type ModerationModule from "../../../../index.js";
 
 import { CASE_EMOJIS, CASE_TITLES } from "../../../../constants.js";

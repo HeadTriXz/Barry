@@ -4,7 +4,7 @@ import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
-} from "../../../../src/modules/marketplace/dependencies/profiles/database.js";
+} from "../../../../src/modules/marketplace/dependencies/profiles/database/index.js";
 
 import { mockChannel } from "@barry/testing";
 import { mockProfile } from "./mocks/profile.js";

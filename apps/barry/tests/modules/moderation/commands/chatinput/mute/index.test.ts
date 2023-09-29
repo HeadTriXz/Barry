@@ -64,7 +64,7 @@ describe("/mute", () => {
         vi.spyOn(client.api.guilds, "editMember").mockResolvedValue(mockMember);
         vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
         vi.spyOn(module.cases, "create").mockResolvedValue(entity);
-        vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     afterEach(() => {

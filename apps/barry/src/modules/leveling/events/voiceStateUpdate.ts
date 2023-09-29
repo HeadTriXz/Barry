@@ -56,7 +56,7 @@ export default class extends Event<LevelingModule> {
      * @returns Whether the user is blacklisted.
      */
     async #isBlacklisted(state: GuildGatewayVoiceState, channelID?: string): Promise<boolean> {
-        const settings = await this.module.levelingSettings.getOrCreate(state.guild_id);
+        const settings = await this.module.settings.getOrCreate(state.guild_id);
         return !settings.enabled
             || (channelID !== undefined && settings.ignoredChannels.includes(channelID))
             || (state.member !== undefined && settings.ignoredRoles.some((id) => state.member?.roles.includes(id)));

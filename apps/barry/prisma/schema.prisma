@@ -67,6 +67,8 @@ model Profile {
   pricing        String?
   skills         String[]               @default([])
 
+  reports        Report[]
+
   @@map("profiles")
 }
 
@@ -116,6 +118,8 @@ model Request {
   createdAt    DateTime            @default(now()) @map("created_at")
   updatedAt    DateTime            @updatedAt @map("updated_at")
 
+  reports      Report[]
+
   @@index([updatedAt, status])
   @@index([userID, status])
   
@@ -152,6 +156,73 @@ model RequestsSettings {
   minCompensation Float   @default(50) @map("min_compensation")
 
   @@map("requests_settings")
+}
+
+/// Reports
+enum ReportCategory {
+  Inappropriate    @map("INAPPROPRIATE")
+  ScamsFraud       @map("SCAMS_FRAUD")
+  FalseInformation @map("FALSE_INFORMATION")
+  Copyright        @map("COPYRIGHT")
+  Other            @map("OTHER")
+}
+
+enum ReportStatus {
+  Open     @map("OPEN")
+  Accepted @map("ACCEPTED")
+  Ignored  @map("IGNORED")
+}
+
+enum ReportType {
+  Profile @map("PROFILE")
+  Request @map("REQUEST")
+}
+
+model Report {
+  id        Int            @id @default(autoincrement())
+  category  ReportCategory
+  creatorID String         @map("creator_id")
+  guildID   String         @map("guild_id")
+  reason    String
+  requestID Int?           @map("request_id")
+  type      ReportType
+  userID    String         @map("user_id")
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  local     LocalReport[]
+  profile   Profile?       @relation(references: [userID], fields: [userID], onDelete: Cascade)
+  request   Request?       @relation(references: [id], fields: [requestID], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+model LocalReport {
+  id        Int
+  guildID   String       @map("guild_id")
+  reportID  Int          @map("report_id")
+  report    Report       @relation(references: [id], fields: [reportID], onDelete: Cascade)
+  status    ReportStatus @default(Open)
+  threadID  String       @map("thread_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  @@id([guildID, id])
+  @@map("local_reports")
+}
+
+model ReportsSettings {
+  guildID               String  @id @map("guild_id")
+  channelID             String? @map("channel_id")
+
+  tag_open              String? @map("tag_open")
+  tag_accepted          String? @map("tag_accepted")
+  tag_ignored           String? @map("tag_ignored")
+  tag_inappropriate     String? @map("tag_inappropriate")
+  tag_scams_fraud       String? @map("tag_scams_fraud")
+  tag_false_information String? @map("tag_false_information")
+  tag_copyright         String? @map("tag_copyright")
+  tag_other             String? @map("tag_other")
+
+  @@map("reports_settings")
 }
 
 // Moderation

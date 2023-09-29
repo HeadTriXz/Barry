@@ -1,4 +1,4 @@
-import type { RequestWithAttachments } from "../../../../../src/modules/marketplace/dependencies/requests/database.js";
+import type { RequestWithAttachments } from "../../../../../src/modules/marketplace/dependencies/requests/database/index.js";
 import { RequestStatus } from "@prisma/client";
 import { mockUser } from "@barry/testing";
 

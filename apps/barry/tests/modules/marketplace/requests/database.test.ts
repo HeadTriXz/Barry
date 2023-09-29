@@ -3,7 +3,7 @@ import {
     RequestMessageRepository,
     RequestRepository,
     RequestsSettingsRepository
-} from "../../../../src/modules/marketplace/dependencies/requests/database.js";
+} from "../../../../src/modules/marketplace/dependencies/requests/database/index.js";
 
 import { mockChannel } from "@barry/testing";
 import { mockRequest } from "./mocks/request.js";

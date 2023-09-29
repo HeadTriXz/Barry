@@ -13,7 +13,7 @@ import {
 } from "@barry/core";
 import type LevelingModule from "../../../index.js";
 
-import { MemberActivitySortBy, MemberActivitySortOrder } from "../../../database.js";
+import { MemberActivitySortBy, MemberActivitySortOrder } from "../../../database/index.js";
 
 import { PAGE_SIZE } from "./constants.js";
 import { LeaderboardCanvas } from "./LeaderboardCanvas.js";

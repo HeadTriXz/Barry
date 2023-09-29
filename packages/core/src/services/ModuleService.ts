@@ -1,5 +1,5 @@
-import type { Module } from "../modules/index.js";
 import type { Awaitable } from "../types.js";
+import type { Module } from "../modules/index.js";
 
 /**
  * Represents a service for managing modules.
@@ -30,7 +30,7 @@ export interface ModuleRegistry {
      * @param id The ID of the module.
      * @returns The retrieved module, if found.
      */
-    get(id: string): Module | undefined;
+    get<T extends Module>(id: string): T | undefined;
 }
 
 /**
@@ -78,7 +78,21 @@ export class ModuleService implements ModuleRegistry {
      * @param id The ID of the module.
      * @returns The retrieved module, if found.
      */
-    get(id: string): Module | undefined {
-        return this.#modules.get(id);
+    get<T extends Module>(id: string): T | undefined {
+        const [key, children] = id.split(".", 2);
+        if (key === undefined) {
+            return;
+        }
+
+        const module = this.#modules.get(key);
+        if (module === undefined) {
+            return;
+        }
+
+        if (children === undefined) {
+            return module as T;
+        }
+
+        return module.dependencies.get(children);
     }
 }

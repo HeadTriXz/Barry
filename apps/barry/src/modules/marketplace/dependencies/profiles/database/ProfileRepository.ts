@@ -1,82 +1,18 @@
 import type {
-    Prisma,
-    PrismaClient,
     Profile,
     ProfileMessage,
-    ProfilesSettings
+    PrismaClient,
+    Prisma
 } from "@prisma/client";
 
 /**
  * Represents a profile record with its messages.
  */
-export type ProfileWithMessages = Profile & { messages: ProfileMessage[] };
-
-/**
- * Repository class for managing settings for the profiles module.
- */
-export class ProfilesSettingsRepository {
+export interface ProfileWithMessages extends Profile {
     /**
-     * The Prisma client used to interact with the database.
+     * The messages for the profile.
      */
-    #prisma: PrismaClient;
-
-    /**
-     * Repository class for managing settings for the profiles module.
-     *
-     * @param prisma The Prisma client used to interact with the database.
-     */
-    constructor(prisma: PrismaClient) {
-        this.#prisma = prisma;
-    }
-
-    /**
-     * Creates a new profiles settings record for the specified guild.
-     *
-     * @param guildID The ID of the guild.
-     * @returns The created profiles settings record.
-     */
-    async create(guildID: string): Promise<ProfilesSettings> {
-        return this.#prisma.profilesSettings.create({
-            data: { guildID }
-        });
-    }
-
-    /**
-     * Retrieves the profiles settings record for the specified guild.
-     *
-     * @param guildID The ID of the guild.
-     * @returns The profiles settings record, or null if not found.
-     */
-    async get(guildID: string): Promise<ProfilesSettings | null> {
-        return this.#prisma.profilesSettings.findUnique({
-            where: { guildID }
-        });
-    }
-
-    /**
-     * If a record exists for the specified guild, return it, otherwise create a new one.
-     *
-     * @param guildID The ID of the guild.
-     * @returns The profiles settings record.
-     */
-    async getOrCreate(guildID: string): Promise<ProfilesSettings> {
-        return await this.get(guildID) ?? await this.create(guildID);
-    }
-
-    /**
-     * Upserts the provided profiles settings record.
-     *
-     * @param guildID The ID of the guild.
-     * @param settings The profiles settings to upsert.
-     * @returns The upserted profiles settings record.
-     */
-    async upsert(guildID: string, settings: Omit<Prisma.ProfilesSettingsCreateInput, "guildID">): Promise<ProfilesSettings> {
-        return this.#prisma.profilesSettings.upsert({
-            create: { ...settings, guildID },
-            update: settings,
-            where: { guildID }
-        });
-    }
+    messages: ProfileMessage[];
 }
 
 /**
@@ -201,57 +137,6 @@ export class ProfileRepository {
             },
             update: options,
             where: { userID }
-        });
-    }
-}
-
-/**
- * Repository class for managing profile messages.
- */
-export class ProfileMessageRepository {
-    /**
-     * The Prisma client used to interact with the database.
-     */
-    #prisma: PrismaClient;
-
-    /**
-     * Repository class for managing profile messages.
-     *
-     * @param prisma The Prisma client used to interact with the database.
-     */
-    constructor(prisma: PrismaClient) {
-        this.#prisma = prisma;
-    }
-
-    /**
-     * Creates a new profile message record.
-     *
-     * @param messageID The ID of the message.
-     * @param guildID The ID of the guild.
-     * @param userID The ID of the user.
-     * @returns The created profile message record.
-     */
-    async create(messageID: string, guildID: string, userID: string): Promise<ProfileMessage> {
-        return this.#prisma.profileMessage.create({
-            data: {
-                guildID,
-                messageID,
-                userID
-            }
-        });
-    }
-
-    /**
-     * Retrieves the latest profile message for a user in a guild.
-     *
-     * @param guildID The ID of the guild.
-     * @param userID The ID of the user.
-     * @returns The latest profile message, or null if not found.
-     */
-    async getLatest(guildID: string, userID: string): Promise<ProfileMessage | null> {
-        return this.#prisma.profileMessage.findFirst({
-            orderBy: { messageID: "desc" },
-            where: { guildID, userID }
         });
     }
 }

@@ -54,7 +54,7 @@ describe("/unban", () => {
         vi.spyOn(client.api.guilds, "unbanUser").mockResolvedValue();
         vi.spyOn(client.api.guilds, "get").mockResolvedValue(mockGuild);
         vi.spyOn(module.cases, "create").mockResolvedValue(entity);
-        vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("execute", () => {

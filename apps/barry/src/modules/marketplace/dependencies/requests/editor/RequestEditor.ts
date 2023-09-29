@@ -1,5 +1,5 @@
 import { type RequestsSettings, RequestStatus } from "@prisma/client";
-import type { RequestWithAttachments } from "../database.js";
+import type { RequestWithAttachments } from "../database/index.js";
 import type { UpdatableInteraction } from "@barry/core";
 import type RequestsModule from "../index.js";
 

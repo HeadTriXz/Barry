@@ -8,11 +8,20 @@ import {
     DWCScheduledBanRepository,
     ModerationSettingsRepository,
     TempBanRepository
-} from "./database.js";
-import type { ProfilesModule, RequestsModule } from "./types.js";
+} from "./database/index.js";
 import type { Application } from "../../Application.js";
+import type { BaseModerationModule } from "../../types/moderation.js";
+import type { FlaggableModule } from "./types.js";
 
+import {
+    DWC_BAN_INTERVAL,
+    DWC_BAN_REASON,
+    NOTIFY_WORDS,
+    UNBAN_INTERVAL,
+    UNKNOWN_UNDWC_REASON
+} from "./constants.js";
 import { DiscordAPIError } from "@discordjs/rest";
+import { ModerationActions } from "./functions/actions/actions.js";
 import { Module } from "@barry/core";
 import { loadCommands } from "../../utils/loadFolder.js";
 import config from "../../config.js";
@@ -78,41 +87,14 @@ export interface UnflagOptions {
 }
 
 /**
- * The words to use for each case type.
- */
-const NOTIFY_WORDS: Record<Exclude<CaseType, "Note" | "DWC" | "UnDWC">, string> = {
-    [CaseType.Ban]: "banned from",
-    [CaseType.Kick]: "kicked from",
-    [CaseType.Mute]: "muted in",
-    [CaseType.Unban]: "unbanned from",
-    [CaseType.Unmute]: "unmuted from",
-    [CaseType.Warn]: "warned in"
-};
-
-/**
- * How often to check for expired scheduled bans.
- */
-const DWC_BAN_INTERVAL = 600000;
-
-/**
- * The reason to display for expired bans.
- */
-const DWC_BAN_REASON = "User did not resolve issue.";
-
-/**
- * How often to check for expired temporary bans.
- */
-const UNBAN_INTERVAL = 600000;
-
-/**
- * The reason to display when a user no longer has the DWC role.
- */
-const UNKNOWN_UNDWC_REASON = "The DWC role was removed manually. The user will not be banned.";
-
-/**
  * Represents the moderation module.
  */
-export default class ModerationModule extends Module<Application> {
+export default class ModerationModule extends Module<Application> implements BaseModerationModule {
+    /**
+     * Actions that can be performed on a user.
+     */
+    actions: ModerationActions;
+
     /**
      * Repository class for managing case notes.
      */
@@ -131,7 +113,7 @@ export default class ModerationModule extends Module<Application> {
     /**
      * Repository class for managing settings for this module.
      */
-    moderationSettings: ModerationSettingsRepository;
+    settings: ModerationSettingsRepository;
 
     /**
      * Repository class for managing temporary bans.
@@ -151,10 +133,11 @@ export default class ModerationModule extends Module<Application> {
             commands: loadCommands("./commands")
         });
 
+        this.actions = new ModerationActions(this);
         this.caseNotes = new CaseNoteRepository(client.prisma);
         this.cases = new CaseRepository(client.prisma);
         this.dwcScheduledBans = new DWCScheduledBanRepository(client.prisma);
-        this.moderationSettings = new ModerationSettingsRepository(client.prisma);
+        this.settings = new ModerationSettingsRepository(client.prisma);
         this.tempBans = new TempBanRepository(client.prisma);
     }
 
@@ -186,7 +169,7 @@ export default class ModerationModule extends Module<Application> {
                 userID: ban.userID
             });
 
-            const settings = await this.moderationSettings.getOrCreate(ban.guildID);
+            const settings = await this.settings.getOrCreate(ban.guildID);
             if (settings.channelID !== null) {
                 const user = await this.client.api.users.get(ban.userID);
                 await this.createLogMessage(settings.channelID, {
@@ -253,7 +236,7 @@ export default class ModerationModule extends Module<Application> {
             await this.client.api.channels.createMessage(channelID, content);
         } catch (error: unknown) {
             if (error instanceof DiscordAPIError && error.code === 10003) {
-                await this.moderationSettings.upsert(options.case.guildID, {
+                await this.settings.upsert(options.case.guildID, {
                     channelID: null
                 });
             }
@@ -297,7 +280,7 @@ export default class ModerationModule extends Module<Application> {
      * @returns Whether the guild has enabled this module.
      */
     async isEnabled(guildID: string): Promise<boolean> {
-        const settings = await this.moderationSettings.getOrCreate(guildID);
+        const settings = await this.settings.getOrCreate(guildID);
         return settings.enabled;
     }
 
@@ -387,19 +370,18 @@ export default class ModerationModule extends Module<Application> {
             userID: options.user.id
         });
 
-        const marketplace = this.client.modules.get("marketplace");
-        const profiles = marketplace?.dependencies.get("profiles") as ProfilesModule;
-        const requests = marketplace?.dependencies.get("requests") as RequestsModule;
+        const profiles = this.client.modules.get<FlaggableModule>("marketplace.profiles");
+        const requests = this.client.modules.get<FlaggableModule>("marketplace.requests");
 
         if (profiles !== undefined) {
-            const profilesSettings = await profiles.profilesSettings.getOrCreate(options.guildID);
+            const profilesSettings = await profiles.settings.getOrCreate(options.guildID);
             if (profilesSettings.channelID !== null) {
                 await profiles.unflagUser(options.guildID, profilesSettings.channelID, options.user);
             }
         }
 
         if (requests !== undefined) {
-            const requestsSettings = await requests.requestsSettings.getOrCreate(options.guildID);
+            const requestsSettings = await requests.settings.getOrCreate(options.guildID);
             if (requestsSettings.channelID !== null) {
                 await requests.unflagUser(options.guildID, requestsSettings.channelID, options.user);
             }

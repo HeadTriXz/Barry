@@ -1,5 +1,5 @@
 import { type ProfilesSettings, ProfileCreationStatus } from "@prisma/client";
-import type { ProfileWithMessages } from "../../../../../src/modules/marketplace/dependencies/profiles/database.js";
+import type { ProfileWithMessages } from "../../../../../src/modules/marketplace/dependencies/profiles/database/index.js";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";

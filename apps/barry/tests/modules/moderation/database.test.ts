@@ -14,7 +14,7 @@ import {
     DWCScheduledBanRepository,
     ModerationSettingsRepository,
     TempBanRepository
-} from "../../../src/modules/moderation/database.js";
+} from "../../../src/modules/moderation/database/index.js";
 import { prisma } from "../../mocks/index.js";
 
 describe("CaseRepository", () => {

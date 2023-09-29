@@ -68,7 +68,7 @@ describe("/ban", () => {
         vi.spyOn(client.api.guilds, "banUser").mockResolvedValue(undefined);
         vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
         vi.spyOn(module.cases, "create").mockResolvedValue(entity);
-        vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("execute", () => {

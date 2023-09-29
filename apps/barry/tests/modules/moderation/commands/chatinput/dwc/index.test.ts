@@ -102,7 +102,7 @@ describe("/dwc", () => {
         profilesModule.flagUser = vi.fn();
         requestsModule.flagUser = vi.fn();
         vi.spyOn(module.dwcScheduledBans, "get").mockResolvedValue(null);
-        vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
         vi.spyOn(module.cases, "create").mockResolvedValue(entity);
         vi.spyOn(profilesModule.profilesSettings, "getOrCreate").mockResolvedValue(profilesSettings);
         vi.spyOn(requestsModule.requestsSettings, "getOrCreate").mockResolvedValue(requestsSettings);
@@ -444,7 +444,7 @@ describe("/dwc", () => {
         it("should update the settings with the new role ID", async () => {
             vi.spyOn(command.client.api.guilds, "createRole").mockResolvedValue(mockRole);
             vi.spyOn(command.client.api.guilds, "getRoles").mockResolvedValue([]);
-            const upsertSpy = vi.spyOn(command.module.moderationSettings, "upsert");
+            const upsertSpy = vi.spyOn(command.module.settings, "upsert");
 
             await command.getOrCreateRole(settings);
 

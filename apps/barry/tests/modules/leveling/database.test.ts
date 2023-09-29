@@ -11,7 +11,7 @@ import {
     MemberActivityRepository,
     MemberActivitySortBy,
     MemberActivitySortOrder
-} from "../../../src/modules/leveling/database.js";
+} from "../../../src/modules/leveling/database/index.js";
 
 import { prisma } from "../../mocks/index.js";
 

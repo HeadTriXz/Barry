@@ -6,7 +6,7 @@ import {
     DWCScheduledBanRepository,
     ModerationSettingsRepository,
     TempBanRepository
-} from "../../../src/modules/moderation/database.js";
+} from "../../../src/modules/moderation/database/index.js";
 import {
     type ModerationSettings,
     type ProfilesSettings,
@@ -82,7 +82,7 @@ describe("ModerationModule", () => {
             expect(module.caseNotes).toBeInstanceOf(CaseNoteRepository);
             expect(module.cases).toBeInstanceOf(CaseRepository);
             expect(module.dwcScheduledBans).toBeInstanceOf(DWCScheduledBanRepository);
-            expect(module.moderationSettings).toBeInstanceOf(ModerationSettingsRepository);
+            expect(module.settings).toBeInstanceOf(ModerationSettingsRepository);
             expect(module.tempBans).toBeInstanceOf(TempBanRepository);
         });
     });
@@ -103,7 +103,7 @@ describe("ModerationModule", () => {
                 type: CaseType.Unban,
                 userID: userID
             });
-            vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+            vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
 
             settings.channelID = "30527482987641765";
         });
@@ -199,7 +199,7 @@ describe("ModerationModule", () => {
                 type: CaseType.Ban,
                 userID: userID
             });
-            vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+            vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
 
             settings.channelID = "30527482987641765";
         });
@@ -332,7 +332,7 @@ describe("ModerationModule", () => {
             };
 
             const error = new DiscordAPIError(response, 10003, 404, "POST", "", {});
-            const updateSpy = vi.spyOn(module.moderationSettings, "upsert");
+            const updateSpy = vi.spyOn(module.settings, "upsert");
             vi.spyOn(module.client.api.channels, "createMessage").mockRejectedValue(error);
 
             await module.createLogMessage(channelID, options);
@@ -431,7 +431,7 @@ describe("ModerationModule", () => {
         const guildID = "68239102456844360";
 
         it("should return true if the guild has the module enabled", async () => {
-            const settingsSpy = vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const enabled = await module.isEnabled(guildID);
 
@@ -441,7 +441,7 @@ describe("ModerationModule", () => {
         });
 
         it("should return false if the guild has the module disabled", async () => {
-            const settingsSpy = vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
             settings.enabled = false;
 
             const enabled = await module.isEnabled(guildID);

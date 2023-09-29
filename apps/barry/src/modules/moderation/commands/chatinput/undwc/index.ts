@@ -79,7 +79,7 @@ export default class extends SlashCommand<ModerationModule> {
             });
         }
 
-        const settings = await this.module.moderationSettings.getOrCreate(interaction.guildID);
+        const settings = await this.module.settings.getOrCreate(interaction.guildID);
         const member = interaction.data.resolved.members.get(options.user.id);
 
         if (settings.dwcRoleID !== null && member?.roles.includes(settings.dwcRoleID)) {

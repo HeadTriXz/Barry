@@ -5,7 +5,7 @@ import {
     RequestMessageRepository,
     RequestRepository,
     RequestsSettingsRepository
-} from "../../../../src/modules/marketplace/dependencies/requests/database.js";
+} from "../../../../src/modules/marketplace/dependencies/requests/database/index.js";
 import { mockUser, mockMessage } from "@barry/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";

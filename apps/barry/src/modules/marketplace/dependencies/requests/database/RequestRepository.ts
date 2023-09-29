@@ -1,10 +1,9 @@
 import {
-    type Prisma,
-    type PrismaClient,
     type Request,
     type RequestAttachment,
     type RequestMessage,
-    type RequestsSettings,
+    type Prisma,
+    type PrismaClient,
     RequestStatus
 } from "@prisma/client";
 
@@ -54,6 +53,19 @@ export class RequestRepository {
      */
     async delete(id: number): Promise<Request> {
         return this.#prisma.request.delete({ where: { id } });
+    }
+
+    /**
+     * Retrieves the request record for the specified ID.
+     *
+     * @param id The ID of the request.
+     * @returns The request record, or null if not found.
+     */
+    async get(id: number): Promise<RequestWithAttachments | null> {
+        return this.#prisma.request.findUnique({
+            include: { attachments: true },
+            where: { id }
+        });
     }
 
     /**
@@ -232,100 +244,5 @@ export class RequestRepository {
         return options.compensation !== undefined
             && options.description !== undefined
             && options.title !== undefined;
-    }
-}
-
-/**
- * Repository class for managing request messages.
- */
-export class RequestMessageRepository {
-    /**
-     * The Prisma client used to interact with the database.
-     */
-    #prisma: PrismaClient;
-
-    /**
-     * Repository class for managing request messages.
-     */
-    constructor(prisma: PrismaClient) {
-        this.#prisma = prisma;
-    }
-
-    /**
-     * Creates a new request message record.
-     *
-     * @param messageID The ID of the message.
-     * @param guildID The ID of the guild.
-     * @param requestID The ID of the request.
-     * @returns The created request message record.
-     */
-    async create(messageID: string, guildID: string, requestID: number): Promise<RequestMessage> {
-        return this.#prisma.requestMessage.create({
-            data: {
-                guildID,
-                messageID,
-                requestID
-            }
-        });
-    }
-
-    /**
-     * Retrieves the latest request message record for the specified request.
-     *
-     * @param guildID The ID of the guild.
-     * @param requestID The ID of the request.
-     * @returns The latest request message record, or null if not found.
-     */
-    async getLatest(guildID: string, requestID: number): Promise<RequestMessage | null> {
-        return this.#prisma.requestMessage.findFirst({
-            orderBy: { messageID: "desc" },
-            where: { guildID, requestID }
-        });
-    }
-}
-
-/**
- * Repository class for managing settings for the requests module.
- */
-export class RequestsSettingsRepository {
-    /**
-     * The Prisma client used to interact with the database.
-     */
-    #prisma: PrismaClient;
-
-    /**
-     * Repository class for managing settings for the requests module.
-     */
-    constructor(prisma: PrismaClient) {
-        this.#prisma = prisma;
-    }
-
-    /**
-     * If a record exists for the specified guild, return it, otherwise create a new one.
-     *
-     * @param guildID The ID of the guild.
-     * @returns The requests settings record.
-     */
-    async getOrCreate(guildID: string): Promise<RequestsSettings> {
-        return this.#prisma.requestsSettings.upsert({
-            create: { guildID },
-            update: {},
-            where: { guildID }
-        });
-    }
-
-    /**
-     * Upserts the specified settings for the specified guild.
-     *
-     * @param guildID The ID of the guild.
-     * @param settings The request settings to upsert.
-     * @returns The upserted request settings record.
-     */
-    async upsert(guildID: string, settings: Partial<Prisma.RequestsSettingsCreateInput>): Promise<void> {
-        await this.#prisma.requestsSettings.upsert({
-            create: { ...settings, guildID },
-            update: settings,
-            where: { guildID }
-        });
     }
 }

@@ -60,7 +60,7 @@ describe("/undwc", () => {
             guildID: mockGuild.id,
             userID: options.user.id
         });
-        vi.spyOn(module.moderationSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
         vi.spyOn(module, "unflagUser").mockResolvedValue({ ...mockCase, type: CaseType.UnDWC });
     });
 

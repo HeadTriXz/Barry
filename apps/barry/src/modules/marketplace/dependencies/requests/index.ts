@@ -1,5 +1,6 @@
 import {
     type APIEmbed,
+    type APIInteractionResponseCallbackData,
     type APIUser,
     ButtonStyle,
     ComponentType
@@ -9,8 +10,9 @@ import {
     RequestMessageRepository,
     RequestRepository,
     RequestsSettingsRepository
-} from "./database.js";
+} from "./database/index.js";
 import type { Application } from "../../../../Application.js";
+import type { ModuleWithSettings } from "../../../../types/modules.js";
 import type { RequestsSettings } from "@prisma/client";
 
 import { DiscordAPIError } from "@discordjs/rest";
@@ -39,7 +41,7 @@ export enum RequestActionButton {
 /**
  * Represents the requests module.
  */
-export default class RequestsModule extends Module<Application> {
+export default class RequestsModule extends Module<Application> implements ModuleWithSettings<RequestsSettings> {
     /**
      * Repository class for managing request messages.
     */
@@ -53,7 +55,7 @@ export default class RequestsModule extends Module<Application> {
     /**
      * Repository class for managing settings for this module.
      */
-    requestsSettings: RequestsSettingsRepository;
+    settings: RequestsSettingsRepository;
 
     /**
      * Represents the requests module.
@@ -70,7 +72,7 @@ export default class RequestsModule extends Module<Application> {
 
         this.requestMessages = new RequestMessageRepository(client.prisma);
         this.requests = new RequestRepository(client.prisma);
-        this.requestsSettings = new RequestsSettingsRepository(client.prisma);
+        this.settings = new RequestsSettingsRepository(client.prisma);
     }
 
     /**
@@ -86,12 +88,28 @@ export default class RequestsModule extends Module<Application> {
     }
 
     /**
+     * Returns the content of a request.
+     *
+     * @param requestID The ID of the request.
+     * @returns The content of the request.
+     */
+    async getContent(requestID: number): Promise<APIInteractionResponseCallbackData | undefined> {
+        const request = await this.requests.get(requestID);
+        if (request === null) {
+            return;
+        }
+
+        const user = await this.client.api.users.get(request.userID);
+        return getRequestContent(user, request);
+    }
+
+    /**
      * Checks if the guild has enabled this module.
      *
      * @returns Whether the guild has enabled this module.
      */
     async isEnabled(guildID: string): Promise<boolean> {
-        const settings = await this.requestsSettings.getOrCreate(guildID);
+        const settings = await this.settings.getOrCreate(guildID);
         return settings.enabled;
     }
 
@@ -168,7 +186,7 @@ export default class RequestsModule extends Module<Application> {
         });
 
         await this.requestMessages.create(message.id, settings.guildID, request.id);
-        await this.requestsSettings.upsert(settings.guildID, {
+        await this.settings.upsert(settings.guildID, {
             lastMessageID: buttons.id
         });
 
