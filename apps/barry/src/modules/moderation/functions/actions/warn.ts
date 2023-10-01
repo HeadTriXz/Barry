@@ -35,12 +35,12 @@ export async function warn(
 
     const guild = await module.client.api.guilds.get(interaction.guildID);
     if (!isAboveMember(guild, interaction.member, options.member)) {
-        return respond(interaction, `${config.emotes.error} You cannot warn this member.`);
+        return respond(interaction, `${config.emotes.error} You cannot warn a member with a higher or equal role to you.`);
     }
 
     const self = await module.client.api.guilds.getMember(interaction.guildID, module.client.applicationID);
     if (!isAboveMember(guild, self as PartialGuildMember, options.member)) {
-        return respond(interaction, `${config.emotes.error} I cannot warn this member.`);
+        return respond(interaction, `${config.emotes.error} I cannot warn a member with a higher or equal role to me.`);
     }
 
     const entity = await module.cases.create({

@@ -678,8 +678,8 @@ describe("ModerationModule", () => {
                 type: CaseType.UnDWC,
                 userID: userID
             });
-            vi.spyOn(profilesModule.profilesSettings, "getOrCreate").mockResolvedValue(profilesSettings);
-            vi.spyOn(requestsModule.requestsSettings, "getOrCreate").mockResolvedValue(requestsSettings);
+            vi.spyOn(profilesModule.settings, "getOrCreate").mockResolvedValue(profilesSettings);
+            vi.spyOn(requestsModule.settings, "getOrCreate").mockResolvedValue(requestsSettings);
         });
 
         it("should unflag the user's profile", async () => {

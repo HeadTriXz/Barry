@@ -1,16 +1,12 @@
-import {
-    type APIRole,
-    OverwriteType,
-    PermissionFlagsBits
-} from "@discordjs/core";
-import type { FlaggableModule, SettingsWithChannel } from "../../types.js";
-import { type ModerationSettings, CaseType } from "@prisma/client";
 import { type PartialGuildMember, isAboveMember } from "../permissions.js";
 import type { DWCOptions } from "../../../../types/moderation.js";
+import type { FlaggableModule } from "../../types.js";
 import type { ReplyableInteraction } from "@barry/core";
 import type ModerationModule from "../../index.js";
 
+import { CaseType } from "@prisma/client";
 import { DiscordAPIError } from "@discordjs/rest";
+import { getDWCRole } from "../getDWCRole.js";
 import { respond } from "./actions.js";
 import config from "../../../../config.js";
 
@@ -62,7 +58,7 @@ export async function dwc(
     const profilesSettings = await profiles?.settings.getOrCreate(interaction.guildID);
     const requestsSettings = await requests?.settings.getOrCreate(interaction.guildID);
 
-    const role = await getOrCreateRole(module, settings, profilesSettings, requestsSettings);
+    const role = await getDWCRole(module, settings, profilesSettings, requestsSettings);
     if (role === undefined) {
         return respond(interaction, `${config.emotes.error} Failed to create the DWC role.`);
     }
@@ -139,60 +135,5 @@ export async function dwc(
             options.user,
             options.reason
         );
-    }
-}
-
-/**
- * Retrieves or creates the 'Deal With Caution' role.
- *
- * @param module The moderation module.
- * @param settings The moderation settings for the guild.
- * @param profilesSettings The profiles settings for the guild.
- * @param requestsSettings The requests settings for the guild.
- * @returns The 'Deal With Caution' role, or undefined if it failed to create it.
- */
-async function getOrCreateRole(
-    module: ModerationModule,
-    settings: ModerationSettings,
-    profilesSettings?: SettingsWithChannel,
-    requestsSettings?: SettingsWithChannel
-): Promise<APIRole | undefined> {
-    if (settings.dwcRoleID !== undefined) {
-        const roles = await module.client.api.guilds.getRoles(settings.guildID);
-        const role = roles.find((r) => r.id === settings.dwcRoleID);
-
-        if (role !== undefined) {
-            return role;
-        }
-    }
-
-    try {
-        const role = await module.client.api.guilds.createRole(settings.guildID, {
-            color: config.defaultDWCColor,
-            hoist: true,
-            name: "Deal With Caution"
-        });
-
-        await module.settings.upsert(settings.guildID, {
-            dwcRoleID: role.id
-        });
-
-        if (profilesSettings !== undefined && profilesSettings.channelID !== null) {
-            await module.client.api.channels.editPermissionOverwrite(profilesSettings.channelID, role.id, {
-                deny: PermissionFlagsBits.ViewChannel.toString(),
-                type: OverwriteType.Role
-            });
-        }
-
-        if (requestsSettings !== undefined && requestsSettings.channelID !== null) {
-            await module.client.api.channels.editPermissionOverwrite(requestsSettings.channelID, role.id, {
-                deny: PermissionFlagsBits.ViewChannel.toString(),
-                type: OverwriteType.Role
-            });
-        }
-
-        return role;
-    } catch (error: unknown) {
-        module.client.logger.error(error);
     }
 }
