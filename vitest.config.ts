@@ -8,6 +8,7 @@ export default defineConfig({
                 "**/coverage/**",
                 "**/dist/**",
                 "**/tests/**",
+                "**/types/**",
                 "**/types.ts"
             ],
             include: ["src"],
