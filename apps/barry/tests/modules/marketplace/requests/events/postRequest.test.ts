@@ -37,7 +37,7 @@ describe("Post Request (InteractionCreate) Event", () => {
         interaction = new MessageComponentInteraction(data, event.client, vi.fn());
         interaction.editOriginalMessage = vi.fn();
 
-        vi.spyOn(event.module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("execute", () => {
@@ -83,7 +83,7 @@ describe("Post Request (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction was sent outside a guild", async () => {
             delete interaction.guildID;
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -92,7 +92,7 @@ describe("Post Request (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction is not of type 'MessageComponent'", async () => {
             const interaction = new PingInteraction(mockPingInteraction, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -101,7 +101,7 @@ describe("Post Request (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction does not come from a button", async () => {
             interaction.data.componentType = ComponentType.StringSelect;
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -110,7 +110,7 @@ describe("Post Request (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction does not come the 'Post' button", async () => {
             interaction.data.customID = ManageRequestButton.Edit;
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 

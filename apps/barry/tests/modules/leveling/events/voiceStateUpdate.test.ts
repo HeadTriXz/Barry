@@ -1,9 +1,9 @@
 import type { GatewayVoiceState } from "@discordjs/core";
 
-import { prisma, redis } from "../../../mocks/index.js";
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
 import { mockMember } from "@barry/testing";
+import { redis } from "../../../mocks/index.js";
 
 import LevelingModule from "../../../../src/modules/leveling/index.js";
 import VoiceStateUpdateEvent from "../../../../src/modules/leveling/events/voiceStateUpdate.js";
@@ -36,14 +36,14 @@ describe("VoiceStateUpdate Event", () => {
             suppress: false
         };
 
-        vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue({
             guildID: guildID,
             enabled: true,
             ignoredChannels: [],
             ignoredRoles: []
         });
 
-        vi.mocked(prisma.memberActivity.upsert).mockResolvedValue({
+        vi.spyOn(module.memberActivity, "getOrCreate").mockResolvedValue({
             guildID: guildID,
             userID: userID,
             experience: 1520,
@@ -120,7 +120,7 @@ describe("VoiceStateUpdate Event", () => {
         });
 
         it("should not update voice minutes if the channel is blacklisted", async () => {
-            vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+            vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [channelID],
@@ -136,7 +136,7 @@ describe("VoiceStateUpdate Event", () => {
         it("should not update voice minutes if the user has a blacklisted role", async () => {
             state.member = { ...mockMember, roles: ["68239102456844360"] };
 
-            vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+            vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [],

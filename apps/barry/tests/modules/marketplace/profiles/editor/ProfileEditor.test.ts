@@ -42,7 +42,7 @@ describe("ProfileEditor", () => {
             lastMessageID: null
         };
 
-        vi.spyOn(module.profilesSettings, "get").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
         vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
         vi.spyOn(client.api.channels, "createMessage").mockResolvedValue(mockMessage);
         vi.spyOn(client.api.channels, "editMessage").mockResolvedValue(mockMessage);

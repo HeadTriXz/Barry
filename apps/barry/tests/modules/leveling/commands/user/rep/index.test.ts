@@ -7,7 +7,6 @@ import {
 import { ApplicationCommandInteraction } from "@barry/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
-import { prisma } from "../../../../../mocks/index.js";
 
 import LevelingModule from "../../../../../../src/modules/leveling/index.js";
 import ReputationCommand from "../../../../../../src/modules/leveling/commands/user/rep/index.js";
@@ -28,7 +27,7 @@ describe("Give Reputation", () => {
         interaction = new ApplicationCommandInteraction(data, client, vi.fn());
         interaction.createMessage = vi.fn();
 
-        vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue({
             guildID: guildID,
             enabled: true,
             ignoredChannels: [],
@@ -93,7 +92,7 @@ describe("Give Reputation", () => {
 
         it("should not give reputation to a user with a blacklisted role", async () => {
             const incrementSpy = vi.spyOn(command.module.memberActivity, "increment");
-            vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+            vi.mocked(command.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [],
@@ -115,7 +114,7 @@ describe("Give Reputation", () => {
 
         it("should not give reputation if the initiator has a blacklisted role", async () => {
             const incrementSpy = vi.spyOn(command.module.memberActivity, "increment");
-            vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+            vi.mocked(command.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [],

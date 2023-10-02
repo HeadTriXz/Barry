@@ -36,14 +36,14 @@ describe("ProfilesModule", () => {
             lastMessageID: null
         };
 
-        vi.spyOn(module.profilesSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("constructor", () => {
         it("should set up the repositories correctly", () => {
             expect(module.profileMessages).toBeInstanceOf(ProfileMessageRepository);
             expect(module.profiles).toBeInstanceOf(ProfileRepository);
-            expect(module.profilesSettings).toBeInstanceOf(ProfilesSettingsRepository);
+            expect(module.settings).toBeInstanceOf(ProfilesSettingsRepository);
         });
     });
 
@@ -73,8 +73,8 @@ describe("ProfilesModule", () => {
             const enabled = await module.isEnabled("68239102456844360");
 
             expect(enabled).toBe(true);
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledOnce();
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
+            expect(module.settings.getOrCreate).toHaveBeenCalledOnce();
+            expect(module.settings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
         });
 
         it("should return false if the guild has the module disabled", async () => {
@@ -83,8 +83,8 @@ describe("ProfilesModule", () => {
             const enabled = await module.isEnabled("68239102456844360");
 
             expect(enabled).toBe(false);
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledOnce();
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
+            expect(module.settings.getOrCreate).toHaveBeenCalledOnce();
+            expect(module.settings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
         });
     });
 

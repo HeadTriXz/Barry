@@ -30,7 +30,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
             lastMessageID: null
         };
 
-        vi.spyOn(event.module.profilesSettings, "get").mockResolvedValue(settings);
+        vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("execute", () => {
@@ -57,7 +57,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
 
             delete data.guild_id;
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -66,7 +66,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction is not of type 'MessageComponent'", async () => {
             const interaction = new PingInteraction(mockPingInteraction, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -81,7 +81,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
             });
 
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -95,7 +95,7 @@ describe("Create Profile (InteractionCreate) Event", () => {
             });
 
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 

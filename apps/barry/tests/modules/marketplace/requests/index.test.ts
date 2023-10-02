@@ -42,7 +42,7 @@ describe("RequestsModule", () => {
         it("should set up the repositories correctly", () => {
             expect(module.requestMessages).toBeInstanceOf(RequestMessageRepository);
             expect(module.requests).toBeInstanceOf(RequestRepository);
-            expect(module.requestsSettings).toBeInstanceOf(RequestsSettingsRepository);
+            expect(module.settings).toBeInstanceOf(RequestsSettingsRepository);
         });
     });
 
@@ -69,7 +69,7 @@ describe("RequestsModule", () => {
 
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
-            const settingsSpy = vi.spyOn(module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const enabled = await module.isEnabled("68239102456844360");
 
@@ -79,7 +79,7 @@ describe("RequestsModule", () => {
         });
 
         it("should return false if the guild has the module disabled", async () => {
-            const settingsSpy = vi.spyOn(module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
             settings.enabled = false;
 
             const enabled = await module.isEnabled("68239102456844360");

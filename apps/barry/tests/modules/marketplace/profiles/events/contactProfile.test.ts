@@ -46,7 +46,7 @@ describe("Contact (InteractionCreate) Event", () => {
 
             delete data.guild_id;
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -55,7 +55,7 @@ describe("Contact (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction is not of type 'MessageComponent'", async () => {
             const interaction = new PingInteraction(mockPingInteraction, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -70,7 +70,7 @@ describe("Contact (InteractionCreate) Event", () => {
             });
 
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -84,7 +84,7 @@ describe("Contact (InteractionCreate) Event", () => {
             });
 
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 

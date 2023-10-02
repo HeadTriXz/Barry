@@ -8,7 +8,6 @@ import {
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
-import { prisma } from "../../../mocks/index.js";
 
 import LevelingModule from "../../../../src/modules/leveling/index.js";
 import MessageCreateEvent from "../../../../src/modules/leveling/events/messageCreate.js";
@@ -31,14 +30,14 @@ describe("MessageCreate Event", () => {
             member: mockMember
         };
 
-        vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue({
             guildID: guildID,
             enabled: true,
             ignoredChannels: [],
             ignoredRoles: []
         });
 
-        vi.mocked(prisma.memberActivity.upsert).mockResolvedValue({
+        vi.spyOn(module.memberActivity, "upsert").mockResolvedValue({
             guildID: guildID,
             userID: userID,
             experience: 1520,
@@ -55,7 +54,7 @@ describe("MessageCreate Event", () => {
 
             await event.execute(message);
 
-            expect(prisma.memberActivity.upsert).not.toHaveBeenCalled();
+            expect(event.module.memberActivity.upsert).not.toHaveBeenCalled();
         });
 
         it("should ignore messages outside a guild", async () => {
@@ -63,7 +62,7 @@ describe("MessageCreate Event", () => {
 
             await event.execute(message);
 
-            expect(prisma.memberActivity.upsert).not.toHaveBeenCalled();
+            expect(event.module.memberActivity.upsert).not.toHaveBeenCalled();
         });
 
         it("should add experience if the user is not on cooldown", async () => {
@@ -88,7 +87,7 @@ describe("MessageCreate Event", () => {
         });
 
         it("should not add experience if the message was sent in a blacklisted channel", async () => {
-            vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+            vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: ["30527482987641765"],
@@ -97,13 +96,13 @@ describe("MessageCreate Event", () => {
 
             await event.execute(message);
 
-            expect(prisma.memberActivity.upsert).not.toHaveBeenCalled();
+            expect(event.module.memberActivity.upsert).not.toHaveBeenCalled();
         });
 
         it("should not add experience if the message was sent by a user with a blacklisted role", async () => {
             message.member = { ...mockMember, roles: ["68239102456844360"] };
 
-            vi.mocked(prisma.levelingSettings.findUnique).mockResolvedValue({
+            vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [],
@@ -112,7 +111,7 @@ describe("MessageCreate Event", () => {
 
             await event.execute(message);
 
-            expect(prisma.memberActivity.upsert).not.toHaveBeenCalled();
+            expect(event.module.memberActivity.upsert).not.toHaveBeenCalled();
         });
 
         it("should check if the user has leveled up", async () => {
