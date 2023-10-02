@@ -44,7 +44,7 @@ export class ReportsSettingsRepository implements SettingsRepository<ReportsSett
      * @param settings The reports settings to upsert.
      * @returns The upserted reports settings record.
      */
-    async upsert(guildID: string, settings: Omit<Prisma.RequestsSettingsCreateInput, "guildID">): Promise<ReportsSettings> {
+    async upsert(guildID: string, settings: Omit<Prisma.ReportsSettingsCreateInput, "guildID">): Promise<ReportsSettings> {
         return this.#prisma.reportsSettings.upsert({
             create: { ...settings, guildID },
             update: settings,

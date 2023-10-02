@@ -68,6 +68,31 @@ describe("ProfilesModule", () => {
         });
     });
 
+    describe("getContent", () => {
+        it("should return undefined if the profile does not exist", async () => {
+            const profileSpy = vi.spyOn(module.profiles, "get").mockResolvedValue(null);
+
+            const content = await module.getContent(mockUser.id);
+
+            expect(profileSpy).toHaveBeenCalledOnce();
+            expect(profileSpy).toHaveBeenCalledWith(mockUser.id);
+            expect(content).toBeUndefined();
+        });
+
+        it("should return the content of the profile", async () => {
+            const profileSpy = vi.spyOn(module.profiles, "get").mockResolvedValue(mockProfile);
+            const userSpy = vi.spyOn(module.client.api.users, "get").mockResolvedValue(mockUser);
+
+            const content = await module.getContent(mockUser.id);
+
+            expect(profileSpy).toHaveBeenCalledOnce();
+            expect(profileSpy).toHaveBeenCalledWith(mockUser.id);
+            expect(userSpy).toHaveBeenCalledOnce();
+            expect(userSpy).toHaveBeenCalledWith(mockUser.id);
+            expect(content).toEqual(getProfileContent(mockUser, mockProfile));
+        });
+    });
+
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
             const enabled = await module.isEnabled("68239102456844360");

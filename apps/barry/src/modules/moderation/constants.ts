@@ -32,7 +32,7 @@ export const CASE_TITLES: Record<CaseType, string> = {
 };
 
 /**
- * Pre-defined reaons for severe moderation actions.
+ * Pre-defined reasons for severe moderation actions.
  */
 export const COMMON_SEVERE_REASONS = [
     "Suspicious or spam account",
@@ -45,7 +45,7 @@ export const COMMON_SEVERE_REASONS = [
 ];
 
 /**
- * Pre-defined reaons for minor moderation actions.
+ * Pre-defined reasons for minor moderation actions.
  */
 export const COMMON_MINOR_REASONS = [
     "Being abusive or disrespectful",
@@ -57,7 +57,7 @@ export const COMMON_MINOR_REASONS = [
 ];
 
 /**
- * Pre-defined reaons for the 'Deal With Caution' command.
+ * Pre-defined reasons for the 'Deal With Caution' command.
  */
 export const COMMON_DWC_REASONS = [
     "Not paying for services",

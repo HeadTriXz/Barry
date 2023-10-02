@@ -115,7 +115,7 @@ describe("MessageCreate Event", () => {
         });
 
         it("should check if the user has leveled up", async () => {
-            const checkLevelSpy = vi.spyOn(event.module, "checkLevel");
+            const checkLevelSpy = vi.spyOn(event.module, "checkLevel").mockResolvedValue(undefined);
 
             await event.execute(message);
 

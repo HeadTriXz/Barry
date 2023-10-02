@@ -38,7 +38,7 @@ describe("RequestsSettingsRepository", () => {
     });
 
     describe("upsert", () => {
-        it("should upsert the provided level up settings record", async () => {
+        it("should upsert the provided requests settings record", async () => {
             await repository.upsert(guildID, {
                 lastMessageID: "91256340920236565"
             });

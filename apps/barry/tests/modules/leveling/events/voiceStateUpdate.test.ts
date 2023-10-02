@@ -99,7 +99,7 @@ describe("VoiceStateUpdate Event", () => {
 
         it("should check if the user has leveled up if the previous channel is known", async () => {
             vi.mocked(redis.get).mockResolvedValue("1690543918340");
-            const checkLevelSpy = vi.spyOn(event.module, "checkLevel");
+            const checkLevelSpy = vi.spyOn(event.module, "checkLevel").mockResolvedValue(undefined);
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(state, channelID);
@@ -110,7 +110,7 @@ describe("VoiceStateUpdate Event", () => {
 
         it("should not check if the user has leveled up if the previous channel is unknown", async () => {
             vi.mocked(redis.get).mockResolvedValue("1690543918340");
-            const checkLevelSpy = vi.spyOn(event.module, "checkLevel");
+            const checkLevelSpy = vi.spyOn(event.module, "checkLevel").mockResolvedValue(undefined);
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(state);

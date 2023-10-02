@@ -23,6 +23,29 @@ describe("RequestRepository", () => {
         });
     });
 
+    describe("get", () => {
+        it("should return the request for the specified ID", async () => {
+            vi.mocked(prisma.request.findUnique).mockResolvedValue(mockRequest);
+
+            const entity = await repository.get(requestID);
+
+            expect(entity).toEqual(mockRequest);
+            expect(prisma.request.findUnique).toHaveBeenCalledOnce();
+            expect(prisma.request.findUnique).toHaveBeenCalledWith({
+                include: { attachments: true },
+                where: { id: requestID }
+            });
+        });
+
+        it("should return null if no request is found", async () => {
+            vi.mocked(prisma.request.findUnique).mockResolvedValue(null);
+
+            const entity = await repository.get(requestID);
+
+            expect(entity).toBe(null);
+        });
+    });
+
     describe("getAvailableByUser", () => {
         it("should return the available requests for the specified user", async () => {
             vi.mocked(prisma.request.findMany).mockResolvedValue([mockRequest]);

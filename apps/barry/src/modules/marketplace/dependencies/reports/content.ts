@@ -142,7 +142,7 @@ export function getReportContent(options: ReportOptions): APIInteractionResponse
             footer: {
                 text: `User ID: ${options.user.id}`
             },
-            timestamp: new Date().toISOString(),
+            timestamp: options.report.createdAt.toISOString(),
             title: `${REPORT_CATEGORY_TITLE[options.report.category]} | Report #${options.localReportID}`
         }]
     };

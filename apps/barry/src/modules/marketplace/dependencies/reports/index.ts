@@ -92,15 +92,15 @@ export default class ReportsModule extends Module<Application> implements Module
     getTagFromCategory(settings: ReportsSettings, category: ReportCategory): string | null {
         switch (category) {
             case ReportCategory.Copyright:
-                return settings.tag_copyright;
+                return settings.tagCopyright;
             case ReportCategory.FalseInformation:
-                return settings.tag_false_information;
+                return settings.tagFalseInformation;
             case ReportCategory.Inappropriate:
-                return settings.tag_inappropriate;
+                return settings.tagInappropriate;
             case ReportCategory.ScamsFraud:
-                return settings.tag_scams_fraud;
+                return settings.tagScamsFraud;
             case ReportCategory.Other:
-                return settings.tag_other;
+                return settings.tagOther;
             default:
                 return null;
         }

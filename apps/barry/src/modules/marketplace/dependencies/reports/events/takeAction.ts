@@ -297,8 +297,8 @@ export default class extends Event<ReportsModule> {
 
         const settings = await this.module.settings.getOrCreate(report.guildID);
         const tagID = status === ReportStatus.Accepted
-            ? settings.tag_accepted
-            : settings.tag_ignored;
+            ? settings.tagAccepted
+            : settings.tagIgnored;
 
         const tags = [tagID];
         const category = this.module.getTagFromCategory(settings, report.report.category);

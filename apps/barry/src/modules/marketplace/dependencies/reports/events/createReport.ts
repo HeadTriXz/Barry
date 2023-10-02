@@ -210,8 +210,8 @@ export default class extends Event<ReportsModule> {
             if (settings.channelID !== null) {
                 try {
                     const tags: string[] = [];
-                    if (settings.tag_open !== null) {
-                        tags.push(settings.tag_open);
+                    if (settings.tagOpen !== null) {
+                        tags.push(settings.tagOpen);
                     }
 
                     const tagID = this.module.getTagFromCategory(settings, report.category);

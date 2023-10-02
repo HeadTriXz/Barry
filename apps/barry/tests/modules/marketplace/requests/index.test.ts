@@ -67,6 +67,31 @@ describe("RequestsModule", () => {
         });
     });
 
+    describe("getContent", () => {
+        it("should return undefined if the request does not exist", async () => {
+            const requestSpy = vi.spyOn(module.requests, "get").mockResolvedValue(null);
+
+            const content = await module.getContent(1);
+
+            expect(requestSpy).toHaveBeenCalledOnce();
+            expect(requestSpy).toHaveBeenCalledWith(1);
+            expect(content).toBeUndefined();
+        });
+
+        it("should return the content of the request", async () => {
+            const requestSpy = vi.spyOn(module.requests, "get").mockResolvedValue(mockRequest);
+            const userSpy = vi.spyOn(module.client.api.users, "get").mockResolvedValue(mockUser);
+
+            const content = await module.getContent(1);
+
+            expect(requestSpy).toHaveBeenCalledOnce();
+            expect(requestSpy).toHaveBeenCalledWith(1);
+            expect(userSpy).toHaveBeenCalledOnce();
+            expect(userSpy).toHaveBeenCalledWith(mockRequest.userID);
+            expect(content).toEqual(getRequestContent(mockUser, mockRequest));
+        });
+    });
+
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
             const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
