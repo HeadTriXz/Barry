@@ -46,6 +46,14 @@ model MemberActivity {
 }
 
 // Marketplace
+model MarketplaceSettings {
+  guildID String @id @map("guild_id")
+  blacklistedGuilds String[] @default([]) @map("blacklisted_guilds")
+  blacklistedUsers String[] @default([]) @map("blacklisted_users")
+
+  @@map("marketplace_settings")
+}
+
 /// Profiles
 enum ProfileCreationStatus {
   Availability @map("AVAILABILITY")

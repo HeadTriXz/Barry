@@ -1,12 +1,20 @@
 import type { Application } from "../../Application.js";
+import type { MarketplaceSettings } from "@prisma/client";
+import type { ModuleWithSettings } from "../../types/modules.js";
 
+import { MarketplaceSettingsRepository } from "./database/MarketplaceSettingsRepository.js";
 import { Module } from "@barry/core";
 import { loadModules } from "../../utils/index.js";
 
 /**
  * Represents the marketplace module.
  */
-export default class MarketplaceModule extends Module<Application> {
+export default class MarketplaceModule extends Module<Application> implements ModuleWithSettings<MarketplaceSettings> {
+    /**
+     * Represents a repository for managing settings of this module.
+     */
+    settings: MarketplaceSettingsRepository;
+
     /**
      * Represents the marketplace module.
      *
@@ -19,6 +27,8 @@ export default class MarketplaceModule extends Module<Application> {
             description: "Allows users to showcase their services and request services from others.",
             dependencies: loadModules("./dependencies")
         });
+
+        this.settings = new MarketplaceSettingsRepository(client.prisma);
     }
 
     /**
