@@ -1,10 +1,10 @@
 import {
     type AnyInteraction,
-    type Module,
     type UpdatableInteraction,
     Event
 } from "@barry/core";
 import type { BaseModerationModule } from "../../../../../types/moderation.js";
+import type { BlacklistableModule } from "../../../../../types/blacklist.js";
 import type { LocalReportWithReport } from "../database/LocalReportRepository.js";
 import type { PartialGuildMember } from "../../../../moderation/functions/permissions.js";
 import type ReportsModule from "../index.js";
@@ -26,36 +26,6 @@ import { ReportActionButton } from "../index.js";
 import { ReportStatus } from "@prisma/client";
 import { timeoutContent } from "../../../constants.js";
 import config from "../../../../../config.js";
-
-/**
- * Represents a repository for managing blacklisted users.
- */
-export interface BlacklistableRepository {
-    /**
-     * Blacklists a user.
-     *
-     * @param id The ID of the user to blacklist.
-     */
-    blacklist(id: string): Promise<void>;
-
-    /**
-     * Checks if a user is blacklisted.
-     *
-     * @param id The ID of the user to check.
-     * @returns Whether the user is blacklisted.
-     */
-    isBlacklisted(id: string): Promise<boolean>;
-}
-
-/**
- * Represents a module that can blacklist users.
- */
-export interface BlacklistableModule extends Module {
-    /**
-     * The repository for managing blacklisted users.
-     */
-    blacklistedUsers: BlacklistableRepository;
-}
 
 /**
  * Represents an event handler for taking action on a report.

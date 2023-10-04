@@ -13,7 +13,7 @@ import {
     type RequestsSettings,
     CaseType
 } from "@prisma/client";
-import type { CaseLogOptions } from "../../../dist/modules/moderation/functions/getLogContent.js";
+import type { CaseLogOptions } from "../../../src/modules/moderation/functions/getLogContent.js";
 
 import {
     mockChannel,

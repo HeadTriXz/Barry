@@ -1,4 +1,4 @@
-import type { CaseWithNotes } from "../../../../../../../dist/modules/moderation/database/index.js";
+import type { CaseWithNotes } from "../../../../../../../src/modules/moderation/database/index.js";
 import {
     createMockApplicationCommandInteraction,
     mockGuild,

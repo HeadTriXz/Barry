@@ -1,4 +1,5 @@
 import type { Application } from "../../Application.js";
+import type { BlacklistableModule } from "../../types/blacklist.js";
 
 import { BlacklistedGuildRepository } from "./database/BlacklistedGuildRepository.js";
 import { BlacklistedUserRepository } from "./database/BlacklistedUserRepository.js";
@@ -8,7 +9,7 @@ import { loadCommands } from "../../utils/index.js";
 /**
  * Represents the developers module.
  */
-export default class DevelopersModule extends Module<Application> {
+export default class DevelopersModule extends Module<Application> implements BlacklistableModule {
     /**
      * Represents the repository for managing blacklisted guilds.
      */

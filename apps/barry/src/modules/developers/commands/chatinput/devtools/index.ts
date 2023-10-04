@@ -2,9 +2,13 @@ import { type ApplicationCommandInteraction, SlashCommand } from "@barry/core";
 import type DevelopersModule from "../../../index.js";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { blacklistGuild, blacklistUser } from "./tools/blacklist.js";
-import { unblacklistGuild, unblacklistUser } from "./tools/unblacklist.js";
-import { evaluate } from "./tools/eval.js";
+import {
+    blacklistGuild,
+    blacklistUser,
+    evaluate,
+    unblacklistGuild,
+    unblacklistUser
+} from "./tools/index.js";
 import { timeoutContent } from "../../../../marketplace/constants.js"; // TODO: Move more globally.
 
 import config from "../../../../../config.js";

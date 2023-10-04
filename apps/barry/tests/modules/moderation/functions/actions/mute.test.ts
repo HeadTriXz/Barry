@@ -3,7 +3,7 @@ import {
     type ModerationSettings,
     CaseType
 } from "@prisma/client";
-import type { MuteOptions } from "../../../../../dist/types/moderation.js";
+import type { MuteOptions } from "../../../../../src/types/moderation.js";
 
 import {
     createMockApplicationCommandInteraction,
