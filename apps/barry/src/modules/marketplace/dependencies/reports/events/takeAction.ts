@@ -1,5 +1,6 @@
 import {
     type AnyInteraction,
+    type Module,
     type UpdatableInteraction,
     Event
 } from "@barry/core";
@@ -25,6 +26,36 @@ import { ReportActionButton } from "../index.js";
 import { ReportStatus } from "@prisma/client";
 import { timeoutContent } from "../../../constants.js";
 import config from "../../../../../config.js";
+
+/**
+ * Represents a repository for managing blacklisted users.
+ */
+export interface BlacklistableRepository {
+    /**
+     * Blacklists a user.
+     *
+     * @param id The ID of the user to blacklist.
+     */
+    blacklist(id: string): Promise<void>;
+
+    /**
+     * Checks if a user is blacklisted.
+     *
+     * @param id The ID of the user to check.
+     * @returns Whether the user is blacklisted.
+     */
+    isBlacklisted(id: string): Promise<boolean>;
+}
+
+/**
+ * Represents a module that can blacklist users.
+ */
+export interface BlacklistableModule extends Module {
+    /**
+     * The repository for managing blacklisted users.
+     */
+    blacklistedUsers: BlacklistableRepository;
+}
 
 /**
  * Represents an event handler for taking action on a report.
@@ -128,6 +159,49 @@ export default class extends Event<ReportsModule> {
                 break;
             }
         }
+    }
+
+    /**
+     * Handles a blacklist action on a report.
+     *
+     * @param interaction The interaction that triggered the action.
+     * @param report The report to take action on.
+     * @param action The action to take.
+     */
+    async handleBlacklist(
+        interaction: UpdatableInteraction,
+        report: LocalReportWithReport,
+        action: ReportAction
+    ): Promise<void> {
+        if (!interaction.isInvokedInGuild()) {
+            return;
+        }
+
+        const developers = this.client.modules.get<BlacklistableModule>("developers");
+        if (developers === undefined) {
+            return;
+        }
+
+        const userID = action === ReportAction.BlacklistReporter
+            ? report.report.creatorID
+            : report.report.userID;
+
+        const isBlacklisted = await developers.blacklistedUsers.isBlacklisted(userID);
+        if (isBlacklisted) {
+            return interaction.editParent({
+                components: [],
+                content: `${config.emotes.error} The user is already blacklisted.`,
+                flags: MessageFlags.Ephemeral
+            });
+        }
+
+        await developers.blacklistedUsers.blacklist(userID);
+
+        await interaction.editParent({
+            components: [],
+            content: `${config.emotes.check} Successfully blacklisted <@${userID}>.`,
+            flags: MessageFlags.Ephemeral
+        });
     }
 
     /**

@@ -7,6 +7,18 @@ datasource db {
   url      = env("POSTGRES_URL")
 }
 
+model BlacklistedGuild {
+  guildID String @id @map("guild_id")
+
+  @@map("blacklisted_guilds")
+}
+
+model BlacklistedUser {
+  userID String @id @map("user_id")
+
+  @@map("blacklisted_users")
+}
+
 // Leveling
 enum LevelUpNotificationType {
   CurrentChannel @map("CURRENT_CHANNEL")
@@ -46,14 +58,6 @@ model MemberActivity {
 }
 
 // Marketplace
-model MarketplaceSettings {
-  guildID String @id @map("guild_id")
-  blacklistedGuilds String[] @default([]) @map("blacklisted_guilds")
-  blacklistedUsers String[] @default([]) @map("blacklisted_users")
-
-  @@map("marketplace_settings")
-}
-
 /// Profiles
 enum ProfileCreationStatus {
   Availability @map("AVAILABILITY")
