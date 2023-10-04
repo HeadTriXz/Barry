@@ -8,7 +8,7 @@ import {
     MessageFlags
 } from "@discordjs/core";
 import { ManageRequestButton } from "../index.js";
-import { timeoutContent } from "../../../constants.js";
+import { timeoutContent } from "../../../../../common.js";
 
 import config from "../../../../../config.js";
 

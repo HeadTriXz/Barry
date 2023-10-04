@@ -10,7 +10,7 @@ import {
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockProfile } from "../mocks/profile.js";
-import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../src/common.js";
 
 import ProfilesModule, { ManageProfileButton } from "../../../../../src/modules/marketplace/dependencies/profiles/index.js";
 import EditProfileEvent from "../../../../../src/modules/marketplace/dependencies/profiles/events/editProfile.js";

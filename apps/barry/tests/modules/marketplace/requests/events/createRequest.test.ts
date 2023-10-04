@@ -7,7 +7,7 @@ import { createMockMessageComponentInteraction, mockPingInteraction } from "@bar
 import { RequestEditor } from "../../../../../src/modules/marketplace/dependencies/requests/editor/RequestEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockRequest } from "../mocks/request.js";
-import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../src/common.js";
 
 import RequestsModule, { ManageRequestButton } from "../../../../../src/modules/marketplace/dependencies/requests/index.js";
 import CreateRequestEvent from "../../../../../src/modules/marketplace/dependencies/requests/events/createRequest.js";

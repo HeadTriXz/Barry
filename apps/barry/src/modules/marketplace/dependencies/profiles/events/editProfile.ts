@@ -9,7 +9,7 @@ import {
 } from "@discordjs/core";
 import { ProfileEditor } from "../editor/ProfileEditor.js";
 import { ManageProfileButton } from "../index.js";
-import { timeoutContent } from "../../../constants.js";
+import { timeoutContent } from "../../../../../common.js";
 
 import config from "../../../../../config.js";
 

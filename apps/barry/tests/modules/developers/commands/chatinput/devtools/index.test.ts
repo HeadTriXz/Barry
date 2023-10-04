@@ -9,7 +9,7 @@ import {
 } from "@barry/testing";
 import { ComponentType } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
-import { timeoutContent } from "../../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../../src/common.js";
 
 import DevToolsCommand, { DevTool } from "../../../../../../src/modules/developers/commands/chatinput/devtools/index.js";
 import DevelopersModule from "../../../../../../src/modules/developers/index.js";

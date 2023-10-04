@@ -14,7 +14,7 @@ import { unblacklistGuild, unblacklistUser } from "../../../../../../../src/modu
 import { ComponentType } from "@discordjs/core";
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../../../../mocks/application.js";
-import { timeoutContent } from "../../../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../../../src/common.js";
 
 import DevelopersModule from "../../../../../../../src/modules/developers/index.js";
 

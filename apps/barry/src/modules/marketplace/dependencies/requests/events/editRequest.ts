@@ -11,7 +11,7 @@ import {
 import { RequestEditor } from "../editor/RequestEditor.js";
 import { RequestStatus } from "@prisma/client";
 import { ManageRequestButton } from "../index.js";
-import { timeoutContent } from "../../../constants.js";
+import { timeoutContent } from "../../../../../common.js";
 
 import config, { type Emoji } from "../../../../../config.js";
 

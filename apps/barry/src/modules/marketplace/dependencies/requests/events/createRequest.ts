@@ -9,7 +9,7 @@ import {
 } from "@discordjs/core";
 import { ManageRequestButton } from "../index.js";
 import { RequestEditor } from "../editor/RequestEditor.js";
-import { timeoutContent } from "../../../constants.js";
+import { timeoutContent } from "../../../../../common.js";
 import config from "../../../../../config.js";
 
 /**

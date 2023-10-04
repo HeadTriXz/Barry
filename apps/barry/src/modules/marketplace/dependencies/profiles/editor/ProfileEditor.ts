@@ -7,7 +7,7 @@ import type { UpdatableInteraction } from "@barry/core";
 import type ProfilesModule from "../index.js";
 
 import { ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core";
-import { INVITE_REGEX, retryComponents, timeoutContent } from "../../../constants.js";
+import { INVITE_REGEX, retryComponents } from "../../../constants.js";
 import { capitalizeEachSentence, displayContact } from "../../../utils.js";
 import {
     getEditAvailabilityContent,
@@ -17,6 +17,7 @@ import {
 } from "./functions/content.js";
 
 import { parseProfileData } from "./functions/utils.js";
+import { timeoutContent } from "../../../../../common.js";
 import config from "../../../../../config.js";
 
 /**

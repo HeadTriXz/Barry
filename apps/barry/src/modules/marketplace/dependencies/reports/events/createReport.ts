@@ -22,7 +22,7 @@ import { DiscordAPIError } from "@discordjs/rest";
 import { ProfileActionButton } from "../../profiles/index.js";
 import { RequestActionButton } from "../../requests/index.js";
 import { getReportContent } from "../content.js";
-import { timeoutContent } from "../../../constants.js";
+import { timeoutContent } from "../../../../../common.js";
 import config from "../../../../../config.js";
 
 /**

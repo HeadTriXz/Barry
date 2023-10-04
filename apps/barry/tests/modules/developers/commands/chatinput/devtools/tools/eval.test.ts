@@ -7,7 +7,7 @@ import {
 import { ComponentType } from "@discordjs/core";
 import { createMockApplication } from "../../../../../../mocks/application.js";
 import { evaluate } from "../../../../../../../src/modules/developers/commands/chatinput/devtools/tools/index.js";
-import { timeoutContent } from "../../../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../../../src/common.js";
 
 import vm from "node:vm";
 

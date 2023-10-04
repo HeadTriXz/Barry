@@ -13,12 +13,13 @@ import {
     mockMessage,
     mockUser
 } from "@barry/testing";
-import { retryComponents, timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
 import { createMockApplication } from "../../../../mocks/application.js";
 import { mockProfile } from "../mocks/profile.js";
+import { retryComponents } from "../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../src/common.js";
 
 import ProfilesModule from "../../../../../src/modules/marketplace/dependencies/profiles/index.js";
 import * as utils from "../../../../../src/modules/marketplace/utils.js";

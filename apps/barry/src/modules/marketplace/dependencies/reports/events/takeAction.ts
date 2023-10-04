@@ -24,7 +24,7 @@ import {
 
 import { ReportActionButton } from "../index.js";
 import { ReportStatus } from "@prisma/client";
-import { timeoutContent } from "../../../constants.js";
+import { timeoutContent } from "../../../../../common.js";
 import config from "../../../../../config.js";
 
 /**

@@ -5,7 +5,7 @@ import { MessageComponentInteraction, PingInteraction } from "@barry/core";
 import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry/testing";
 import { createMockApplication } from "../../../../mocks/application.js";
 import { mockRequest } from "../mocks/request.js";
-import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../src/common.js";
 
 import RequestsModule, { ManageRequestButton } from "../../../../../src/modules/marketplace/dependencies/requests/index.js";
 import PostRequestEvent from "../../../../../src/modules/marketplace/dependencies/requests/events/postRequest.js";

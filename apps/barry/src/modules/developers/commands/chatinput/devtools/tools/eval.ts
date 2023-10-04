@@ -1,7 +1,7 @@
 import type { UpdatableInteraction } from "@barry/core";
 
 import { ComponentType, TextInputStyle } from "@discordjs/core";
-import { timeoutContent } from "../../../../../marketplace/constants.js";
+import { timeoutContent } from "../../../../../../common.js";
 
 import config from "../../../../../../config.js";
 import vm from "node:vm";

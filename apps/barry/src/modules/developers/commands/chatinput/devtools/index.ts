@@ -9,7 +9,7 @@ import {
     unblacklistGuild,
     unblacklistUser
 } from "./tools/index.js";
-import { timeoutContent } from "../../../../marketplace/constants.js"; // TODO: Move more globally.
+import { timeoutContent } from "../../../../../common.js";
 
 import config from "../../../../../config.js";
 
