@@ -1,4 +1,4 @@
-import { type API, InteractionType } from "@discordjs/core";
+import { type API, InteractionType, GatewayDispatchEvents } from "@discordjs/core";
 
 import {
     ApplicationCommandInteraction,
@@ -94,6 +94,31 @@ describe("InteractionService", () => {
             await interactions.handle(interaction);
 
             expect(results).toEqual([1, 2, 3, 4, 5, 6, 7]);
+        });
+
+        it("should emit the 'InteractionCreate' event if the interaction is valid", async () => {
+            const data = createMockApplicationCommandInteraction();
+            const interaction = new ApplicationCommandInteraction(data, client);
+            const emitSpy = vi.spyOn(client, "emit");
+
+            await interactions.handle(interaction);
+
+            expect(emitSpy).toHaveBeenCalledOnce();
+            expect(emitSpy).toHaveBeenCalledWith(GatewayDispatchEvents.InteractionCreate, interaction);
+        });
+
+        it("should not emit the 'InteractionCreate' event if the interaction is invalid", async () => {
+            const data = createMockApplicationCommandInteraction();
+            const interaction = new ApplicationCommandInteraction(data, client);
+            const emitSpy = vi.spyOn(client, "emit");
+
+            interactions.addMiddleware(() => {
+                return;
+            });
+
+            await interactions.handle(interaction);
+
+            expect(emitSpy).not.toHaveBeenCalled();
         });
     });
 });

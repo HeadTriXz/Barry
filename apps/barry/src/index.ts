@@ -21,11 +21,12 @@ const logger = new Logger({
     }
 });
 
-// Intialize the application.
+// Initialize the application.
 const app = new Application({
     discord: {
         applicationID: process.env.DISCORD_CLIENT_ID,
-        intents: GatewayIntentBits.GuildMessages
+        intents: GatewayIntentBits.Guilds
+            | GatewayIntentBits.GuildMessages
             | GatewayIntentBits.GuildVoiceStates
             | GatewayIntentBits.DirectMessages,
         token: process.env.DISCORD_TOKEN
