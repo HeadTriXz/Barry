@@ -80,7 +80,7 @@ export class ModuleService implements ModuleRegistry {
      */
     get<T extends Module>(id: string): T | undefined {
         const [key, children] = id.split(".", 2);
-        if (key === undefined) {
+        if (key === "") {
             return;
         }
 
