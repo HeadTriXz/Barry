@@ -94,11 +94,9 @@ export default class extends Event<ReportsModule> {
         }
 
         switch (response.data.values[0]) {
-            case ReportAction.Blacklist: {
-                break;
-            }
+            case ReportAction.Blacklist:
             case ReportAction.BlacklistReporter: {
-                break;
+                return this.handleBlacklist(response, report, response.data.values[0]);
             }
             case ReportAction.Ban:
             case ReportAction.DWC:
@@ -113,20 +111,16 @@ export default class extends Event<ReportsModule> {
             case ReportAction.Ignore: {
                 await response.editParent({
                     components: [],
-                    content: `${config.emotes.check} The report has been ignored.`,
-                    flags: MessageFlags.Ephemeral
+                    content: `${config.emotes.check} The report has been ignored.`
                 });
-                await this.#updateStatus(report, ReportStatus.Ignored);
-                break;
+                return this.#updateStatus(report, ReportStatus.Ignored);
             }
             case ReportAction.None: {
                 await response.editParent({
                     components: [],
-                    content: `${config.emotes.check} The report has been marked as resolved.`,
-                    flags: MessageFlags.Ephemeral
+                    content: `${config.emotes.check} The report has been marked as resolved.`
                 });
-                await this.#updateStatus(report, ReportStatus.Accepted);
-                break;
+                return this.#updateStatus(report, ReportStatus.Accepted);
             }
         }
     }
@@ -160,17 +154,16 @@ export default class extends Event<ReportsModule> {
         if (isBlacklisted) {
             return interaction.editParent({
                 components: [],
-                content: `${config.emotes.error} The user is already blacklisted.`,
-                flags: MessageFlags.Ephemeral
+                content: `${config.emotes.error} The user is already blacklisted.`
             });
         }
 
         await developers.blacklistedUsers.blacklist(userID);
+        await this.#updateStatus(report, ReportStatus.Accepted);
 
         await interaction.editParent({
             components: [],
-            content: `${config.emotes.check} Successfully blacklisted <@${userID}>.`,
-            flags: MessageFlags.Ephemeral
+            content: `${config.emotes.check} Successfully blacklisted <@${userID}>.`
         });
     }
 
@@ -240,8 +233,7 @@ export default class extends Event<ReportsModule> {
                 if (member === undefined) {
                     return response.editParent({
                         components: [],
-                        content: `${config.emotes.error} Failed to find the user to kick.`,
-                        flags: MessageFlags.Ephemeral
+                        content: `${config.emotes.error} Failed to find the user to kick.`
                     });
                 }
 
@@ -253,8 +245,7 @@ export default class extends Event<ReportsModule> {
                 if (member === undefined) {
                     return response.editParent({
                         components: [],
-                        content: `${config.emotes.error} Failed to find the user to warn.`,
-                        flags: MessageFlags.Ephemeral
+                        content: `${config.emotes.error} Failed to find the user to warn.`
                     });
                 }
 
@@ -277,6 +268,11 @@ export default class extends Event<ReportsModule> {
             return;
         }
 
+        const moderation = this.client.modules.get<BaseModerationModule>("moderation");
+        if (moderation === undefined) {
+            return;
+        }
+
         const member = await this.client.api.guilds
             .getMember(interaction.guildID, report.report.userID)
             .catch(() => undefined) as PartialGuildMember | undefined;
@@ -284,8 +280,7 @@ export default class extends Event<ReportsModule> {
         if (member === undefined) {
             return interaction.editParent({
                 components: [],
-                content: `${config.emotes.error} Failed to find the user to mute.`,
-                flags: MessageFlags.Ephemeral
+                content: `${config.emotes.error} Failed to find the user to mute.`
             });
         }
 
@@ -324,8 +319,7 @@ export default class extends Event<ReportsModule> {
         }
 
         const { duration, reason } = response.values;
-        const moderation = this.client.modules.get<BaseModerationModule>("moderation");
-        await moderation?.actions.mute(response, { duration, member, reason });
+        await moderation.actions.mute(response, { duration, member, reason });
 
         await this.#updateStatus(report, ReportStatus.Accepted);
     }
@@ -337,8 +331,6 @@ export default class extends Event<ReportsModule> {
      * @param status The new status of the report.
      */
     async #updateStatus(report: LocalReportWithReport, status: ReportStatus): Promise<void> {
-        await this.module.localReports.update(report.guildID, report.id, { status });
-
         const settings = await this.module.settings.getOrCreate(report.guildID);
         const tagID = status === ReportStatus.Accepted
             ? settings.tagAccepted
@@ -351,7 +343,7 @@ export default class extends Event<ReportsModule> {
         }
 
         await this.client.api.channels.edit(report.threadID, {
-            // @ts-expect-error - The typings are incorrect.
+            // @ts-expect-error - The typings are incorrect. Update @discordjs/core.
             applied_tags: tags,
             archived: true
         });

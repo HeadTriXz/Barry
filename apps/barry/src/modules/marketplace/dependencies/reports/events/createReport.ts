@@ -30,7 +30,7 @@ import config from "../../../../../config.js";
  */
 export interface CreateReportData {
     /**
-     * The ID of the report.
+     * The ID of the request.
      */
     id?: number;
 
@@ -99,7 +99,7 @@ export default class extends Event<ReportsModule> {
 
         if (entity?.userID === undefined) {
             return interaction.createMessage({
-                content: `${config.emotes.error} An error occurred while reporting this user.`,
+                content: `${config.emotes.error} Failed to find the user to report.`,
                 flags: MessageFlags.Ephemeral
             });
         }
@@ -195,20 +195,20 @@ export default class extends Event<ReportsModule> {
         const user = await this.client.api.users.get(entity.userID);
         const guilds = [interaction.guildID, ...(process.env.MODERATOR_GUILDS?.trim().split(/\s*,\s*/) ?? [])];
         for (const guildID of guilds) {
-            const acceptedReports = await this.module.localReports.getAccepted(guildID, entity.userID);
-            const localID = await this.module.localReports.nextInSequence(guildID);
-
-            const content = getReportContent({
-                acceptedReports: acceptedReports,
-                creator: interaction.user,
-                localReportID: localID,
-                report: report,
-                user: user
-            });
-
             const settings = await this.module.settings.getOrCreate(guildID);
             if (settings.channelID !== null) {
                 try {
+                    const acceptedReports = await this.module.localReports.getAccepted(guildID, entity.userID);
+                    const localID = await this.module.localReports.nextInSequence(guildID);
+
+                    const content = getReportContent({
+                        acceptedReports: acceptedReports,
+                        creator: interaction.user,
+                        localReportID: localID,
+                        report: report,
+                        user: user
+                    });
+
                     const tags: string[] = [];
                     if (settings.tagOpen !== null) {
                         tags.push(settings.tagOpen);
@@ -245,7 +245,7 @@ export default class extends Event<ReportsModule> {
 
         await response.editParent({
             components: [],
-            content: `${config.emotes.check} Your report has been filed.`
+            content: `${config.emotes.check} Your report has successfully been submitted.`
         });
     }
 }

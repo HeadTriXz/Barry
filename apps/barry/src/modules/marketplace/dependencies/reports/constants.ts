@@ -106,13 +106,13 @@ export enum ReportAction {
  */
 export const REPORT_BASE_ACTIONS = [
     {
-        description: "Take no action and accept this report.",
-        label: "None",
+        description: "Take no action and mark the report as resolved.",
+        label: "Mark as Resolved",
         value: ReportAction.None
     },
     {
         description: "Take no action and ignore this report.",
-        label: "Ignore",
+        label: "Mark as Ignored",
         value: ReportAction.Ignore
     }
 ];
