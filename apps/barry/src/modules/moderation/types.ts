@@ -1,17 +1,17 @@
 import type { APIUser } from "@discordjs/core";
-import type { Module } from "@barry/core";
+import type { ModuleWithSettings, BaseSettings } from "../../types/modules.js";
 
 /**
  * Represents a module that allows flagging users.
  */
-export interface FlaggableModule extends Module {
+export interface FlaggableModule extends ModuleWithSettings<SettingsWithChannel> {
     /**
      * Flags all items for the specified user.
      *
      * @param guildID The ID of the guild.
      * @param channelID The ID of the channel.
      * @param user The user to flag.
-     * @param reason The reason to flag the user.
+     * @param reason The reason for flagging the user.
      */
     flagUser(guildID: string, channelID: string, user: APIUser, reason: string): Promise<void>;
 
@@ -26,42 +26,9 @@ export interface FlaggableModule extends Module {
 }
 
 /**
- * Represents the profiles module.
+ * Represents settings with a channel.
  */
-export interface ProfilesModule extends FlaggableModule {
-    /**
-     * The settings repository for the profiles module.
-     */
-    profilesSettings: SettingsRepository;
-}
-
-/**
- * Represents the requests module.
- */
-export interface RequestsModule extends FlaggableModule {
-    /**
-     * The settings repository for the requests module.
-     */
-    requestsSettings: SettingsRepository;
-}
-
-/**
- * Represents a simple settings repository to fetch a configured channel.
- */
-export interface SettingsRepository {
-    /**
-     * Get the settings of the specified guild.
-     *
-     * @param guildID The ID of the guild.
-     * @returns The settings for the specified guild.
-     */
-    getOrCreate(guildID: string): Promise<SettingsWithChannel>;
-}
-
-/**
- * Represents settings of a module with a configured channel.
- */
-export interface SettingsWithChannel {
+export interface SettingsWithChannel extends BaseSettings {
     /**
      * The ID of the channel.
      */

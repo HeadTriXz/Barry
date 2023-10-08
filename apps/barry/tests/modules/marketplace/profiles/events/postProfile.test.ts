@@ -1,5 +1,5 @@
 import { type ProfilesSettings, ProfileCreationStatus } from "@prisma/client";
-import type { ProfileWithMessages } from "../../../../../src/modules/marketplace/dependencies/profiles/database.js";
+import type { ProfileWithMessages } from "../../../../../src/modules/marketplace/dependencies/profiles/database/index.js";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MessageComponentInteraction, PingInteraction } from "@barry/core";
@@ -37,7 +37,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
     describe("execute", () => {
         it("should post the user's profile", async () => {
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(profile);
-            vi.spyOn(event.module.profilesSettings, "get").mockResolvedValue(settings);
+            vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
@@ -54,7 +54,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
 
         it("should prompt the user if they'd like to create a new profile if they don't have one yet", async () => {
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(null);
-            vi.spyOn(event.module.profilesSettings, "get").mockResolvedValue(settings);
+            vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
@@ -77,7 +77,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             profile.creationStatus = ProfileCreationStatus.Preview;
 
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(profile);
-            vi.spyOn(event.module.profilesSettings, "get").mockResolvedValue(settings);
+            vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
@@ -104,7 +104,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
 
             delete data.guild_id;
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -113,7 +113,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction is not of type 'MessageComponent'", async () => {
             const interaction = new PingInteraction(mockPingInteraction, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -128,7 +128,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             });
 
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -143,7 +143,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
 
             delete data.guild_id;
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -154,7 +154,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             settings.enabled = false;
 
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(profile);
-            vi.spyOn(event.module.profilesSettings, "get").mockResolvedValue(settings);
+            vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
@@ -176,7 +176,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             settings.channelID = null;
 
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(profile);
-            vi.spyOn(event.module.profilesSettings, "get").mockResolvedValue(settings);
+            vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,
@@ -204,7 +204,7 @@ describe("Post Profile (InteractionCreate) Event", () => {
             }];
 
             vi.spyOn(event.module.profiles, "getWithMessages").mockResolvedValue(profile);
-            vi.spyOn(event.module.profilesSettings, "get").mockResolvedValue(settings);
+            vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const data = createMockMessageComponentInteraction({
                 component_type: ComponentType.Button,

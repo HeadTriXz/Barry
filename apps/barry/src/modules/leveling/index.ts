@@ -1,38 +1,42 @@
-import { type MemberActivity, LevelUpNotificationType } from "@prisma/client";
-
+import {
+    type LevelingSettings,
+    type MemberActivity,
+    LevelUpNotificationType
+} from "@prisma/client";
 import type { Application } from "../../Application.js";
+import type { ModuleWithSettings } from "../../types/modules.js";
 
 import {
     LevelUpSettingsRepository,
     LevelingSettingsRepository,
     MemberActivityRepository
-} from "./database.js";
+} from "./database/index.js";
 import { loadCommands, loadEvents } from "../../utils/index.js";
 import { Module } from "@barry/core";
 
 /**
- * Make the selected properties of T requried.
+ * Make the selected properties of T required.
  */
 export type PickRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 /**
  * Represents the leveling module.
  */
-export default class LevelingModule extends Module<Application> {
+export default class LevelingModule extends Module<Application> implements ModuleWithSettings<LevelingSettings> {
     /**
      * Repository class for managing level up settings.
      */
     levelUpSettings: LevelUpSettingsRepository;
 
     /**
-     * Repository class for managing settings for this module.
-     */
-    levelingSettings: LevelingSettingsRepository;
-
-    /**
      * Repository class for managing member activity records.
      */
     memberActivity: MemberActivityRepository;
+
+    /**
+     * Repository class for managing settings for this module.
+     */
+    settings: LevelingSettingsRepository;
 
     /**
      * Represents the leveling module.
@@ -49,8 +53,8 @@ export default class LevelingModule extends Module<Application> {
         });
 
         this.levelUpSettings = new LevelUpSettingsRepository(client.prisma);
-        this.levelingSettings = new LevelingSettingsRepository(client.prisma);
         this.memberActivity = new MemberActivityRepository(client.prisma);
+        this.settings = new LevelingSettingsRepository(client.prisma);
     }
 
     /**
@@ -124,7 +128,7 @@ export default class LevelingModule extends Module<Application> {
      * @returns Whether the guild has enabled this module.
      */
     async isEnabled(guildID: string): Promise<boolean> {
-        const settings = await this.levelingSettings.getOrCreate(guildID);
+        const settings = await this.settings.getOrCreate(guildID);
         return settings.enabled;
     }
 

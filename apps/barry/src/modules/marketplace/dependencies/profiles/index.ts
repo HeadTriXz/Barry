@@ -1,18 +1,19 @@
 import {
     type APIEmbed,
+    type APIInteractionResponseCallbackData,
     type APIUser,
     ButtonStyle,
     ComponentType
 } from "@discordjs/core";
 import type { Profile, ProfilesSettings } from "@prisma/client";
 import type { Application } from "../../../../Application.js";
+import type { ModuleWithSettings } from "../../../../types/modules.js";
 
 import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
-} from "./database.js";
-
+} from "./database/index.js";
 import { DiscordAPIError } from "@discordjs/rest";
 import { Module } from "@barry/core";
 import { getDWCEmbed } from "../../utils.js";
@@ -39,7 +40,7 @@ export enum ProfileActionButton {
 /**
  * Represents the profile module.
  */
-export default class ProfilesModule extends Module<Application> {
+export default class ProfilesModule extends Module<Application> implements ModuleWithSettings<ProfilesSettings> {
     /**
      * Repository class for managing profile messages.
      */
@@ -53,7 +54,7 @@ export default class ProfilesModule extends Module<Application> {
     /**
      * Repository class for managing settings for this module.
      */
-    profilesSettings: ProfilesSettingsRepository;
+    settings: ProfilesSettingsRepository;
 
     /**
      * Represents the profile module.
@@ -70,7 +71,7 @@ export default class ProfilesModule extends Module<Application> {
 
         this.profileMessages = new ProfileMessageRepository(client.prisma);
         this.profiles = new ProfileRepository(client.prisma);
-        this.profilesSettings = new ProfilesSettingsRepository(client.prisma);
+        this.settings = new ProfilesSettingsRepository(client.prisma);
     }
 
     /**
@@ -86,12 +87,28 @@ export default class ProfilesModule extends Module<Application> {
     }
 
     /**
+     * Returns the content of a profile.
+     *
+     * @param userID The ID of the user.
+     * @returns The content of the profile.
+     */
+    async getContent(userID: string): Promise<APIInteractionResponseCallbackData | undefined> {
+        const profile = await this.profiles.get(userID);
+        if (profile === null) {
+            return;
+        }
+
+        const user = await this.client.api.users.get(userID);
+        return getProfileContent(user, profile);
+    }
+
+    /**
      * Checks if the guild has enabled this module.
      *
      * @returns Whether the guild has enabled this module.
      */
     async isEnabled(guildID: string): Promise<boolean> {
-        const settings = await this.profilesSettings.getOrCreate(guildID);
+        const settings = await this.settings.getOrCreate(guildID);
         return settings.enabled;
     }
 
@@ -152,7 +169,7 @@ export default class ProfilesModule extends Module<Application> {
         });
 
         await this.profileMessages.create(message.id, settings.guildID, user.id);
-        await this.profilesSettings.upsert(settings.guildID, {
+        await this.settings.upsert(settings.guildID, {
             lastMessageID: buttons.id
         });
 

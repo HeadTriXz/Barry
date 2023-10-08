@@ -81,7 +81,7 @@ export default class extends SlashCommand<ModerationModule> {
             flags: MessageFlags.Ephemeral
         });
 
-        const settings = await this.module.moderationSettings.getOrCreate(interaction.guildID);
+        const settings = await this.module.settings.getOrCreate(interaction.guildID);
         if (settings.channelID !== null) {
             await this.module.createLogMessage(settings.channelID, {
                 case: entity,

@@ -50,7 +50,7 @@ export default class extends UserCommand<LevelingModule> {
             });
         }
 
-        const settings = await this.module.levelingSettings.getOrCreate(interaction.guildID);
+        const settings = await this.module.settings.getOrCreate(interaction.guildID);
         if (settings.ignoredRoles.some((id) => interaction.member.roles.includes(id))) {
             return interaction.createMessage({
                 content: `${config.emotes.error} You are not allowed to use this command.`,

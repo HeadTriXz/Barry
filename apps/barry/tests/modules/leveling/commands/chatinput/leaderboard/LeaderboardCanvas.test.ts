@@ -4,7 +4,7 @@ import type { MemberActivity } from "@prisma/client";
 import { mockMessage, mockUser } from "@barry/testing";
 
 import { LeaderboardCanvas } from "../../../../../../src/modules/leveling/commands/chatinput/leaderboard/LeaderboardCanvas.js";
-import { MemberActivitySortBy } from "../../../../../../src/modules/leveling/database.js";
+import { MemberActivitySortBy } from "../../../../../../src/modules/leveling/database/index.js";
 import { createMockApplication } from "../../../../../mocks/application.js";
 
 import LevelingModule from "../../../../../../src/modules/leveling/index.js";

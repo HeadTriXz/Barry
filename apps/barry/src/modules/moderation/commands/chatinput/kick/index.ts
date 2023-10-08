@@ -3,29 +3,11 @@ import {
     SlashCommand,
     SlashCommandOptionBuilder
 } from "@barry/core";
-import { type PartialGuildMember, isAboveMember } from "../../../functions/permissions.js";
+import { type KickOptions } from "../../../../../types/moderation.js";
 import type ModerationModule from "../../../index.js";
 
-import { MessageFlags, PermissionFlagsBits } from "@discordjs/core";
 import { COMMON_SEVERE_REASONS } from "../../../constants.js";
-import { CaseType } from "@prisma/client";
-
-import config from "../../../../../config.js";
-
-/**
- * Options for the kick command.
- */
-export interface KickOptions {
-    /**
-     * The member to kick.
-     */
-    member: PartialGuildMember;
-
-    /**
-     * The reason for the kick.
-     */
-    reason: string;
-}
+import { PermissionFlagsBits } from "@discordjs/core";
 
 /**
  * Represents a slash command that kicks a user.
@@ -61,87 +43,12 @@ export default class extends SlashCommand<ModerationModule> {
     }
 
     /**
-     * Kicks the user from the server.
+     * Kicks the user from the guild.
      *
      * @param interaction The interaction that triggered the command.
      * @param options The options for the command.
      */
     async execute(interaction: ApplicationCommandInteraction, options: KickOptions): Promise<void> {
-        if (!interaction.isInvokedInGuild()) {
-            return;
-        }
-
-        if (options.member.user.id === interaction.user.id) {
-            return interaction.createMessage({
-                content: `${config.emotes.error} You cannot kick yourself.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        if (options.member.user.id === this.client.applicationID) {
-            return interaction.createMessage({
-                content: `${config.emotes.error} Your attempt to kick me has been classified as a failed comedy show audition.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        const guild = await this.client.api.guilds.get(interaction.guildID);
-        if (!isAboveMember(guild, interaction.member, options.member)) {
-            return interaction.createMessage({
-                content: `${config.emotes.error} You cannot kick this member.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        const self = await this.client.api.guilds.getMember(interaction.guildID, this.client.applicationID);
-        if (!isAboveMember(guild, self as PartialGuildMember, options.member)) {
-            return interaction.createMessage({
-                content: `${config.emotes.error} I cannot kick this member.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        await this.module.notifyUser({
-            guild: guild,
-            reason: options.reason,
-            type: CaseType.Kick,
-            userID: options.member.user.id
-        });
-
-        try {
-            await this.client.api.guilds.removeMember(interaction.guildID, options.member.user.id, {
-                reason: options.reason
-            });
-        } catch (error: unknown) {
-            this.client.logger.error(error);
-
-            return interaction.createMessage({
-                content: `${config.emotes.error} Failed to kick this member.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        const entity = await this.module.cases.create({
-            creatorID: interaction.user.id,
-            guildID: interaction.guildID,
-            note: options.reason,
-            type: CaseType.Kick,
-            userID: options.member.user.id
-        });
-
-        await interaction.createMessage({
-            content: `${config.emotes.check} Case \`${entity.id}\` | Successfully kicked \`${options.member.user.username}\`.`,
-            flags: MessageFlags.Ephemeral
-        });
-
-        const settings = await this.module.moderationSettings.getOrCreate(interaction.guildID);
-        if (settings.channelID !== null) {
-            await this.module.createLogMessage(settings.channelID, {
-                case: entity,
-                creator: interaction.user,
-                reason: options.reason,
-                user: options.member.user
-            });
-        }
+        return this.module.actions.kick(interaction, options);
     }
 }

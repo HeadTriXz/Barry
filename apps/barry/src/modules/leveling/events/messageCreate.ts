@@ -77,7 +77,7 @@ export default class extends Event<LevelingModule> {
      * @returns Whether the user is blacklisted.
      */
     async #isBlacklisted(message: GuildMessageCreateDispatchData): Promise<boolean> {
-        const settings = await this.module.levelingSettings.getOrCreate(message.guild_id);
+        const settings = await this.module.settings.getOrCreate(message.guild_id);
         return !settings.enabled
             || settings.ignoredChannels.includes(message.channel_id)
             || settings.ignoredRoles.some((id) => message.member?.roles.includes(id));

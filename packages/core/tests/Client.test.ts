@@ -4,7 +4,6 @@ import {
     type Gateway,
     type Server,
     Client,
-    Interaction,
     StatusCodes
 } from "../src/index.js";
 import {
@@ -52,18 +51,13 @@ describe("Client", () => {
             const serverSpy = vi.spyOn(server, "post");
 
             options.server = server;
-
             client = new Client(options);
-            client.interactions.addMiddleware(() => Promise.resolve());
-
-            const onInteraction = vi.fn<[AnyInteraction]>();
-            client.on(GatewayDispatchEvents.InteractionCreate, onInteraction);
+            const handleSpy = vi.spyOn(client.interactions, "handle").mockResolvedValue();
 
             serverSpy.mock.calls[0][1](mockPingInteraction, vi.fn());
 
             expect(serverSpy).toHaveBeenCalledOnce();
-            expect(onInteraction).toHaveBeenCalledOnce();
-            expect(onInteraction.mock.calls[0][0]).toBeInstanceOf(Interaction);
+            expect(handleSpy).toHaveBeenCalledOnce();
         });
 
         it("should handle invalid incoming server events", () => {
@@ -171,14 +165,10 @@ describe("Client", () => {
         it("should handle incoming interactions from the gateway", () => {
             const gateway: Gateway = new MockGateway();
             const gatewaySpy = vi.spyOn(gateway, "on");
-
             options.gateway = gateway;
 
             client = new Client(options);
-            client.interactions.addMiddleware(() => Promise.resolve());
-
-            const onInteraction = vi.fn<[AnyInteraction]>();
-            client.on(GatewayDispatchEvents.InteractionCreate, onInteraction);
+            const handleSpy = vi.spyOn(client.interactions, "handle").mockResolvedValue();
 
             gatewaySpy.mock.calls[0][1]({
                 data: {
@@ -191,8 +181,7 @@ describe("Client", () => {
             });
 
             expect(gatewaySpy).toHaveBeenCalledOnce();
-            expect(onInteraction).toHaveBeenCalledOnce();
-            expect(onInteraction.mock.calls[0][0]).toBeInstanceOf(Interaction);
+            expect(handleSpy).toHaveBeenCalledOnce();
         });
 
         describe("VoiceStateUpdate", () => {

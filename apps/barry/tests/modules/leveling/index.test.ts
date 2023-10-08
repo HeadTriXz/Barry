@@ -5,7 +5,7 @@ import {
     LevelUpSettingsRepository,
     LevelingSettingsRepository,
     MemberActivityRepository
-} from "../../../src/modules/leveling/database.js";
+} from "../../../src/modules/leveling/database/index.js";
 import { createMockApplication } from "../../mocks/application.js";
 
 import LevelingModule from "../../../src/modules/leveling/index.js";
@@ -33,7 +33,7 @@ describe("LevelingModule", () => {
     describe("constructor", () => {
         it("should set up the repositories correctly", () => {
             expect(module.levelUpSettings).toBeInstanceOf(LevelUpSettingsRepository);
-            expect(module.levelingSettings).toBeInstanceOf(LevelingSettingsRepository);
+            expect(module.settings).toBeInstanceOf(LevelingSettingsRepository);
             expect(module.memberActivity).toBeInstanceOf(MemberActivityRepository);
         });
     });
@@ -129,7 +129,7 @@ describe("LevelingModule", () => {
 
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
-            const settingsSpy = vi.spyOn(module.levelingSettings, "getOrCreate").mockResolvedValue({
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue({
                 guildID: "68239102456844360",
                 enabled: true,
                 ignoredChannels: [],
@@ -144,7 +144,7 @@ describe("LevelingModule", () => {
         });
 
         it("should return false if the guild has the module disabled", async () => {
-            const settingsSpy = vi.spyOn(module.levelingSettings, "getOrCreate").mockResolvedValue({
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue({
                 guildID: "68239102456844360",
                 enabled: false,
                 ignoredChannels: [],

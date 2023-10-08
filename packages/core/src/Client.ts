@@ -237,8 +237,6 @@ export class Client extends EventEmitter {
             }
 
             const interaction = InteractionFactory.from(body, this, respond);
-
-            this.emit(GatewayDispatchEvents.InteractionCreate, interaction);
             return this.interactions.handle(interaction);
         });
     }
@@ -263,7 +261,6 @@ export class Client extends EventEmitter {
             case GatewayDispatchEvents.InteractionCreate: {
                 const interaction = InteractionFactory.from(payload.d, this);
 
-                this.emit(payload.t, interaction);
                 this.interactions.handle(interaction);
                 break;
             }

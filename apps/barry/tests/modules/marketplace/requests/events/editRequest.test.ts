@@ -11,7 +11,7 @@ import {
 import { RequestEditor } from "../../../../../src/modules/marketplace/dependencies/requests/editor/RequestEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockRequest } from "../mocks/request.js";
-import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../src/common.js";
 
 import RequestsModule, { ManageRequestButton } from "../../../../../src/modules/marketplace/dependencies/requests/index.js";
 import EditRequestEvent from "../../../../../src/modules/marketplace/dependencies/requests/events/editRequest.js";
@@ -34,7 +34,7 @@ describe("Edit Request (InteractionCreate) Event", () => {
             minCompensation: 50
         };
 
-        vi.spyOn(event.module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
         vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
 
         const data = createMockMessageComponentInteraction({
@@ -153,7 +153,7 @@ describe("Edit Request (InteractionCreate) Event", () => {
 
             await event.execute(interaction);
 
-            expect(event.module.requestsSettings.getOrCreate).not.toHaveBeenCalled();
+            expect(event.module.settings.getOrCreate).not.toHaveBeenCalled();
         });
 
         it("should ignore if the interaction is not of type 'MessageComponent'", async () => {
@@ -161,7 +161,7 @@ describe("Edit Request (InteractionCreate) Event", () => {
 
             await event.execute(interaction);
 
-            expect(event.module.requestsSettings.getOrCreate).not.toHaveBeenCalled();
+            expect(event.module.settings.getOrCreate).not.toHaveBeenCalled();
         });
 
         it("should ignore if the interaction does not come from a button", async () => {
@@ -169,7 +169,7 @@ describe("Edit Request (InteractionCreate) Event", () => {
 
             await event.execute(interaction);
 
-            expect(event.module.requestsSettings.getOrCreate).not.toHaveBeenCalled();
+            expect(event.module.settings.getOrCreate).not.toHaveBeenCalled();
         });
 
         it("should ignore if the interaction does not come from the 'Edit' button", async () => {
@@ -177,7 +177,7 @@ describe("Edit Request (InteractionCreate) Event", () => {
 
             await event.execute(interaction);
 
-            expect(event.module.requestsSettings.getOrCreate).not.toHaveBeenCalled();
+            expect(event.module.settings.getOrCreate).not.toHaveBeenCalled();
         });
 
         it("should show an error message if the module is disabled in the guild", async () => {

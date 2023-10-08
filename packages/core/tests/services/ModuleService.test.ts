@@ -70,12 +70,39 @@ describe("ModuleService", () => {
             expect(modules.get("mock")).toBe(module);
         });
 
+        it("should return a child module by it's ID", async () => {
+            const parent = new MockModule(client);
+            const child = new MockModule(client);
+
+            await parent.dependencies.add(child);
+            await modules.add(parent);
+
+            expect(modules.get("mock.mock")).toBe(child);
+        });
+
         it("should return undefined if not found", async () => {
             const module = new MockModule(client);
             await modules.add(module);
 
             expect(modules.size).toBe(1);
             expect(modules.get("unknown")).toBeUndefined();
+        });
+
+        it("should return undefined if a child module is not found", async () => {
+            const parent = new MockModule(client);
+            const child = new MockModule(client);
+
+            await parent.dependencies.add(child);
+            await modules.add(parent);
+
+            expect(modules.get("mock.unknown")).toBeUndefined();
+        });
+
+        it("should return undefined if the id is empty", async () => {
+            const module = new MockModule(client);
+            await modules.add(module);
+
+            expect(modules.get("")).toBeUndefined();
         });
     });
 });

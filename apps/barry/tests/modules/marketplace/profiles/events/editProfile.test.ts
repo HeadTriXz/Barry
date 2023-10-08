@@ -10,7 +10,7 @@ import {
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockProfile } from "../mocks/profile.js";
-import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../src/common.js";
 
 import ProfilesModule, { ManageProfileButton } from "../../../../../src/modules/marketplace/dependencies/profiles/index.js";
 import EditProfileEvent from "../../../../../src/modules/marketplace/dependencies/profiles/events/editProfile.js";
@@ -40,7 +40,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
         interaction = new MessageComponentInteraction(data, client, vi.fn());
 
         vi.spyOn(client.api.users, "createDM").mockResolvedValue(mockChannel as APIChannel);
-        vi.spyOn(module.profilesSettings, "get").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("execute", () => {
@@ -149,7 +149,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction was sent outside a guild", async () => {
             delete interaction.guildID;
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "get");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -158,7 +158,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction is not of type 'MessageComponent'", async () => {
             const interaction = new PingInteraction(mockPingInteraction, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "get");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -166,7 +166,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
         });
 
         it("should ignore if the interaction does not come from a button", async () => {
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "get");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
             interaction.data.componentType = ComponentType.StringSelect;
 
             await event.execute(interaction);
@@ -175,7 +175,7 @@ describe("Edit Profile (InteractionCreate) Event", () => {
         });
 
         it("should ignore if the interaction does not come from the 'Edit' button", async () => {
-            const settingsSpy = vi.spyOn(event.module.profilesSettings, "get");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
             interaction.data.customID = ManageProfileButton.Create;
 
             await event.execute(interaction);

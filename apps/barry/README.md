@@ -118,6 +118,7 @@ The following environment variables are **optional**:
 | SENTRY_DSN           | The DSN of a project in Sentry.                                         |
 | DEVELOPER_USERS      | A comma-separated list of user IDs that have full control over the bot. |
 | DEVELOPER_GUILDS     | A comma-separated list of guild IDs that can be used for testing.       |
+| MODERATOR_GUILDS     | A comma-separated list of guild IDs that can moderate the marketplace.  |
 
 ## Contributing
 Contributions, bug reports, and feature requests are welcome! Please refer to the [contribution guidelines][link-contributing] for detailed information on how to contribute to the project.

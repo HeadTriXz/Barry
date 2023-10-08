@@ -9,7 +9,7 @@ import {
 } from "@discordjs/core";
 import { ManageRequestButton } from "../index.js";
 import { RequestEditor } from "../editor/RequestEditor.js";
-import { timeoutContent } from "../../../constants.js";
+import { timeoutContent } from "../../../../../common.js";
 import config from "../../../../../config.js";
 
 /**
@@ -40,7 +40,7 @@ export default class extends Event<RequestsModule> {
             return;
         }
 
-        const settings = await this.module.requestsSettings.getOrCreate(interaction.guildID);
+        const settings = await this.module.settings.getOrCreate(interaction.guildID);
         if (!settings.enabled) {
             return interaction.editParent({
                 content: `${config.emotes.error} Requests are currently disabled for this guild.`

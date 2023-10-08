@@ -1,7 +1,7 @@
 import type { AnyInteraction, Awaitable, Client } from "../../index.js";
+import { GatewayDispatchEvents, InteractionType } from "@discordjs/core";
 import { ApplicationCommandInteractionHandler } from "./ApplicationCommandInteractionHandler.js";
 import { AutocompleteInteractionHandler } from "./AutocompleteInteractionHandler.js";
-import { InteractionType } from "@discordjs/core";
 import { PingInteractionHandler } from "./PingInteractionHandler.js";
 
 /**
@@ -48,6 +48,11 @@ export class InteractionService implements MiddlewareCapableHandler {
     handlers: Partial<Record<InteractionType, InteractionHandler>>;
 
     /**
+     * The client that initialized the service.
+     */
+    #client: Client;
+
+    /**
      * The middleware registered for the interaction service.
      */
     #middleware: InteractionMiddleware[] = [];
@@ -58,6 +63,7 @@ export class InteractionService implements MiddlewareCapableHandler {
      * @param client The client that initialized the service.
      */
     constructor(client: Client) {
+        this.#client = client;
         this.handlers = {
             [InteractionType.ApplicationCommand]: new ApplicationCommandInteractionHandler(client),
             [InteractionType.ApplicationCommandAutocomplete]: new AutocompleteInteractionHandler(client),
@@ -85,6 +91,8 @@ export class InteractionService implements MiddlewareCapableHandler {
                 return () => middleware(interaction, next);
             },
             () => {
+                this.#client.emit(GatewayDispatchEvents.InteractionCreate, interaction);
+
                 const handler = this.handlers[interaction.type];
                 if (handler !== undefined) {
                     return handler.handle(interaction);

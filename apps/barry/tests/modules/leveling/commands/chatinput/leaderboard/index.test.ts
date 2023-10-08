@@ -6,7 +6,7 @@ import {
     ModalSubmitInteraction
 } from "@barry/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { MemberActivitySortBy, MemberActivitySortOrder } from "../../../../../../src/modules/leveling/database.js";
+import { MemberActivitySortBy, MemberActivitySortOrder } from "../../../../../../src/modules/leveling/database/index.js";
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,

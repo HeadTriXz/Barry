@@ -31,6 +31,9 @@ export const CASE_TITLES: Record<CaseType, string> = {
     [CaseType.Warn]: "Warn"
 };
 
+/**
+ * Pre-defined reasons for severe moderation actions.
+ */
 export const COMMON_SEVERE_REASONS = [
     "Suspicious or spam account",
     "Compromised or hacked account",
@@ -41,6 +44,9 @@ export const COMMON_SEVERE_REASONS = [
     "Trolling"
 ];
 
+/**
+ * Pre-defined reasons for minor moderation actions.
+ */
 export const COMMON_MINOR_REASONS = [
     "Being abusive or disrespectful",
     "Spamming",
@@ -50,6 +56,9 @@ export const COMMON_MINOR_REASONS = [
     "Violating server rules"
 ];
 
+/**
+ * Pre-defined reasons for the 'Deal With Caution' command.
+ */
 export const COMMON_DWC_REASONS = [
     "Not paying for services",
     "Wasting a someone's time",
@@ -57,3 +66,35 @@ export const COMMON_DWC_REASONS = [
     "Not delivering the work to the client",
     "Selling work that is not theirs"
 ];
+
+/**
+ * How often to check for expired scheduled bans.
+ */
+export const DWC_BAN_INTERVAL = 600000;
+
+/**
+ * The reason to display for expired bans.
+ */
+export const DWC_BAN_REASON = "User did not resolve issue.";
+
+/**
+ * The words to use for each case type.
+ */
+export const NOTIFY_WORDS: Record<Exclude<CaseType, "Note" | "DWC" | "UnDWC">, string> = {
+    [CaseType.Ban]: "banned from",
+    [CaseType.Kick]: "kicked from",
+    [CaseType.Mute]: "muted in",
+    [CaseType.Unban]: "unbanned from",
+    [CaseType.Unmute]: "unmuted from",
+    [CaseType.Warn]: "warned in"
+};
+
+/**
+ * How often to check for expired temporary bans.
+ */
+export const UNBAN_INTERVAL = 600000;
+
+/**
+ * The reason to display when a user no longer has the DWC role.
+ */
+export const UNKNOWN_UNDWC_REASON = "The DWC role was removed manually. The user will not be banned.";

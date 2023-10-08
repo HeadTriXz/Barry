@@ -1,4 +1,4 @@
-import type { CaseWithNotes } from "../../../../../../../src/modules/moderation/database.js";
+import type { CaseWithNotes } from "../../../../../../../src/modules/moderation/database/index.js";
 
 import {
     ApplicationCommandInteraction,

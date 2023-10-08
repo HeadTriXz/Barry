@@ -7,7 +7,7 @@ import { createMockMessageComponentInteraction, mockPingInteraction } from "@bar
 import { RequestEditor } from "../../../../../src/modules/marketplace/dependencies/requests/editor/RequestEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockRequest } from "../mocks/request.js";
-import { timeoutContent } from "../../../../../src/modules/marketplace/constants.js";
+import { timeoutContent } from "../../../../../src/common.js";
 
 import RequestsModule, { ManageRequestButton } from "../../../../../src/modules/marketplace/dependencies/requests/index.js";
 import CreateRequestEvent from "../../../../../src/modules/marketplace/dependencies/requests/events/createRequest.js";
@@ -31,7 +31,7 @@ describe("Create Request (InteractionCreate) Event", () => {
             minCompensation: 50
         };
 
-        vi.spyOn(event.module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(event.module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("execute", () => {
@@ -58,7 +58,7 @@ describe("Create Request (InteractionCreate) Event", () => {
 
             delete data.guild_id;
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -67,7 +67,7 @@ describe("Create Request (InteractionCreate) Event", () => {
 
         it("should ignore if the interaction is not of type 'MessageComponent'", async () => {
             const interaction = new PingInteraction(mockPingInteraction, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -82,7 +82,7 @@ describe("Create Request (InteractionCreate) Event", () => {
             });
 
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 
@@ -96,7 +96,7 @@ describe("Create Request (InteractionCreate) Event", () => {
             });
 
             const interaction = new MessageComponentInteraction(data, event.client, vi.fn());
-            const settingsSpy = vi.spyOn(event.module.requestsSettings, "getOrCreate");
+            const settingsSpy = vi.spyOn(event.module.settings, "getOrCreate");
 
             await event.execute(interaction);
 

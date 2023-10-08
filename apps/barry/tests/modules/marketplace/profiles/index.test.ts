@@ -5,7 +5,7 @@ import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
-} from "../../../../src/modules/marketplace/dependencies/profiles/database.js";
+} from "../../../../src/modules/marketplace/dependencies/profiles/database/index.js";
 import { mockUser, mockMessage } from "@barry/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";
@@ -36,14 +36,14 @@ describe("ProfilesModule", () => {
             lastMessageID: null
         };
 
-        vi.spyOn(module.profilesSettings, "getOrCreate").mockResolvedValue(settings);
+        vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
     });
 
     describe("constructor", () => {
         it("should set up the repositories correctly", () => {
             expect(module.profileMessages).toBeInstanceOf(ProfileMessageRepository);
             expect(module.profiles).toBeInstanceOf(ProfileRepository);
-            expect(module.profilesSettings).toBeInstanceOf(ProfilesSettingsRepository);
+            expect(module.settings).toBeInstanceOf(ProfilesSettingsRepository);
         });
     });
 
@@ -68,13 +68,38 @@ describe("ProfilesModule", () => {
         });
     });
 
+    describe("getContent", () => {
+        it("should return undefined if the profile does not exist", async () => {
+            const profileSpy = vi.spyOn(module.profiles, "get").mockResolvedValue(null);
+
+            const content = await module.getContent(mockUser.id);
+
+            expect(profileSpy).toHaveBeenCalledOnce();
+            expect(profileSpy).toHaveBeenCalledWith(mockUser.id);
+            expect(content).toBeUndefined();
+        });
+
+        it("should return the content of the profile", async () => {
+            const profileSpy = vi.spyOn(module.profiles, "get").mockResolvedValue(mockProfile);
+            const userSpy = vi.spyOn(module.client.api.users, "get").mockResolvedValue(mockUser);
+
+            const content = await module.getContent(mockUser.id);
+
+            expect(profileSpy).toHaveBeenCalledOnce();
+            expect(profileSpy).toHaveBeenCalledWith(mockUser.id);
+            expect(userSpy).toHaveBeenCalledOnce();
+            expect(userSpy).toHaveBeenCalledWith(mockUser.id);
+            expect(content).toEqual(getProfileContent(mockUser, mockProfile));
+        });
+    });
+
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
             const enabled = await module.isEnabled("68239102456844360");
 
             expect(enabled).toBe(true);
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledOnce();
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
+            expect(module.settings.getOrCreate).toHaveBeenCalledOnce();
+            expect(module.settings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
         });
 
         it("should return false if the guild has the module disabled", async () => {
@@ -83,8 +108,8 @@ describe("ProfilesModule", () => {
             const enabled = await module.isEnabled("68239102456844360");
 
             expect(enabled).toBe(false);
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledOnce();
-            expect(module.profilesSettings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
+            expect(module.settings.getOrCreate).toHaveBeenCalledOnce();
+            expect(module.settings.getOrCreate).toHaveBeenCalledWith("68239102456844360");
         });
     });
 

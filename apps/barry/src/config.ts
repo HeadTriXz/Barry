@@ -59,10 +59,12 @@ export default {
         warn: new Emoji("warn", "1149399652504977508"),
 
         // Marketplace
+        action: new Emoji("action", "1154898403508105317"),
         add: new Emoji("add", "1013212104628645888"),
         available: new Emoji("check", "1004436175307669659"),
         busy: new Emoji("busy", "1138853050539323584"),
         unavailable: new Emoji("unavailable", "1138853052460322897"),
+        view: new Emoji("view", "1154898405592682576"),
 
         // Reverse Image Search
         bing: new Emoji("bing", "1127741749016657980"),

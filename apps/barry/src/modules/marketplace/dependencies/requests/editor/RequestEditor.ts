@@ -1,13 +1,13 @@
 import { type RequestsSettings, RequestStatus } from "@prisma/client";
-import type { RequestWithAttachments } from "../database.js";
+import type { RequestWithAttachments } from "../database/index.js";
 import type { UpdatableInteraction } from "@barry/core";
 import type RequestsModule from "../index.js";
 
 import { ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core";
-import { INVITE_REGEX, retryComponents, timeoutContent } from "../../../constants.js";
+import { INVITE_REGEX, retryComponents } from "../../../constants.js";
 import { capitalizeEachSentence, capitalizeEachWord, displayContact } from "../../../utils.js";
 import { getEditContactContent, getEditRequestContent, getRequestContent } from "./functions/content.js";
-
+import { timeoutContent } from "../../../../../common.js";
 import config from "../../../../../config.js";
 
 /**

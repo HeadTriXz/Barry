@@ -1,11 +1,9 @@
 import {
     type APIActionRowComponent,
     type APIButtonComponentWithCustomId,
-    type APIInteractionResponseCallbackData,
     ButtonStyle,
     ComponentType
 } from "@discordjs/core";
-import config from "../../config.js";
 
 /**
  * Regular expression to match Discord invite links.
@@ -32,12 +30,3 @@ export const retryComponents: Array<APIActionRowComponent<APIButtonComponentWith
     ],
     type: ComponentType.ActionRow
 }];
-
-/**
- * The content for a timeout message.
- */
-export const timeoutContent: APIInteractionResponseCallbackData = {
-    components: [],
-    content: `${config.emotes.error} It took you too long to respond. Please try again.`,
-    embeds: []
-};

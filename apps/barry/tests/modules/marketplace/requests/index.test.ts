@@ -5,7 +5,7 @@ import {
     RequestMessageRepository,
     RequestRepository,
     RequestsSettingsRepository
-} from "../../../../src/modules/marketplace/dependencies/requests/database.js";
+} from "../../../../src/modules/marketplace/dependencies/requests/database/index.js";
 import { mockUser, mockMessage } from "@barry/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";
@@ -42,7 +42,7 @@ describe("RequestsModule", () => {
         it("should set up the repositories correctly", () => {
             expect(module.requestMessages).toBeInstanceOf(RequestMessageRepository);
             expect(module.requests).toBeInstanceOf(RequestRepository);
-            expect(module.requestsSettings).toBeInstanceOf(RequestsSettingsRepository);
+            expect(module.settings).toBeInstanceOf(RequestsSettingsRepository);
         });
     });
 
@@ -67,9 +67,34 @@ describe("RequestsModule", () => {
         });
     });
 
+    describe("getContent", () => {
+        it("should return undefined if the request does not exist", async () => {
+            const requestSpy = vi.spyOn(module.requests, "get").mockResolvedValue(null);
+
+            const content = await module.getContent(1);
+
+            expect(requestSpy).toHaveBeenCalledOnce();
+            expect(requestSpy).toHaveBeenCalledWith(1);
+            expect(content).toBeUndefined();
+        });
+
+        it("should return the content of the request", async () => {
+            const requestSpy = vi.spyOn(module.requests, "get").mockResolvedValue(mockRequest);
+            const userSpy = vi.spyOn(module.client.api.users, "get").mockResolvedValue(mockUser);
+
+            const content = await module.getContent(1);
+
+            expect(requestSpy).toHaveBeenCalledOnce();
+            expect(requestSpy).toHaveBeenCalledWith(1);
+            expect(userSpy).toHaveBeenCalledOnce();
+            expect(userSpy).toHaveBeenCalledWith(mockRequest.userID);
+            expect(content).toEqual(getRequestContent(mockUser, mockRequest));
+        });
+    });
+
     describe("isEnabled", () => {
         it("should return true if the guild has the module enabled", async () => {
-            const settingsSpy = vi.spyOn(module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
 
             const enabled = await module.isEnabled("68239102456844360");
 
@@ -79,7 +104,7 @@ describe("RequestsModule", () => {
         });
 
         it("should return false if the guild has the module disabled", async () => {
-            const settingsSpy = vi.spyOn(module.requestsSettings, "getOrCreate").mockResolvedValue(settings);
+            const settingsSpy = vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
             settings.enabled = false;
 
             const enabled = await module.isEnabled("68239102456844360");
