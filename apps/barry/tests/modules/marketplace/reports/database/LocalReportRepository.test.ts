@@ -113,7 +113,8 @@ describe("LocalReportRepository", () => {
                                 }
                             }
                         ]
-                    }
+                    },
+                    status: ReportStatus.Open
                 }
             });
         });
@@ -149,7 +150,8 @@ describe("LocalReportRepository", () => {
                                 }
                             }
                         ]
-                    }
+                    },
+                    status: ReportStatus.Open
                 }
             });
         });

@@ -127,7 +127,8 @@ export class LocalReportRepository {
                             }
                         }
                     ]
-                }
+                },
+                status: ReportStatus.Open
             }
         });
     }

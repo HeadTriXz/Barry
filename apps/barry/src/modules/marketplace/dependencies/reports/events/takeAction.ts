@@ -159,12 +159,13 @@ export default class extends Event<ReportsModule> {
         }
 
         await developers.blacklistedUsers.blacklist(userID);
-        await this.#updateStatus(report, ReportStatus.Accepted);
 
         await interaction.editParent({
             components: [],
             content: `${config.emotes.check} Successfully blacklisted <@${userID}>.`
         });
+
+        await this.#updateStatus(report, ReportStatus.Accepted);
     }
 
     /**
