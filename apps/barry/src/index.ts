@@ -27,6 +27,7 @@ const app = new Application({
         applicationID: process.env.DISCORD_CLIENT_ID,
         intents: GatewayIntentBits.Guilds
             | GatewayIntentBits.GuildMessages
+            | GatewayIntentBits.GuildMessageReactions
             | GatewayIntentBits.GuildVoiceStates
             | GatewayIntentBits.DirectMessages,
         token: process.env.DISCORD_TOKEN
