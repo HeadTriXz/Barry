@@ -306,3 +306,44 @@ model DWCScheduledBan {
   @@id([guildID, userID])
   @@map("dwc_scheduled_bans")
 }
+
+// Starboard
+model StarboardSettings {
+  guildID           String   @id @map("guild_id")
+  channelID         String?  @map("channel_id")
+  enabled           Boolean  @default(false)
+  allowedChannels   String[] @default([]) @map("allowed_channels")
+  allowedRoles      String[] @default([]) @map("allowed_roles")
+  autoReactChannels String[] @default([]) @map("auto_react_channels")
+  emojiID           String?  @map("emoji_id")
+  emojiName         String   @default("\u2B50") @map("emoji_name")
+  ignoredChannels   String[] @default([]) @map("ignored_channels")
+  ignoredRoles      String[] @default([]) @map("ignored_roles")
+  threshold         Int      @default(5)
+
+  @@map("starboard_settings")
+}
+
+model StarboardMessage {
+  channelID   String              @map("channel_id")
+  messageID   String              @map("message_id")
+  authorID    String              @map("author_id")
+  crosspostID String?             @map("crosspost_id")
+  guildID     String              @map("guild_id")
+
+  reactions   StarboardReaction[]
+
+  @@id([channelID, messageID])
+  @@map("starboard_messages")
+}
+
+model StarboardReaction {
+  channelID String           @map("channel_id")
+  messageID String           @map("message_id")
+  userID    String           @map("user_id")
+
+  message   StarboardMessage @relation(references: [channelID, messageID], fields: [channelID, messageID], onDelete: Cascade)
+
+  @@id([channelID, messageID, userID])
+  @@map("starboard_reactions")
+}
