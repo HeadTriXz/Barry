@@ -347,3 +347,24 @@ model StarboardReaction {
   @@id([channelID, messageID, userID])
   @@map("starboard_reactions")
 }
+
+// Welcomer
+model WelcomerSettings {
+  guildID          String  @id @map("guild_id")
+  channelID        String? @map("channel_id")
+  enabled          Boolean @default(false)
+  content          String? @default("Welcome {user.mention} to {guild.name}!")
+  embedAuthor      String? @map("embed_author")
+  embedAuthorIcon  String? @map("embed_author_icon")
+  embedColor       Int?    @map("embed_color")
+  embedDescription String? @map("embed_description")
+  embedImage       String? @map("embed_image")
+  embedFooter      String? @map("embed_footer")
+  embedFooterIcon  String? @map("embed_footer_icon")
+  embedThumbnail   String? @map("embed_thumbnail")
+  embedTimestamp   Boolean @default(false) @map("embed_timestamp")
+  embedTitle       String? @map("embed_title")
+  withImage        Boolean @default(false) @map("with_image")
+
+  @@map("welcomer_settings")
+}

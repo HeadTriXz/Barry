@@ -99,6 +99,7 @@ export class Application extends Client {
         });
 
         this.redis = new Redis(options.redis);
+        this.setMaxListeners(200);
     }
 
     /**
