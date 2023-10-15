@@ -26,6 +26,7 @@ const app = new Application({
     discord: {
         applicationID: process.env.DISCORD_CLIENT_ID,
         intents: GatewayIntentBits.Guilds
+            | GatewayIntentBits.GuildMembers
             | GatewayIntentBits.GuildMessages
             | GatewayIntentBits.GuildMessageReactions
             | GatewayIntentBits.GuildVoiceStates
