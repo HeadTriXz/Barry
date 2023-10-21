@@ -34,8 +34,10 @@ export class MessageChannelSelectInteractionData extends MessageComponentInterac
             channels: new Map()
         };
 
-        for (const id in data.resolved.channels) {
-            this.resolved.channels.set(id, data.resolved.channels[id]);
+        if (data.resolved?.channels !== undefined) {
+            for (const id in data.resolved.channels) {
+                this.resolved.channels.set(id, data.resolved.channels[id]);
+            }
         }
 
         this.values = data.values;

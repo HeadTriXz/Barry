@@ -8,14 +8,14 @@ import {
 } from "@discordjs/core";
 import type { StarboardMessage, StarboardSettings } from "@prisma/client";
 import type { Application } from "../../Application.js";
-import type { ModuleWithSettings } from "../../types/modules.js";
 
-import { Module, getAvatarURL } from "@barry/core";
+import { ConfigurableModule, GuildSettingOptionBuilder } from "../../ConfigurableModule.js";
 import {
     StarboardMessageRepository,
     StarboardReactionRepository,
     StarboardSettingsRepository
 } from "./database/index.js";
+import { getAvatarURL } from "@barry/core";
 import { loadEvents } from "../../utils/loadFolder.js";
 
 import config from "../../config.js";
@@ -63,7 +63,7 @@ export interface UpdateMessageOptions {
 /**
  * Represents the starboard module.
  */
-export default class StarboardModule extends Module<Application> implements ModuleWithSettings<StarboardSettings> {
+export default class StarboardModule extends ConfigurableModule<StarboardSettings> {
     /**
      * The repository for managing starboard messages.
      */
@@ -95,6 +95,52 @@ export default class StarboardModule extends Module<Application> implements Modu
         this.messages = new StarboardMessageRepository(client.prisma);
         this.reactions = new StarboardReactionRepository(client.prisma);
         this.settings = new StarboardSettingsRepository(client.prisma);
+
+        this.defineConfig({
+            settings: {
+                allowedChannels: GuildSettingOptionBuilder.channelArray({
+                    description: "The channels where users are allowed to star messages.",
+                    name: "Allowed Channels"
+                }),
+                allowedRoles: GuildSettingOptionBuilder.roleArray({
+                    description: "The roles that are allowed to star messages.",
+                    name: "Allowed Roles"
+                }),
+                autoReactChannels: GuildSettingOptionBuilder.channelArray({
+                    description: "The channels where images are automatically starred.",
+                    name: "Auto React Channels"
+                }),
+                channelID: GuildSettingOptionBuilder.channel({
+                    description: "The channel where starred messages are posted.",
+                    name: "Starboard Channel",
+                    nullable: true
+                }),
+                emojiName: GuildSettingOptionBuilder.emoji({
+                    description: "The emoji that is used to star messages.",
+                    emojiKeys: {
+                        id: "emojiID",
+                        name: "emojiName"
+                    },
+                    name: "Star Emoji"
+                }),
+                enabled: GuildSettingOptionBuilder.boolean({
+                    description: "Whether this module is enabled.",
+                    name: "Enabled"
+                }),
+                ignoredChannels: GuildSettingOptionBuilder.channelArray({
+                    description: "The channels where messages are ignored.",
+                    name: "Ignored Channels"
+                }),
+                ignoredRoles: GuildSettingOptionBuilder.roleArray({
+                    description: "The roles that are ignored.",
+                    name: "Ignored Roles"
+                }),
+                threshold: GuildSettingOptionBuilder.integer({
+                    description: "The amount of stars required to post a message in the starboard.",
+                    name: "Star Threshold"
+                })
+            }
+        });
     }
 
     /**

@@ -12,11 +12,14 @@ import {
     RequestsSettingsRepository
 } from "./database/index.js";
 import type { Application } from "../../../../Application.js";
-import type { ModuleWithSettings } from "../../../../types/modules.js";
 import type { RequestsSettings } from "@prisma/client";
 
+import {
+    ConfigurableModule,
+    GuildSettingOptionBuilder,
+    GuildSettingType
+} from "../../../../ConfigurableModule.js";
 import { DiscordAPIError } from "@discordjs/rest";
-import { Module } from "@barry/core";
 import { getDWCEmbed } from "../../utils.js";
 import { getRequestContent } from "./editor/functions/content.js";
 import { loadEvents } from "../../../../utils/loadFolder.js";
@@ -41,7 +44,7 @@ export enum RequestActionButton {
 /**
  * Represents the requests module.
  */
-export default class RequestsModule extends Module<Application> implements ModuleWithSettings<RequestsSettings> {
+export default class RequestsModule extends ConfigurableModule<RequestsSettings> {
     /**
      * Repository class for managing request messages.
     */
@@ -73,6 +76,33 @@ export default class RequestsModule extends Module<Application> implements Modul
         this.requestMessages = new RequestMessageRepository(client.prisma);
         this.requests = new RequestRepository(client.prisma);
         this.settings = new RequestsSettingsRepository(client.prisma);
+
+        this.defineConfig({
+            settings: {
+                channelID: GuildSettingOptionBuilder.custom({
+                    base: GuildSettingType.Channel,
+                    callback: async (interaction, settings, originalHandler) => {
+                        await originalHandler();
+
+                        if (settings.channelID !== null) {
+                            await this.postButtons(settings.channelID);
+                        }
+                    },
+                    description: "The channel where requests are posted.",
+                    name: "Requests Channel",
+                    nullable: true
+                }),
+                enabled: GuildSettingOptionBuilder.boolean({
+                    description: "Whether this module is enabled.",
+                    name: "Enabled"
+                }),
+                minCompensation: GuildSettingOptionBuilder.float({
+                    description: "The minimum compensation for a request.",
+                    minimum: 0,
+                    name: "Minimum Compensation"
+                })
+            }
+        });
     }
 
     /**
@@ -130,6 +160,36 @@ export default class RequestsModule extends Module<Application> implements Modul
     }
 
     /**
+     * Posts the buttons for managing requests.
+     *
+     * @param channelID The ID of the channel.
+     * @returns The ID of the message.
+     */
+    async postButtons(channelID: string): Promise<string> {
+        const message = await this.client.api.channels.createMessage(channelID, {
+            components: [{
+                components: [
+                    {
+                        custom_id: ManageRequestButton.Post,
+                        label: "Post Request",
+                        style: ButtonStyle.Success,
+                        type: ComponentType.Button
+                    },
+                    {
+                        custom_id: ManageRequestButton.Edit,
+                        label: "Edit Request",
+                        style: ButtonStyle.Secondary,
+                        type: ComponentType.Button
+                    }
+                ],
+                type: ComponentType.ActionRow
+            }]
+        });
+
+        return message.id;
+    }
+
+    /**
      * Posts the request in the marketplace.
      *
      * @param user The user that posted the request.
@@ -165,29 +225,11 @@ export default class RequestsModule extends Module<Application> implements Modul
         }];
 
         const message = await this.client.api.channels.createMessage(settings.channelID, content);
-        const buttons = await this.client.api.channels.createMessage(settings.channelID, {
-            components: [{
-                components: [
-                    {
-                        custom_id: ManageRequestButton.Post,
-                        label: "Post Request",
-                        style: ButtonStyle.Success,
-                        type: ComponentType.Button
-                    },
-                    {
-                        custom_id: ManageRequestButton.Edit,
-                        label: "Edit Request",
-                        style: ButtonStyle.Secondary,
-                        type: ComponentType.Button
-                    }
-                ],
-                type: ComponentType.ActionRow
-            }]
-        });
+        const buttonsID = await this.postButtons(settings.channelID);
 
         await this.requestMessages.create(message.id, settings.guildID, request.id);
         await this.settings.upsert(settings.guildID, {
-            lastMessageID: buttons.id
+            lastMessageID: buttonsID
         });
 
         if (settings.lastMessageID !== null) {

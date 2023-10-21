@@ -77,7 +77,14 @@ export default {
         loading: new Emoji("loading", "1135668500728397855", true),
         menu: new Emoji("hamburger", "1136294229405077564"),
         next: new Emoji("next", "1124406938738905098"),
-        previous: new Emoji("previous", "1124406936188768357")
+        previous: new Emoji("previous", "1124406936188768357"),
+
+        // Menu
+        channel: new Emoji("channel", "1164796815183462443"),
+        close: new Emoji("close", "1164797630988173322"),
+        emoji: new Emoji("emoji", "1164796819507789834"),
+        role: new Emoji("role", "1164796811811237949"),
+        unknown: new Emoji("unknown", "1164796817297383495")
     },
     defaultColor: 0xFFC331,
     defaultDWCColor: 0xFFFF58,
