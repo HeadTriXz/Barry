@@ -32,14 +32,14 @@
 - [License](#license)
 
 ## Features
-- **Leveling**. Reward your members for being active in your server.
-- **Marketplace**. A place where your community can request and offer services.
-- **Moderation**. A set of easy-to-use tools to help you moderate your server.
-- **Starboard**. A place to share the best content from your server.
-- **Welcomer**. Welcome new members to your server with a custom message.
-- **Utilities**. A set of useful tools to help the workflow of your community.
-- **Customizable**. Barry is highly customizable and can be configured to fit your needs.
-- **And more!**. Barry is constantly being improved with new features.
+- **Leveling**: Reward your members for being active in your server.
+- **Marketplace**: A place where your community can request and offer services.
+- **Moderation**: A set of easy-to-use tools to help you moderate your server.
+- **Starboard**: A place to share the best content from your server.
+- **Welcomer**: Welcome new members to your server with a custom message.
+- **Utilities**: A set of useful tools to help the workflow of your community.
+- **Customizable**: Barry is highly customizable and can be configured to fit your needs.
+- **And more!**: Barry is constantly being improved with new features.
 
 ## Installation & Usage
 ### Run using Docker (preferred)
