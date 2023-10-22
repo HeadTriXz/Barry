@@ -301,15 +301,11 @@ export abstract class ConfigurableModule<
      */
     getConfig(): ParsedGuildSettingConfig<M> {
         const config: ParsedGuildSettingConfig<M> = [];
-        for (const repository in this.#config) {
-            const options = this.#config[repository as RepositoryKeys<M>];
-            if (options === undefined) {
-                continue;
-            }
 
-            for (const key in options) {
+        for (const [repository, options] of Object.entries(this.#config)) {
+            for (const [key, option] of Object.entries(options as Record<string, AnyGuildSettingOption<T>>)) {
                 config.push({
-                    ...options[key],
+                    ...option,
                     key: key,
                     repository: this[repository as keyof this]
                 } as ParsedGuildSettingOption<M, GuildSettingType, BaseSettings>);
