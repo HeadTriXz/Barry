@@ -1,12 +1,14 @@
 import type { WelcomerSettings } from "@prisma/client";
 import { type Canvas, loadImage } from "canvas-constructor/napi-rs";
 
-import { mockGuild, mockUser } from "@barry/testing";
+import { createMockModalSubmitInteraction, mockGuild, mockUser } from "@barry/testing";
 import { WelcomerSettingsRepository } from "../../../src/modules/welcomer/database/index.js";
 import { createMockApplication } from "../../mocks/application.js";
-import { getAvatarURL } from "@barry/core";
+import { ModalSubmitInteraction, UpdatableInteraction, getAvatarURL } from "@barry/core";
 
 import WelcomerModule from "../../../src/modules/welcomer/index.js";
+import { ComponentType, MessageFlags } from "@discordjs/core";
+import { timeoutContent } from "../../../src/common.js";
 
 vi.mock("canvas-constructor/napi-rs", () => {
     const image = Buffer.from("Hello World!");
@@ -340,6 +342,118 @@ describe("WelcomerModule", () => {
                     title: "Hello World"
                 }]
             });
+        });
+    });
+
+    describe("handleColor", () => {
+        let interaction: UpdatableInteraction;
+        let response: ModalSubmitInteraction;
+
+        beforeEach(() => {
+            vi.useFakeTimers().setSystemTime("01-01-2023");
+
+            const data = createMockModalSubmitInteraction();
+            interaction = new UpdatableInteraction(data, module.client, vi.fn());
+            interaction.createModal = vi.fn();
+            interaction.editParent = vi.fn();
+
+            const responseData = createMockModalSubmitInteraction({
+                components: [{
+                    components: [{
+                        custom_id: "color",
+                        type: ComponentType.TextInput,
+                        value: "FF0000"
+                    }],
+                    type: ComponentType.ActionRow
+                }],
+                custom_id: `config-color-${Date.now()}`
+            });
+            response = new ModalSubmitInteraction(responseData, module.client, vi.fn());
+            response.createMessage = vi.fn();
+
+            vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
+        });
+
+        it("should update the embed color if a valid color is provided", async () => {
+            await module.handleColor(interaction, settings);
+
+            expect(settings.embedColor).toBe(0xFF0000);
+        });
+
+        it("should show the original color if it exists", async () => {
+            settings.embedColor = 0xFF0000;
+
+            await module.handleColor(interaction, settings);
+
+            expect(interaction.createModal).toHaveBeenCalledOnce();
+            expect(interaction.createModal).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    components: [{
+                        components: [
+                            expect.objectContaining({
+                                value: "#ff0000"
+                            })
+                        ],
+                        type: ComponentType.ActionRow
+                    }]
+                })
+            );
+        });
+
+        it("should remove the # from the color if provided", async () => {
+            const responseData = createMockModalSubmitInteraction({
+                components: [{
+                    components: [{
+                        custom_id: "color",
+                        type: ComponentType.TextInput,
+                        value: "#FF0000"
+                    }],
+                    type: ComponentType.ActionRow
+                }],
+                custom_id: `config-color-${Date.now()}`
+            });
+            response = new ModalSubmitInteraction(responseData, module.client, vi.fn());
+
+            vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
+
+            await module.handleColor(interaction, settings);
+
+            expect(settings.embedColor).toBe(0xFF0000);
+        });
+
+        it("should return an error if an invalid color is provided", async () => {
+            const responseData = createMockModalSubmitInteraction({
+                components: [{
+                    components: [{
+                        custom_id: "color",
+                        type: ComponentType.TextInput,
+                        value: "invalid"
+                    }],
+                    type: ComponentType.ActionRow
+                }],
+                custom_id: `config-color-${Date.now()}`
+            });
+            response = new ModalSubmitInteraction(responseData, module.client, vi.fn());
+            response.createMessage = vi.fn();
+
+            vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
+
+            await module.handleColor(interaction, settings);
+
+            expect(response.createMessage).toHaveBeenCalledOnce();
+            expect(response.createMessage).toHaveBeenCalledWith({
+                content: expect.stringContaining("The color you entered is invalid."),
+                flags: MessageFlags.Ephemeral
+            });
+        });
+
+        it("should show a timeout message if the user does not respond", async () => {
+            vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(undefined);
+
+            await module.handleColor(interaction, settings);
+
+            expect(interaction.editParent).toHaveBeenCalledOnce();
+            expect(interaction.editParent).toHaveBeenCalledWith(timeoutContent);
         });
     });
 

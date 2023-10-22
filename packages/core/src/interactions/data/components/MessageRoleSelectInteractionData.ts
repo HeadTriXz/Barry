@@ -34,8 +34,10 @@ export class MessageRoleSelectInteractionData extends MessageComponentInteractio
             roles: new Map()
         };
 
-        for (const id in data.resolved.roles) {
-            this.resolved.roles.set(id, data.resolved.roles[id]);
+        if (data.resolved?.roles !== undefined) {
+            for (const id in data.resolved.roles) {
+                this.resolved.roles.set(id, data.resolved.roles[id]);
+            }
         }
 
         this.values = data.values;

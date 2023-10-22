@@ -6,9 +6,15 @@ import {
     RequestRepository,
     RequestsSettingsRepository
 } from "../../../../src/modules/marketplace/dependencies/requests/database/index.js";
-import { mockUser, mockMessage } from "@barry/testing";
+import {
+    createMockMessageComponentInteraction,
+    mockMessage,
+    mockUser
+} from "@barry/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";
+import { GuildSettingType } from "../../../../src/ConfigurableModule.js";
+import { UpdatableInteraction } from "@barry/core";
 import { createMockApplication } from "../../../mocks/application.js";
 import { getRequestContent } from "../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
 import { mockRequest } from "./mocks/request.js";
@@ -43,6 +49,26 @@ describe("RequestsModule", () => {
             expect(module.requestMessages).toBeInstanceOf(RequestMessageRepository);
             expect(module.requests).toBeInstanceOf(RequestRepository);
             expect(module.settings).toBeInstanceOf(RequestsSettingsRepository);
+        });
+
+        it("should post the buttons when a new channel is configured", async () => {
+            const postSpy = vi.spyOn(module, "postButtons").mockResolvedValue("91256340920236565");
+
+            const config = module.getConfig();
+            const option = config.find((option) => option.key === "channelID");
+            if (option?.type !== GuildSettingType.Custom) {
+                expect.unreachable("Expected option to be of type GuildSettingType.Custom");
+            }
+
+            const data = createMockMessageComponentInteraction();
+            const interaction = new UpdatableInteraction(data, module.client, vi.fn());
+            const originalHandler = vi.fn();
+
+            await option.callback(interaction, settings, originalHandler);
+
+            expect(originalHandler).toHaveBeenCalledOnce();
+            expect(postSpy).toHaveBeenCalledOnce();
+            expect(postSpy).toHaveBeenCalledWith(channelID);
         });
     });
 

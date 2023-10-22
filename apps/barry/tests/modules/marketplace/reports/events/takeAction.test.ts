@@ -102,7 +102,7 @@ describe("Take Action Event (InteractionCreate)", () => {
 
         vi.spyOn(client.api.channels, "edit").mockResolvedValue({ ...mockChannel, position: 1 });
         vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
-        vi.spyOn(module, "getTagFromCategory").mockResolvedValue("116051392457550900");
+        vi.spyOn(module, "getTagFromCategory").mockReturnValue("116051392457550900");
         vi.spyOn(module.localReports, "getByThread").mockResolvedValue(localReport);
         vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
     });
@@ -451,6 +451,33 @@ describe("Take Action Event (InteractionCreate)", () => {
             expect(updateSpy).toHaveBeenCalledOnce();
             expect(updateSpy).toHaveBeenCalledWith(localReport.guildID, localReport.id, {
                 status: ReportStatus.Accepted
+            });
+        });
+
+        it("should add tags if they are configured", async () => {
+            const editSpy = vi.spyOn(event.client.api.channels, "edit");
+            settings.tagAccepted = "116051392457550900";
+
+            await event.handleModerationAction(response, localReport, ReportAction.Ban);
+
+            expect(editSpy).toHaveBeenCalledOnce();
+            expect(editSpy).toHaveBeenCalledWith(localReport.threadID, {
+                applied_tags: ["116051392457550900", "116051392457550900"],
+                archived: true
+            });
+        });
+
+        it("should not add tags if they are not configured", async () => {
+            const editSpy = vi.spyOn(event.client.api.channels, "edit");
+            vi.mocked(event.module.getTagFromCategory).mockReturnValue(null);
+            settings.tagAccepted = null;
+
+            await event.handleModerationAction(response, localReport, ReportAction.Ban);
+
+            expect(editSpy).toHaveBeenCalledOnce();
+            expect(editSpy).toHaveBeenCalledWith(localReport.threadID, {
+                applied_tags: [],
+                archived: true
             });
         });
 

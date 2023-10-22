@@ -337,7 +337,7 @@ export default class extends Event<ReportsModule> {
             ? settings.tagAccepted
             : settings.tagIgnored;
 
-        const tags = [tagID];
+        const tags = tagID !== null ? [tagID] : [];
         const category = this.module.getTagFromCategory(settings, report.report.category);
         if (category !== null) {
             tags.push(category);

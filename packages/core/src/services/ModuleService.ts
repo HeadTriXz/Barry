@@ -18,6 +18,13 @@ export interface ModuleRegistry {
     add(module: Module): Awaitable<void>;
 
     /**
+     * Retrieves all registered modules.
+     *
+     * @returns The retrieved modules.
+     */
+    all(): Module[];
+
+    /**
      * Removes a module.
      *
      * @param id The ID of the module to remove.
@@ -61,6 +68,15 @@ export class ModuleService implements ModuleRegistry {
 
         module.registerCommands();
         module.registerEvents();
+    }
+
+    /**
+     * Retrieves all registered modules.
+     *
+     * @returns The retrieved modules.
+     */
+    all(): Module[] {
+        return Array.from(this.#modules.values());
     }
 
     /**

@@ -4,15 +4,14 @@ import {
     LevelUpNotificationType
 } from "@prisma/client";
 import type { Application } from "../../Application.js";
-import type { ModuleWithSettings } from "../../types/modules.js";
 
+import { ConfigurableModule, GuildSettingOptionBuilder } from "../../ConfigurableModule.js";
 import {
     LevelUpSettingsRepository,
     LevelingSettingsRepository,
     MemberActivityRepository
 } from "./database/index.js";
 import { loadCommands, loadEvents } from "../../utils/index.js";
-import { Module } from "@barry/core";
 
 /**
  * Make the selected properties of T required.
@@ -22,7 +21,7 @@ export type PickRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
 /**
  * Represents the leveling module.
  */
-export default class LevelingModule extends Module<Application> implements ModuleWithSettings<LevelingSettings> {
+export default class LevelingModule extends ConfigurableModule<LevelingSettings, LevelingModule> {
     /**
      * Repository class for managing level up settings.
      */
@@ -55,6 +54,39 @@ export default class LevelingModule extends Module<Application> implements Modul
         this.levelUpSettings = new LevelUpSettingsRepository(client.prisma);
         this.memberActivity = new MemberActivityRepository(client.prisma);
         this.settings = new LevelingSettingsRepository(client.prisma);
+
+        this.defineConfig({
+            levelUpSettings: {
+                message: GuildSettingOptionBuilder.string({
+                    name: "Message",
+                    description: "The message to send when a user levels up."
+                }),
+                notificationChannel: GuildSettingOptionBuilder.channel({
+                    name: "Notification Channel",
+                    description: "The channel to send the notification in.",
+                    nullable: true
+                }),
+                notificationType: GuildSettingOptionBuilder.enum({
+                    name: "Notification Type",
+                    description: "The type of notification to send when a user levels up.",
+                    values: Object.values(LevelUpNotificationType)
+                })
+            },
+            settings: {
+                enabled: GuildSettingOptionBuilder.boolean({
+                    name: "Enabled",
+                    description: "Whether the leveling module is enabled in the guild."
+                }),
+                ignoredChannels: GuildSettingOptionBuilder.channelArray({
+                    name: "Ignored Channels",
+                    description: "Channels that are ignored when tracking user activity."
+                }),
+                ignoredRoles: GuildSettingOptionBuilder.roleArray({
+                    name: "Ignored Roles",
+                    description: "Roles that are ignored when tracking user activity."
+                })
+            }
+        });
     }
 
     /**

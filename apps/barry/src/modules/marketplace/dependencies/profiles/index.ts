@@ -7,15 +7,14 @@ import {
 } from "@discordjs/core";
 import type { Profile, ProfilesSettings } from "@prisma/client";
 import type { Application } from "../../../../Application.js";
-import type { ModuleWithSettings } from "../../../../types/modules.js";
 
+import { ConfigurableModule, GuildSettingOptionBuilder } from "../../../../ConfigurableModule.js";
 import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
 } from "./database/index.js";
 import { DiscordAPIError } from "@discordjs/rest";
-import { Module } from "@barry/core";
 import { getDWCEmbed } from "../../utils.js";
 import { getProfileContent } from "./editor/functions/content.js";
 import { loadEvents } from "../../../../utils/loadFolder.js";
@@ -40,7 +39,7 @@ export enum ProfileActionButton {
 /**
  * Represents the profile module.
  */
-export default class ProfilesModule extends Module<Application> implements ModuleWithSettings<ProfilesSettings> {
+export default class ProfilesModule extends ConfigurableModule<ProfilesSettings, ProfilesModule> {
     /**
      * Repository class for managing profile messages.
      */
@@ -72,6 +71,27 @@ export default class ProfilesModule extends Module<Application> implements Modul
         this.profileMessages = new ProfileMessageRepository(client.prisma);
         this.profiles = new ProfileRepository(client.prisma);
         this.settings = new ProfilesSettingsRepository(client.prisma);
+
+        this.defineConfig({
+            settings: {
+                channelID: GuildSettingOptionBuilder.custom({
+                    callback: async (interaction, settings, originalHandler) => {
+                        await originalHandler();
+
+                        if (settings.channelID !== null) {
+                            await this.postButtons(settings.channelID!);
+                        }
+                    },
+                    description: "The channel where profiles are posted.",
+                    name: "Profiles Channel",
+                    nullable: true
+                }),
+                enabled: GuildSettingOptionBuilder.boolean({
+                    description: "Whether this module is enabled.",
+                    name: "Enabled"
+                })
+            }
+        });
     }
 
     /**
@@ -113,6 +133,36 @@ export default class ProfilesModule extends Module<Application> implements Modul
     }
 
     /**
+     * Posts the buttons for managing profiles.
+     *
+     * @param channelID The ID of the channel.
+     * @returns The ID of the message.
+     */
+    async postButtons(channelID: string): Promise<string> {
+        const message = await this.client.api.channels.createMessage(channelID, {
+            components: [{
+                components: [
+                    {
+                        custom_id: ManageProfileButton.Post,
+                        label: "Post Profile",
+                        style: ButtonStyle.Success,
+                        type: ComponentType.Button
+                    },
+                    {
+                        custom_id: ManageProfileButton.Edit,
+                        label: "Edit Profile",
+                        style: ButtonStyle.Secondary,
+                        type: ComponentType.Button
+                    }
+                ],
+                type: ComponentType.ActionRow
+            }]
+        });
+
+        return message.id;
+    }
+
+    /**
      * Posts the profile of a user in the marketplace.
      *
      * @param user The user to post the profile of.
@@ -148,29 +198,11 @@ export default class ProfilesModule extends Module<Application> implements Modul
         }];
 
         const message = await this.client.api.channels.createMessage(settings.channelID, content);
-        const buttons = await this.client.api.channels.createMessage(settings.channelID, {
-            components: [{
-                components: [
-                    {
-                        custom_id: ManageProfileButton.Post,
-                        label: "Post Profile",
-                        style: ButtonStyle.Success,
-                        type: ComponentType.Button
-                    },
-                    {
-                        custom_id: ManageProfileButton.Edit,
-                        label: "Edit Profile",
-                        style: ButtonStyle.Secondary,
-                        type: ComponentType.Button
-                    }
-                ],
-                type: ComponentType.ActionRow
-            }]
-        });
+        const buttonsID = await this.postButtons(settings.channelID);
 
         await this.profileMessages.create(message.id, settings.guildID, user.id);
         await this.settings.upsert(settings.guildID, {
-            lastMessageID: buttons.id
+            lastMessageID: buttonsID
         });
 
         if (settings.lastMessageID !== null) {

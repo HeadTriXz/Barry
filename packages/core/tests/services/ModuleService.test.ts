@@ -40,6 +40,15 @@ describe("ModuleService", () => {
         });
     });
 
+    describe("all", () => {
+        it("should return all registered modules", async () => {
+            const module = new MockModule(client);
+            await modules.add(module);
+
+            expect(modules.all()).toEqual([module]);
+        });
+    });
+
     describe("delete", () => {
         it("should remove a registered module", async () => {
             const module = new MockModule(client);
