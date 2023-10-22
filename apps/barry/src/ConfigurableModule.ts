@@ -63,7 +63,7 @@ export type IntegerGuildSettingOption = GuildSettingOptionWithSize<GuildSettingT
  * Represents the parsed configurable settings for a module.
  */
 export type ParsedGuildSettingConfig<T extends Module> = Array<
-    ParsedGuildSettingOption<T, GuildSettingType, BaseSettings>
+    ParsedGuildSettingOption<T, GuildSettingType, RepositoryValues<T>[keyof T]>
 >;
 
 /**

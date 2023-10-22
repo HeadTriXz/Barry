@@ -34,7 +34,7 @@
     "@napi-rs/canvas": "^0.1.41",
     "@prisma/client": "^5.0.0",
     "canvas-constructor": "^7.0.1",
-    "emojilib": "^3.0.11",
+    "emojilib": "^2.4.0",
     "ioredis": "^5.3.2"
   },
   "devDependencies": {

@@ -30,6 +30,7 @@ import { ModifyGuildSettingHandlers } from "../../../general/commands/chatinput/
 import { REPORT_CHANNEL_GUIDELINES } from "./content.js";
 import { loadEvents } from "../../../../utils/loadFolder.js";
 import { timeoutContent } from "../../../../common.js";
+import config from "../../../../config.js";
 
 /**
  * Represents buttons for managing reports.
@@ -205,19 +206,19 @@ export default class ReportsModule extends ConfigurableModule<ReportsSettings> {
         }
 
         if (response.data.customID === "new_channel") {
-            if (!interaction.isInvokedInGuild()) {
+            if (!response.isInvokedInGuild()) {
                 return;
             }
 
-            if ((interaction.appPermissions! & PermissionFlagsBits.ManageChannels) === 0n) {
+            if ((response.appPermissions! & PermissionFlagsBits.ManageChannels) === 0n) {
                 return response.editParent({
-                    content: "I do not have permission to create channels.",
-                    components: []
+                    components: [],
+                    content: `${config.emotes.error} I do not have permission to create channels.`
                 });
             }
 
             await response.deferUpdate();
-            await this.createChannel(interaction.guildID);
+            await this.createChannel(response.guildID);
         }
 
         if (response.data.customID === "existing_channel") {

@@ -108,12 +108,8 @@ export default class extends SlashCommand<GeneralModule> {
                 return this.formatValue(settings, { ...option, type: option.base || GuildSettingType.String });
             }
             case GuildSettingType.Emoji: {
-                if (option.emojiKeys === undefined) {
-                    throw new Error("Missing 'emojiKeys' for option of type 'Emoji'.");
-                }
-
-                const emojiName = settings[option.emojiKeys["name"]] as string;
-                const emojiID = settings[option.emojiKeys["id"]] as string | null;
+                const emojiName = settings[option.emojiKeys.name] as string;
+                const emojiID = settings[option.emojiKeys.id] as string | null;
 
                 return emojiID !== null
                     ? `<:${emojiName}:${emojiID}>`
@@ -220,7 +216,7 @@ export default class extends SlashCommand<GeneralModule> {
                         name: emoji.name
                     },
                     label: setting.name,
-                    value: setting.key
+                    value: setting.key as string
                 });
 
                 embedOptions.push({

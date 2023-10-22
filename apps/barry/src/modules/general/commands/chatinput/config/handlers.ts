@@ -6,10 +6,10 @@ import {
     MessageFlags,
     TextInputStyle
 } from "@discordjs/core";
-import { emojiMap } from "./emojis.js";
 import { timeoutContent } from "../../../../../common.js";
 
 import emotes from "../../../../../config.js";
+import { getEmoji, normalizeEmoji } from "./emojis.js";
 
 /**
  * The base settings for a guild.
@@ -58,20 +58,16 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.Boolean, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
+        const value = settings[config.key];
+        if (typeof value !== "boolean" && !(config.nullable && value === null)) {
+            throw new Error(`The setting '${String(config.key)}' is not of type 'boolean'.`);
         }
 
-        if (typeof settings[config.key] !== "boolean" && !(config.nullable && settings[config.key] === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a boolean.`);
-        }
-
-        const newValue = !settings[config.key];
         await config.repository.upsert(settings.guildID, {
-            [config.key]: newValue
+            [config.key]: !value
         });
 
-        settings[config.key] = newValue as U[keyof U];
+        settings[config.key] = !value as U[keyof U];
     }
 
     /**
@@ -86,13 +82,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.Channel, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key];
         if (typeof value !== "string" && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a string.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'string'.`);
         }
 
         await interaction.editParent({
@@ -103,7 +95,6 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                     // @ts-expect-error discord.js is lazy
                     default_values: value !== null
                         ? [{ id: value, type: "channel" }]
-                        // ? [{ id: value, type: SelectMenuDefaultValueType.Channel }]
                         : undefined,
                     min_values: config.nullable ? 0 : 1,
                     placeholder: config.description,
@@ -144,13 +135,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.ChannelArray, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key] as string[] | null;
         if (!Array.isArray(value) && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a string.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'string[]'.`);
         }
 
         await interaction.editParent({
@@ -162,7 +149,6 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                     default_values: value?.map((value: string) => ({
                         id: value,
                         type: "channel"
-                        // type: SelectMenuDefaultValueType.Channel
                     })),
                     max_values: config.maximum ?? 25,
                     min_values: config.minimum ?? 0,
@@ -171,7 +157,7 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                 }],
                 type: ComponentType.ActionRow
             }],
-            content: `Please select the channel you want to set as the **${config.name}**.`
+            content: `Please select the channels you want to set as the **${config.name}**.`
         });
 
         const response = await interaction.awaitMessageComponent({
@@ -204,25 +190,15 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.Emoji, U>
     ): Promise<void> {
-        if (config.emojiKeys === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not have keys.`);
-        }
-
-        if (!(config.emojiKeys.id in settings)) {
-            throw new Error(`Setting ${config.emojiKeys.id} does not exist.`);
-        }
-
-        if (!(config.emojiKeys.name in settings)) {
-            throw new Error(`Setting ${config.emojiKeys.name} does not exist.`);
-        }
-
-        if (typeof settings[config.emojiKeys.id] !== "string" && settings[config.emojiKeys.id] !== null) {
-            throw new Error(`Setting ${config.emojiKeys.id} is not a string.`);
-        }
-
+        const oldEmojiID = settings[config.emojiKeys.id] as string | null;
         const oldEmojiName = settings[config.emojiKeys.name] as string | null;
-        if (typeof oldEmojiName !== "string" && (config.nullable && oldEmojiName !== null)) {
-            throw new Error(`Setting ${config.emojiKeys.name} is not a string.`);
+
+        if (typeof oldEmojiID !== "string" && oldEmojiID !== null) {
+            throw new Error(`The setting '${config.emojiKeys.id}' is not of type 'string'.`);
+        }
+
+        if (typeof oldEmojiName !== "string" && !(config.nullable && oldEmojiName === null)) {
+            throw new Error(`The setting '${config.emojiKeys.name}' is not of type 'string'.`);
         }
 
         const key = `config-emoji-${Date.now()}`;
@@ -232,7 +208,7 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                     custom_id: "emoji",
                     label: config.name,
                     min_length: config.nullable ? 0 : 1,
-                    placeholder: config.description,
+                    placeholder: "e.g., 😁, :smile:, or <:custom:1234567890123456789>",
                     style: TextInputStyle.Short,
                     type: ComponentType.TextInput,
                     value: oldEmojiName || ""
@@ -250,29 +226,16 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
 
         await response.deferUpdate();
 
-        const newValue = response.values.emoji;
         let emojiID: string | null = null;
         let emojiName: string | null = null;
 
+        const newValue = normalizeEmoji(response.values.emoji);
         if (newValue !== "") {
-            const match = newValue.match(/<?a?:?(\w+):(\d+)>?/);
-            if (match !== null) {
-                emojiID = match[2];
-                emojiName = match[1];
+            const emoji = getEmoji(newValue);
+            if (emoji !== null) {
+                emojiID = emoji.id;
+                emojiName = emoji.name;
             } else {
-                const unicode = newValue.match(/[\p{Extended_Pictographic}\u200d]/u);
-                if (unicode !== null) {
-                    emojiName = unicode[0];
-                } else {
-                    const cleaned = newValue[0] === ":"
-                        ? newValue.slice(1, -1)
-                        : newValue;
-
-                    emojiName = emojiMap.get(cleaned) || null;
-                }
-            }
-
-            if (emojiName === null) {
                 const emojis = await this.#module.client.api.guilds.getEmojis(settings.guildID);
                 const emoji = emojis.find((emoji) => emoji.name === newValue);
                 if (emoji !== undefined) {
@@ -310,17 +273,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.Enum, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        if (!Array.isArray(config.values)) {
-            throw new Error(`Setting ${String(config.key)} does not have values.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key];
         if (typeof value !== "string" && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a string.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'string'.`);
         }
 
         await interaction.editParent({
@@ -371,13 +326,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.Float, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key];
         if (typeof value !== "number" && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a number.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'number'.`);
         }
 
         const key = `config-float-${Date.now()}`;
@@ -405,33 +356,43 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
 
         await response.deferUpdate();
 
-        const newValue = Number(response.values.float);
-        if (isNaN(newValue)) {
+        let float: number | null = null;
+        if (response.values.float !== "") {
+            float = Number(response.values.float);
+            if (isNaN(float)) {
+                return response.createMessage({
+                    content: `${emotes.emotes.error} The value you entered is not a float.`,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+
+            if (config.minimum !== undefined && float < config.minimum) {
+                return response.createMessage({
+                    content: `${emotes.emotes.error} The value you entered is too small.`,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+
+            if (config.maximum !== undefined && float > config.maximum) {
+                return response.createMessage({
+                    content: `${emotes.emotes.error} The value you entered is too large.`,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+        }
+
+        if (float === null && !config.nullable) {
             return response.createMessage({
                 content: `${emotes.emotes.error} The value you entered is not a float.`,
                 flags: MessageFlags.Ephemeral
             });
         }
 
-        if (config.minimum !== undefined && newValue < config.minimum) {
-            return response.createMessage({
-                content: `${emotes.emotes.error} The value you entered is too small.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        if (config.maximum !== undefined && newValue > config.maximum) {
-            return response.createMessage({
-                content: `${emotes.emotes.error} The value you entered is too large.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
         await config.repository.upsert(settings.guildID, {
-            [config.key]: newValue
+            [config.key]: float
         });
 
-        settings[config.key] = newValue as U[keyof U];
+        settings[config.key] = float as U[keyof U];
     }
 
     /**
@@ -499,13 +460,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.Integer, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key];
         if (typeof value !== "number" && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a number.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'number'.`);
         }
 
         const key = `config-integer-${Date.now()}`;
@@ -533,33 +490,43 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
 
         await response.deferUpdate();
 
-        const newValue = Number(response.values.integer);
-        if (!Number.isInteger(newValue)) {
+        let integer: number | null = null;
+        if (response.values.integer !== "") {
+            integer = Number(response.values.integer);
+            if (!Number.isInteger(integer)) {
+                return response.createMessage({
+                    content: `${emotes.emotes.error} The value you entered is not an integer.`,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+
+            if (config.minimum !== undefined && integer < config.minimum) {
+                return response.createMessage({
+                    content: `${emotes.emotes.error} The value you entered is too small.`,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+
+            if (config.maximum !== undefined && integer > config.maximum) {
+                return response.createMessage({
+                    content: `${emotes.emotes.error} The value you entered is too large.`,
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+        }
+
+        if (integer === null && !config.nullable) {
             return response.createMessage({
                 content: `${emotes.emotes.error} The value you entered is not an integer.`,
                 flags: MessageFlags.Ephemeral
             });
         }
 
-        if (config.minimum !== undefined && newValue < config.minimum) {
-            return response.createMessage({
-                content: `${emotes.emotes.error} The value you entered is too small.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
-        if (config.maximum !== undefined && newValue > config.maximum) {
-            return response.createMessage({
-                content: `${emotes.emotes.error} The value you entered is too large.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
         await config.repository.upsert(settings.guildID, {
-            [config.key]: newValue
+            [config.key]: integer
         });
 
-        settings[config.key] = newValue as U[keyof U];
+        settings[config.key] = integer as U[keyof U];
     }
 
     /**
@@ -574,13 +541,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.Role, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key];
         if (typeof value !== "string" && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a string.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'string'.`);
         }
 
         await interaction.editParent({
@@ -590,7 +553,6 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                     // @ts-expect-error discord.js is lazy
                     default_values: value !== null
                         ? [{ id: value, type: "role" }]
-                        // ? [{ id: value, type: SelectMenuDefaultValueType.Role }]
                         : undefined,
                     min_values: config.nullable ? 0 : 1,
                     placeholder: config.description,
@@ -631,13 +593,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.RoleArray, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key] as string[] | null;
         if (!Array.isArray(value) && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not an array.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'string[]'.`);
         }
 
         await interaction.editParent({
@@ -648,7 +606,6 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                     default_values: value?.map((value: string) => ({
                         id: value,
                         type: "role"
-                        // type: SelectMenuDefaultValueType.Role
                     })),
                     max_values: config.maximum ?? 25,
                     min_values: config.minimum ?? 0,
@@ -657,7 +614,7 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                 }],
                 type: ComponentType.ActionRow
             }],
-            content: `Please select the role you want to set as the **${config.name}**.`
+            content: `Please select the roles you want to set as the **${config.name}**.`
         });
 
         const response = await interaction.awaitMessageComponent({
@@ -690,13 +647,9 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
         settings: U,
         config: ParsedGuildSettingOption<T, GuildSettingType.String, U>
     ): Promise<void> {
-        if (settings[config.key] === undefined) {
-            throw new Error(`Setting ${String(config.key)} does not exist.`);
-        }
-
-        const value = settings[config.key] as unknown;
+        const value = settings[config.key];
         if (typeof value !== "string" && !(config.nullable && value === null)) {
-            throw new Error(`Setting ${String(config.key)} is not a string.`);
+            throw new Error(`The setting '${String(config.key)}' is not of type 'string'.`);
         }
 
         const key = `config-string-${Date.now()}`;
@@ -705,7 +658,8 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
                 components: [{
                     custom_id: "string",
                     label: config.name,
-                    min_length: config.nullable ? 0 : 1,
+                    max_length: config.maximum,
+                    min_length: config.nullable ? 0 : config.minimum,
                     placeholder: config.description,
                     style: TextInputStyle.Short,
                     type: ComponentType.TextInput,
@@ -724,25 +678,18 @@ export class ModifyGuildSettingHandlers<T extends Module, U extends BaseGuildSet
 
         await response.deferUpdate();
 
-        const newValue = response.values.string;
-        if (config.minimum !== undefined && newValue.length < config.minimum) {
+        const string = response.values.string || null;
+        if (string !== null && config.minimum !== undefined && string.length < config.minimum) {
             return response.createMessage({
                 content: `${emotes.emotes.error} The value you entered is too short.`,
                 flags: MessageFlags.Ephemeral
             });
         }
 
-        if (config.maximum !== undefined && newValue.length > config.maximum) {
-            return response.createMessage({
-                content: `${emotes.emotes.error} The value you entered is too long.`,
-                flags: MessageFlags.Ephemeral
-            });
-        }
-
         await config.repository.upsert(settings.guildID, {
-            [config.key]: newValue
+            [config.key]: string
         });
 
-        settings[config.key] = newValue as U[keyof U];
+        settings[config.key] = string as U[keyof U];
     }
 }
