@@ -8,7 +8,11 @@ import {
 import type { Profile, ProfilesSettings } from "@prisma/client";
 import type { Application } from "../../../../Application.js";
 
-import { ConfigurableModule, GuildSettingOptionBuilder } from "../../../../ConfigurableModule.js";
+import {
+    ConfigurableModule,
+    GuildSettingOptionBuilder,
+    GuildSettingType
+} from "../../../../ConfigurableModule.js";
 import {
     ProfileMessageRepository,
     ProfileRepository,
@@ -75,6 +79,7 @@ export default class ProfilesModule extends ConfigurableModule<ProfilesSettings,
         this.defineConfig({
             settings: {
                 channelID: GuildSettingOptionBuilder.custom({
+                    base: GuildSettingType.Channel,
                     callback: async (interaction, settings, originalHandler) => {
                         await originalHandler();
 
