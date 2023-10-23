@@ -56,6 +56,15 @@ describe("MessageCreate Event", () => {
             expect(reactSpy).not.toHaveBeenCalled();
         });
 
+        it("should ignore if the module is disabled", async () => {
+            const reactSpy = vi.spyOn(event.client.api.channels, "addMessageReaction");
+            settings.enabled = false;
+
+            await event.execute(data);
+
+            expect(reactSpy).not.toHaveBeenCalled();
+        });
+
         it("should ignore if the message was sent outside a auto-react channel", async () => {
             const reactSpy = vi.spyOn(event.client.api.channels, "addMessageReaction");
             settings.autoReactChannels = ["30527482987641455"];
