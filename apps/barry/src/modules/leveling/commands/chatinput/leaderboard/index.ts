@@ -23,8 +23,8 @@ import { loadFont } from "canvas-constructor/napi-rs";
 
 import config from "../../../../../config.js";
 
-loadFont(join(process.cwd(), "./fonts/Inter-SemiBold.ttf"), "Inter SemiBold");
-loadFont(join(process.cwd(), "./fonts/Inter-Regular.ttf"), "Inter");
+loadFont(join(process.cwd(), "./assets/fonts/Inter-SemiBold.ttf"), "Inter SemiBold");
+loadFont(join(process.cwd(), "./assets/fonts/Inter-Regular.ttf"), "Inter");
 
 /**
  * Represents sort options for the leaderboard.
