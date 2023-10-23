@@ -30,6 +30,7 @@ const app = new Application({
             | GatewayIntentBits.GuildMessages
             | GatewayIntentBits.GuildMessageReactions
             | GatewayIntentBits.GuildVoiceStates
+            | GatewayIntentBits.MessageContent
             | GatewayIntentBits.DirectMessages,
         token: process.env.DISCORD_TOKEN
     },

@@ -33,7 +33,7 @@ export default class extends Event<StarboardModule> {
         }
 
         const settings = await this.module.settings.getOrCreate(message.guild_id);
-        if (!settings.autoReactChannels.includes(message.channel_id)) {
+        if (!settings.enabled || !settings.autoReactChannels.includes(message.channel_id)) {
             return;
         }
 
