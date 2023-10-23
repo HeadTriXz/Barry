@@ -47,8 +47,8 @@ const DIVIDER_COLOR = "#343434";
  */
 const ACCENT_COLOR = "#FFC331";
 
-loadFont(join(process.cwd(), "./fonts/Inter-SemiBold.ttf"), "Inter SemiBold");
-loadFont(join(process.cwd(), "./fonts/Inter-Regular.ttf"), "Inter");
+loadFont(join(process.cwd(), "./assets/fonts/Inter-SemiBold.ttf"), "Inter SemiBold");
+loadFont(join(process.cwd(), "./assets/fonts/Inter-Regular.ttf"), "Inter");
 
 /**
  * Represents a user command that allows users to view someone's rank card.
