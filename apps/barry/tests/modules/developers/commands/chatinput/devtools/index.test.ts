@@ -42,16 +42,6 @@ describe("/devtools", () => {
     });
 
     describe("execute", () => {
-        it("should send the eval tool if selected", async () => {
-            const evalSpy = vi.spyOn(tools, "evaluate").mockResolvedValue();
-            values.push(DevTool.Eval);
-
-            await command.execute(interaction);
-
-            expect(evalSpy).toHaveBeenCalledOnce();
-            expect(evalSpy).toHaveBeenCalledWith(response);
-        });
-
         it("should send the blacklist user tool if selected", async () => {
             const blacklistSpy = vi.spyOn(tools, "blacklistUser").mockResolvedValue();
             values.push(DevTool.BlacklistUser);

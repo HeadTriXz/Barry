@@ -5,7 +5,6 @@ import { ComponentType, MessageFlags } from "@discordjs/core";
 import {
     blacklistGuild,
     blacklistUser,
-    evaluate,
     unblacklistGuild,
     unblacklistUser
 } from "./tools/index.js";
@@ -19,7 +18,6 @@ import config from "../../../../../config.js";
 export enum DevTool {
     BlacklistGuild = "blacklist-guild",
     BlacklistUser = "blacklist-user",
-    Eval = "eval",
     UnblacklistGuild = "unblacklist-guild",
     UnblacklistUser = "unblacklist-user"
 }
@@ -52,10 +50,6 @@ export default class extends SlashCommand<DevelopersModule> {
                 components: [{
                     custom_id: "devtools-select-tool",
                     options: [
-                        {
-                            label: "Eval",
-                            value: DevTool.Eval
-                        },
                         {
                             label: "Blacklist User",
                             value: DevTool.BlacklistUser
@@ -92,9 +86,6 @@ export default class extends SlashCommand<DevelopersModule> {
         }
 
         switch (response.data.values[0]) {
-            case DevTool.Eval: {
-                return evaluate(response);
-            }
             case DevTool.BlacklistUser: {
                 return blacklistUser(this.module, response);
             }
