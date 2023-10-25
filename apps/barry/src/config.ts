@@ -74,7 +74,6 @@ export default {
         // Other
         check: new Emoji("check", "1004436175307669659"),
         error: new Emoji("error", "1004436176859578510"),
-        loading: new Emoji("loading", "1135668500728397855", true),
         menu: new Emoji("hamburger", "1136294229405077564"),
         next: new Emoji("next", "1124406938738905098"),
         previous: new Emoji("previous", "1124406936188768357"),

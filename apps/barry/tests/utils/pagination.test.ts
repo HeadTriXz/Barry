@@ -135,42 +135,17 @@ describe("PaginationMessage", () => {
             expect(loadSpy).toHaveBeenCalledWith([1, 2], 0);
         });
 
-        it("should show a loading message if 'showLoading' is true", async () => {
-            const initialEditSpy = vi.spyOn(interaction, "editOriginalMessage");
+        it("should call the 'onRefresh' callback when refreshing the message", async () => {
             vi.spyOn(interaction, "awaitMessageComponent")
-                .mockResolvedValueOnce(nextInteraction);
+                .mockResolvedValueOnce(undefined);
 
-            const nextEditSpy = vi.spyOn(nextInteraction, "editOriginalMessage");
-            vi.spyOn(nextInteraction, "awaitMessageComponent")
-                .mockResolvedValue(undefined);
-
-            await PaginationMessage.create({ ...indexOptions, showLoading: true });
-
-            expect(initialEditSpy).toHaveBeenCalledWith({
-                content: expect.stringContaining("Loading...")
+            const refreshSpy = vi.fn();
+            await PaginationMessage.create({
+                ...indexOptions,
+                onRefresh: refreshSpy
             });
-            expect(nextEditSpy).toHaveBeenCalledWith({
-                content: expect.stringContaining("Loading...")
-            });
-        });
 
-        it("should not show a loading message if 'showLoading' is false", async () => {
-            const initialEditSpy = vi.spyOn(interaction, "editOriginalMessage");
-            vi.spyOn(interaction, "awaitMessageComponent")
-                .mockResolvedValueOnce(nextInteraction);
-
-            const nextEditSpy = vi.spyOn(nextInteraction, "editOriginalMessage");
-            vi.spyOn(nextInteraction, "awaitMessageComponent")
-                .mockResolvedValue(undefined);
-
-            await PaginationMessage.create(indexOptions);
-
-            expect(initialEditSpy).not.toHaveBeenCalledWith({
-                content: expect.stringContaining("Loading...")
-            });
-            expect(nextEditSpy).not.toHaveBeenCalledWith({
-                content: expect.stringContaining("Loading...")
-            });
+            expect(refreshSpy).toHaveBeenCalledOnce();
         });
     });
 

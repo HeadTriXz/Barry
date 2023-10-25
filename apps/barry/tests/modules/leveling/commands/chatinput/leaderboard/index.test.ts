@@ -49,6 +49,14 @@ vi.mock("canvas-constructor/napi-rs", () => {
     };
 });
 
+vi.mock("node:fs/promises", async (importOriginal) => {
+    const original = await importOriginal<typeof import("node:fs/promises")>();
+    return {
+        ...original,
+        readFile: vi.fn().mockResolvedValue(Buffer.from("Hello World"))
+    };
+});
+
 describe("/leaderboard", () => {
     const guildID = "68239102456844360";
     const userID = "257522665441460225";
@@ -104,6 +112,24 @@ describe("/leaderboard", () => {
                 files: [{
                     data: Buffer.from("Hello World"),
                     name: "leaderboard.png"
+                }]
+            });
+        });
+
+        it("should show the loading gif while generating the leaderboard", async () => {
+            const editSpy = vi.spyOn(interaction, "editOriginalMessage");
+            vi.spyOn(interaction, "awaitMessageComponent")
+                .mockResolvedValue(undefined);
+
+            await command.execute(interaction);
+
+            expect(editSpy).toHaveBeenCalledTimes(3);
+            expect(editSpy).toHaveBeenCalledWith({
+                attachments: [{ id: "0" }],
+                files: [{
+                    contentType: "image/gif",
+                    data: Buffer.from("Hello World"),
+                    name: "loading.gif"
                 }]
             });
         });

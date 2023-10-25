@@ -55,6 +55,11 @@ export interface BasePaginationOptions {
     interaction: ReplyableInteraction;
 
     /**
+     * A function that is called when the pagination is refreshed.
+     */
+    onRefresh?: (interaction: ReplyableInteraction) => Awaitable<void>;
+
+    /**
      * The amount of items to show per page.
      */
     pageSize: number;
@@ -63,11 +68,6 @@ export interface BasePaginationOptions {
      * The amount of pages to load in the background.
      */
     preLoadPages?: number;
-
-    /**
-     * Whether to show a message indicating the page is still loading.
-     */
-    showLoading?: boolean;
 
     /**
      * The timeout duration in milliseconds (default: 10 minutes).
@@ -212,10 +212,8 @@ export class PaginationMessage<T = unknown> {
      * Refreshes the paginated message by updating the content.
      */
     async refresh(): Promise<void> {
-        if (this.#options.showLoading) {
-            await this.#options.interaction.editOriginalMessage({
-                content: `## ${config.emotes.loading} Loading...`
-            });
+        if (this.#options.onRefresh !== undefined) {
+            await this.#options.onRefresh(this.#options.interaction);
         }
 
         const content = await this.#getPageContent();
