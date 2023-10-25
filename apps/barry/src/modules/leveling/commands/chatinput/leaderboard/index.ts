@@ -20,6 +20,7 @@ import { LeaderboardCanvas } from "./LeaderboardCanvas.js";
 import { PaginationMessage } from "../../../../../utils/pagination.js";
 import { join } from "node:path";
 import { loadFont } from "canvas-constructor/napi-rs";
+import { readFile } from "node:fs/promises";
 
 import config from "../../../../../config.js";
 
@@ -54,6 +55,11 @@ export enum LeaderboardMenuOption {
  * Represents a slash command that shows a leaderboard of the most active members.
  */
 export default class extends SlashCommand<LevelingModule> {
+    /**
+     * The loading image to use for the leaderboard.
+     */
+    #loadingImage?: Buffer;
+
     /**
      * Represents a slash command that shows a leaderboard of the most active members.
      *
@@ -90,9 +96,19 @@ export default class extends SlashCommand<LevelingModule> {
             content: (index) => this.#getPageContent(interaction.guildID, index, sortOptions),
             count: count,
             interaction: interaction,
+            onRefresh: async (interaction) => {
+                const buffer = await this.#loadLoadingImage();
+                await interaction.editOriginalMessage({
+                    attachments: [{ id: "0" }],
+                    files: [{
+                        contentType: "image/gif",
+                        data: buffer,
+                        name: "loading.gif"
+                    }]
+                });
+            },
             pageSize: PAGE_SIZE,
-            preLoadPages: 1,
-            showLoading: true
+            preLoadPages: 1
         });
 
         await Promise.all([
@@ -341,5 +357,21 @@ export default class extends SlashCommand<LevelingModule> {
                 name: "leaderboard.png"
             }]
         };
+    }
+
+    /**
+     * Loads the loading image for the leaderboard.
+     *
+     * @returns The loading image.
+     */
+    async #loadLoadingImage(): Promise<Buffer> {
+        if (this.#loadingImage !== undefined) {
+            return this.#loadingImage;
+        }
+
+        const buffer = await readFile(join(process.cwd(), "./assets/images/leaderboard-loading.gif"));
+        this.#loadingImage = buffer;
+
+        return buffer;
     }
 }
