@@ -81,7 +81,7 @@ export class LeaderboardCanvas {
      * Checks if the leaderboard has a podium (top three members).
      */
     get withPodium(): boolean {
-        return this.#page === 1;
+        return this.#page === 1 && this.#members.length > 3;
     }
 
     /**
