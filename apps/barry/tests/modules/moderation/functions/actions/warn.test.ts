@@ -61,6 +61,7 @@ describe("warn", () => {
         vi.spyOn(client.api.guilds, "get").mockResolvedValue(mockGuild);
         vi.spyOn(client.api.guilds, "getMember").mockResolvedValue(mockMember);
         vi.spyOn(client.api.users, "createDM").mockResolvedValue({ ...mockChannel, position: 0 });
+        vi.spyOn(module, "createLogMessage").mockResolvedValue(undefined);
         vi.spyOn(module.cases, "create").mockResolvedValue(entity);
         vi.spyOn(module.cases, "getByUser").mockResolvedValue([]);
         vi.spyOn(module.settings, "getOrCreate").mockResolvedValue(settings);
@@ -122,7 +123,7 @@ describe("warn", () => {
 
         await warn(module, interaction, options);
 
-        expect(createSpy).toHaveBeenCalledTimes(2);
+        expect(createSpy).toHaveBeenCalledOnce();
         expect(createSpy).toHaveBeenCalledWith(mockChannel.id, {
             embeds: [{
                 color: expect.any(Number),
@@ -164,12 +165,11 @@ describe("warn", () => {
 
     it("should log the case in the configured log channel", async () => {
         vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-        const createSpy = vi.spyOn(module, "createLogMessage");
 
         await warn(module, interaction, options);
 
-        expect(createSpy).toHaveBeenCalledOnce();
-        expect(createSpy).toHaveBeenCalledWith(settings.channelID, {
+        expect(module.createLogMessage).toHaveBeenCalledOnce();
+        expect(module.createLogMessage).toHaveBeenCalledWith(settings.channelID, {
             case: entity,
             creator: interaction.user,
             reason: options.reason,
@@ -179,12 +179,11 @@ describe("warn", () => {
 
     it("should not log the case if there is no log channel configured", async () => {
         vi.spyOn(permissions, "isAboveMember").mockReturnValue(true);
-        const createSpy = vi.spyOn(module, "createLogMessage");
         settings.channelID = null;
 
         await warn(module, interaction, options);
 
-        expect(createSpy).not.toHaveBeenCalled();
+        expect(module.createLogMessage).not.toHaveBeenCalled();
     });
 
     describe("createSuccessMessage", () => {
