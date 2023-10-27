@@ -63,15 +63,15 @@ export async function warn(
                 }]
             }]
         });
+
+        await createSuccessMessage(module, interaction, entity.id, options.member.user);
     } catch (error: unknown) {
         if (!(error instanceof DiscordAPIError) || error.code !== 50007) {
             module.client.logger.error(error);
         }
 
-        return createSuccessMessage(module, interaction, entity.id, options.member.user, true);
+        await createSuccessMessage(module, interaction, entity.id, options.member.user, true);
     }
-
-    await createSuccessMessage(module, interaction, entity.id, options.member.user);
 
     const settings = await module.settings.getOrCreate(interaction.guildID);
     if (settings.channelID !== null) {
