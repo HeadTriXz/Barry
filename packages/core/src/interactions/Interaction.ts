@@ -31,7 +31,7 @@ export type AnyInteraction = ApplicationCommandInteraction
 /**
  * Represents an interaction that has been invoked in a guild.
  */
-type GuildInteraction<T extends Interaction> = T & Required<Pick<T, "guildID" | "guildLocale" | "member">>;
+export type GuildInteraction<T extends Interaction> = T & Required<Pick<T, "guildID" | "guildLocale" | "member">>;
 
 /**
  * Resolved data for an interaction.
@@ -88,6 +88,11 @@ export class Interaction {
     channel?: Partial<APIChannel> & Pick<APIChannel, "id" | "type">;
 
     /**
+     * The client that received the interaction.
+     */
+    client?: Client;
+
+    /**
      * The guild it was sent from.
      */
     guildID?: string;
@@ -128,11 +133,6 @@ export class Interaction {
     version: 1;
 
     /**
-     * The client that received the interaction.
-     */
-    #client?: Client;
-
-    /**
      * Represents an interaction.
      *
      * @param data The raw interaction.
@@ -155,7 +155,7 @@ export class Interaction {
         this.version = data.version;
 
         if (client !== undefined) {
-            this.#client = client;
+            this.client = client;
         }
 
         if (respond !== undefined) {
@@ -176,11 +176,11 @@ export class Interaction {
      * @param options The options for the response.
      */
     async createResponse(options: ResponseOptions<any>): Promise<void> {
-        if (this.#client === undefined) {
+        if (this.client === undefined) {
             throw new Error("Cannot send a response without a valid client.");
         }
 
-        await this.#client.api.rest.post(Routes.interactionCallback(this.id, this.token), {
+        await this.client.api.rest.post(Routes.interactionCallback(this.id, this.token), {
             auth: false,
             body: options.body,
             files: options.files,

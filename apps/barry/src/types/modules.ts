@@ -1,6 +1,3 @@
-import type { Application } from "../Application.js";
-import type { Module } from "@barry/core";
-
 /**
  * Represents the base settings for a module.
  */
@@ -36,7 +33,7 @@ export interface SettingsRepository<T extends BaseSettings> {
 /**
  * Represents a module with settings.
  */
-export interface ModuleWithSettings<T extends BaseSettings> extends Module<Application> {
+export interface ModuleWithSettings<T extends BaseSettings = BaseSettings> {
     /**
      * The settings repository for the module.
      */

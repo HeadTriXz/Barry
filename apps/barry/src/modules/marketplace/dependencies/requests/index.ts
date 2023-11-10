@@ -12,13 +12,15 @@ import {
     RequestsSettingsRepository
 } from "./database/index.js";
 import type { Application } from "../../../../Application.js";
+import type { ModuleWithSettings } from "../../../../types/modules.js";
 import type { RequestsSettings } from "@prisma/client";
 
 import {
-    ConfigurableModule,
-    GuildSettingOptionBuilder,
-    GuildSettingType
-} from "../../../../ConfigurableModule.js";
+    BooleanGuildSettingOption,
+    ChannelGuildSettingOption,
+    FloatGuildSettingOption
+} from "../../../../config/options/index.js";
+import { ConfigurableModule } from "../../../../config/module.js";
 import { DiscordAPIError } from "@discordjs/rest";
 import { getDWCEmbed } from "../../utils.js";
 import { getRequestContent } from "./editor/functions/content.js";
@@ -44,7 +46,9 @@ export enum RequestActionButton {
 /**
  * Represents the requests module.
  */
-export default class RequestsModule extends ConfigurableModule<RequestsSettings> {
+export default class RequestsModule extends ConfigurableModule<RequestsModule> implements ModuleWithSettings<
+    RequestsSettings
+> {
     /**
      * Repository class for managing request messages.
     */
@@ -79,24 +83,24 @@ export default class RequestsModule extends ConfigurableModule<RequestsSettings>
 
         this.defineConfig({
             settings: {
-                channelID: GuildSettingOptionBuilder.custom({
-                    base: GuildSettingType.Channel,
-                    callback: async (interaction, settings, originalHandler) => {
-                        await originalHandler();
-
-                        if (settings.channelID !== null) {
-                            await this.postButtons(settings.channelID);
-                        }
-                    },
+                channelID: new ChannelGuildSettingOption({
                     description: "The channel where requests are posted.",
                     name: "Requests Channel",
-                    nullable: true
+                    nullable: true,
+                    onEdit: async (self, interaction) => {
+                        await self.handle(interaction);
+
+                        const channelID = await self.store.get(interaction.guildID);
+                        if (channelID !== null) {
+                            await this.postButtons(channelID);
+                        }
+                    }
                 }),
-                enabled: GuildSettingOptionBuilder.boolean({
+                enabled: new BooleanGuildSettingOption({
                     description: "Whether this module is enabled.",
                     name: "Enabled"
                 }),
-                minCompensation: GuildSettingOptionBuilder.float({
+                minCompensation: new FloatGuildSettingOption({
                     description: "The minimum compensation for a request.",
                     minimum: 0,
                     name: "Minimum Compensation"

@@ -9,15 +9,23 @@ import {
 } from "@discordjs/core";
 import {
     type APIInteractionResponseCallbackDataWithFiles,
+    type GuildInteraction,
     type UpdatableInteraction,
     getAvatarURL
 } from "@barry/core";
+import type { Prisma, WelcomerSettings } from "@prisma/client";
 import type { Application } from "../../Application.js";
 import type { Image } from "@napi-rs/canvas";
-import type { WelcomerSettings } from "@prisma/client";
+import type { ModuleWithSettings } from "../../types/modules.js";
 
+import {
+    BooleanGuildSettingOption,
+    ChannelGuildSettingOption,
+    IntegerGuildSettingOption,
+    StringGuildSettingOption
+} from "../../config/options/index.js";
 import { Canvas, loadImage } from "canvas-constructor/napi-rs";
-import { ConfigurableModule, GuildSettingOptionBuilder } from "../../ConfigurableModule.js";
+import { ConfigurableModule } from "../../config/module.js";
 import { WelcomerSettingsRepository } from "./database/index.js";
 import { loadEvents } from "../../utils/loadFolder.js";
 import { timeoutContent } from "../../common.js";
@@ -26,7 +34,9 @@ import config from "../../config.js";
 /**
  * Represents the welcomer module.
  */
-export default class WelcomerModule extends ConfigurableModule<WelcomerSettings> {
+export default class WelcomerModule extends ConfigurableModule<WelcomerModule> implements ModuleWithSettings<
+    WelcomerSettings
+> {
     /**
      * The repository for managing the settings of this module.
      */
@@ -54,71 +64,79 @@ export default class WelcomerModule extends ConfigurableModule<WelcomerSettings>
 
         this.defineConfig({
             settings: {
-                channelID: GuildSettingOptionBuilder.channel({
+                channelID: new ChannelGuildSettingOption({
                     description: "The channel to send the welcome message in.",
                     name: "Welcome Channel",
                     nullable: true
                 }),
-                content: GuildSettingOptionBuilder.string({
+                content: new StringGuildSettingOption({
                     description: "The content of the welcome message (e.g., {user.mention}).",
                     name: "Welcome Message",
                     nullable: true
                 }),
-                embedAuthor: GuildSettingOptionBuilder.string({
+                embedAuthor: new StringGuildSettingOption({
                     description: "The author of the welcome message embed (e.g., {user.name}).",
                     name: "Embed Author",
                     nullable: true
                 }),
-                embedAuthorIcon: GuildSettingOptionBuilder.string({
+                embedAuthorIcon: new StringGuildSettingOption({
                     description: "The icon of the welcome message embed author (e.g., {user.avatar}).",
                     name: "Embed Author Icon",
                     nullable: true
                 }),
-                embedColor: GuildSettingOptionBuilder.custom({
-                    callback: this.handleColor.bind(this),
+                embedColor: new IntegerGuildSettingOption({
                     description: "The color of the welcome message embed.",
                     name: "Embed Color",
-                    nullable: true
+                    nullable: true,
+                    onEdit: async (self, interaction) => this.handleColor(self, interaction),
+                    onView: async (self, interaction) => {
+                        const embedColor = await self.store.get(interaction.guildID);
+                        if (embedColor !== null) {
+                            return `#${embedColor.toString(16).padStart(6, "0")}`;
+                        }
+
+                        return "`None`";
+                    }
                 }),
-                embedDescription: GuildSettingOptionBuilder.string({
+                embedDescription: new StringGuildSettingOption({
                     description: "The description of the welcome message embed.",
                     name: "Embed Description",
                     nullable: true
                 }),
-                embedFooter: GuildSettingOptionBuilder.string({
+                embedFooter: new StringGuildSettingOption({
                     description: "The footer of the welcome message embed.",
                     name: "Embed Footer",
                     nullable: true
                 }),
-                embedFooterIcon: GuildSettingOptionBuilder.string({
+                embedFooterIcon: new StringGuildSettingOption({
                     description: "The icon of the welcome message embed footer (e.g., {guild.icon}).",
                     name: "Embed Footer Icon",
                     nullable: true
                 }),
-                embedImage: GuildSettingOptionBuilder.string({
+                embedImage: new StringGuildSettingOption({
                     description: "The image of the welcome message embed.",
                     name: "Embed Image",
                     nullable: true
                 }),
-                embedThumbnail: GuildSettingOptionBuilder.string({
+                embedThumbnail: new StringGuildSettingOption({
                     description: "The thumbnail of the welcome message embed. (e.g., {guild.icon})",
                     name: "Embed Thumbnail",
                     nullable: true
                 }),
-                embedTimestamp: GuildSettingOptionBuilder.boolean({
+                embedTimestamp: new BooleanGuildSettingOption({
                     description: "Whether the welcome message embed should have a timestamp.",
                     name: "Embed Timestamp"
                 }),
-                embedTitle: GuildSettingOptionBuilder.string({
+                embedTitle: new StringGuildSettingOption({
                     description: "The title of the welcome message embed (e.g., {guild.name}).",
                     name: "Embed Title",
                     nullable: true
                 }),
-                enabled: GuildSettingOptionBuilder.boolean({
+                enabled: new BooleanGuildSettingOption({
                     description: "Whether this module is enabled.",
                     name: "Enabled"
                 }),
-                withImage: GuildSettingOptionBuilder.boolean({
+                withImage: new BooleanGuildSettingOption({
                     description: "Whether the welcome message should have a generated image.",
                     name: "With Generated Image"
                 })
@@ -256,7 +274,12 @@ export default class WelcomerModule extends ConfigurableModule<WelcomerSettings>
      * @param interaction The interaction that triggered the option.
      * @param settings The settings of the guild.
      */
-    async handleColor(interaction: UpdatableInteraction, settings: WelcomerSettings): Promise<void> {
+    async handleColor(
+        self: IntegerGuildSettingOption<Prisma.WelcomerSettingsCreateInput, "embedColor">,
+        interaction: GuildInteraction<UpdatableInteraction>
+    ): Promise<void> {
+        const oldColor = await self.store.get(interaction.guildID);
+
         const key = `config-color-${Date.now()}`;
         await interaction.createModal({
             components: [{
@@ -267,8 +290,8 @@ export default class WelcomerModule extends ConfigurableModule<WelcomerSettings>
                     placeholder: "The color of the welcome message embed.",
                     style: TextInputStyle.Short,
                     type: ComponentType.TextInput,
-                    value: settings.embedColor !== null
-                        ? `#${settings.embedColor.toString(16).padStart(6, "0")}`
+                    value: oldColor !== null
+                        ? `#${oldColor.toString(16).padStart(6, "0")}`
                         : ""
                 }],
                 type: ComponentType.ActionRow
@@ -295,11 +318,7 @@ export default class WelcomerModule extends ConfigurableModule<WelcomerSettings>
             });
         }
 
-        await this.settings.upsert(settings.guildID, {
-            embedColor: color
-        });
-
-        settings.embedColor = color;
+        await self.store.set(interaction.guildID, color);
     }
 
     /**

@@ -7,17 +7,18 @@ import {
 } from "@discordjs/core";
 import type { Profile, ProfilesSettings } from "@prisma/client";
 import type { Application } from "../../../../Application.js";
+import type { ModuleWithSettings } from "../../../../types/modules.js";
 
 import {
-    ConfigurableModule,
-    GuildSettingOptionBuilder,
-    GuildSettingType
-} from "../../../../ConfigurableModule.js";
+    BooleanGuildSettingOption,
+    ChannelGuildSettingOption
+} from "../../../../config/options/index.js";
 import {
     ProfileMessageRepository,
     ProfileRepository,
     ProfilesSettingsRepository
 } from "./database/index.js";
+import { ConfigurableModule } from "../../../../config/module.js";
 import { DiscordAPIError } from "@discordjs/rest";
 import { getDWCEmbed } from "../../utils.js";
 import { getProfileContent } from "./editor/functions/content.js";
@@ -43,7 +44,9 @@ export enum ProfileActionButton {
 /**
  * Represents the profile module.
  */
-export default class ProfilesModule extends ConfigurableModule<ProfilesSettings, ProfilesModule> {
+export default class ProfilesModule extends ConfigurableModule<ProfilesModule> implements ModuleWithSettings<
+    ProfilesSettings
+> {
     /**
      * Repository class for managing profile messages.
      */
@@ -78,20 +81,20 @@ export default class ProfilesModule extends ConfigurableModule<ProfilesSettings,
 
         this.defineConfig({
             settings: {
-                channelID: GuildSettingOptionBuilder.custom({
-                    base: GuildSettingType.Channel,
-                    callback: async (interaction, settings, originalHandler) => {
-                        await originalHandler();
-
-                        if (settings.channelID !== null) {
-                            await this.postButtons(settings.channelID!);
-                        }
-                    },
+                channelID: new ChannelGuildSettingOption({
                     description: "The channel where profiles are posted.",
                     name: "Profiles Channel",
-                    nullable: true
+                    nullable: true,
+                    onEdit: async (self, interaction) => {
+                        await self.handle(interaction);
+
+                        const channelID = await self.store.get(interaction.guildID);
+                        if (channelID !== null) {
+                            await this.postButtons(channelID);
+                        }
+                    }
                 }),
-                enabled: GuildSettingOptionBuilder.boolean({
+                enabled: new BooleanGuildSettingOption({
                     description: "Whether this module is enabled.",
                     name: "Enabled"
                 })
