@@ -79,7 +79,7 @@ export default class RewardsModule extends ConfigurableModule<RewardsModule> imp
      * @param level The level of the user.
      */
     async claimRewards(guildID: string, userID: string, level: number): Promise<void> {
-        const rewards = await this.rewards.getAbove(guildID, level);
+        const rewards = await this.rewards.getBelow(guildID, level);
         if (rewards.length === 0) {
             return;
         }

@@ -48,24 +48,6 @@ export class RewardRepository {
     }
 
     /**
-     * Retrieves all rewards above the specified level.
-     *
-     * @param guildID The ID of the guild.
-     * @param level The level to get the rewards for.
-     * @returns The rewards above the specified level.
-     */
-    async getAbove(guildID: string, level: number): Promise<Reward[]> {
-        return this.#prisma.reward.findMany({
-            where: {
-                guildID: guildID,
-                level: {
-                    gte: level
-                }
-            }
-        });
-    }
-
-    /**
      * Retrieves all rewards for the specified guild.
      *
      * @param guildID The ID of the guild.
@@ -74,6 +56,24 @@ export class RewardRepository {
     async getAll(guildID: string): Promise<Reward[]> {
         return this.#prisma.reward.findMany({
             where: { guildID }
+        });
+    }
+
+    /**
+     * Retrieves all rewards for the specified level.
+     *
+     * @param guildID The ID of the guild.
+     * @param level The level to get the rewards for.
+     * @returns The rewards for the specified level.
+     */
+    async getBelow(guildID: string, level: number): Promise<Reward[]> {
+        return this.#prisma.reward.findMany({
+            where: {
+                guildID: guildID,
+                level: {
+                    lte: level
+                }
+            }
         });
     }
 
