@@ -1,13 +1,34 @@
-import { ApplicationCommandInteraction, MessageComponentInteraction, ReplyableInteraction, UpdatableInteraction } from "@barry/core";
+import {
+    type MockSettings,
+    MockModule,
+    mockBooleanOption,
+    mockChannelArrayOption,
+    mockChannelOption,
+    mockEmojiOption,
+    mockRoleArrayOption,
+    mockRoleOption,
+    mockSettings,
+    mockStringOption
+} from "./mocks.js";
+import type { AnyGuildSettingOption } from "../../../../../../src/config/module.js";
+
+import {
+    ApplicationCommandInteraction,
+    MessageComponentInteraction,
+    ReplyableInteraction,
+    UpdatableInteraction
+} from "@barry/core";
+import {
+    createMockApplicationCommandInteraction,
+    createMockMessageComponentInteraction
+} from "@barry/testing";
+
+import { ComponentType } from "@discordjs/core";
+import { createMockApplication } from "../../../../../mocks/application.js";
+import { timeoutContent } from "../../../../../../src/common.js";
+
 import ConfigCommand from "../../../../../../src/modules/general/commands/chatinput/config/index.js";
 import GeneralModule from "../../../../../../src/modules/general/index.js";
-import { createMockApplication } from "../../../../../mocks/application.js";
-import { createMockApplicationCommandInteraction, createMockMessageComponentInteraction } from "@barry/testing";
-import { MockModule, mockBooleanOption, mockSettings, type MockSettings, mockChannelOption, mockChannelArrayOption, mockCustomOption, mockEmojiOption, mockRoleOption, mockRoleArrayOption, mockStringOption } from "./mocks.js";
-import { GuildSettingType } from "../../../../../../src/ConfigurableModule.js";
-import { ComponentType } from "@discordjs/core";
-import { ModifyGuildSettingHandlers } from "../../../../../../src/modules/general/commands/chatinput/config/handlers.js";
-import { timeoutContent } from "../../../../../../src/common.js";
 
 vi.mock("../../../../../../src/config.js", async (importOriginal) => {
     const original = await importOriginal<typeof import("../../../../../../src/config.js")>();
@@ -62,235 +83,57 @@ describe("/config", () => {
         });
     });
 
-    describe("formatValue", () => {
-        it("should return `None` if the value is `null`", () => {
-            settings.channelID = null as unknown as string;
-
-            const result = command.formatValue(settings, {
-                ...mockChannelOption,
-                key: "channelID",
-                nullable: true,
-                repository: mockModule.settings
-            });
-
-            expect(result).toBe("`None`");
-        });
-
-        it("should return `None` if the array is empty", () => {
-            settings.channels = [];
-
-            const result = command.formatValue(settings, {
-                ...mockChannelArrayOption,
-                key: "channels",
-                repository: mockModule.settings
-            });
-
-            expect(result).toBe("`None`");
-        });
-
-        describe("Boolean", () => {
-            it("should return `False` if the value is 'false'", () => {
-                settings.enabled = false;
-
-                const result = command.formatValue(settings, {
-                    ...mockBooleanOption,
-                    key: "enabled",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("`False`");
-            });
-
-            it("should return `True` if the value is 'true'", () => {
-                settings.enabled = true;
-
-                const result = command.formatValue(settings, {
-                    ...mockBooleanOption,
-                    key: "enabled",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("`True`");
-            });
-        });
-
-        describe("Channel", () => {
-            it("should return the channel mention if the value is a channel ID", () => {
-                settings.channelID = "123";
-
-                const result = command.formatValue(settings, {
-                    ...mockChannelOption,
-                    key: "channelID",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("<#123>");
-            });
-        });
-
-        describe("Channel Array", () => {
-            it("should return the channel mentions if the value is an array of channel IDs", () => {
-                settings.channels = ["123", "456"];
-
-                const result = command.formatValue(settings, {
-                    ...mockChannelArrayOption,
-                    key: "channels",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("<#123>, <#456>");
-            });
-        });
-
-        describe("Custom", () => {
-            it("should return the format of the base type if provided", () => {
-                settings.random = "123";
-
-                const result = command.formatValue(settings, {
-                    ...mockCustomOption,
-                    base: GuildSettingType.Channel,
-                    key: "random",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("<#123>");
-            });
-
-            it("should return the raw value if no base type is provided", () => {
-                settings.random = "bar";
-
-                const result = command.formatValue(settings, {
-                    ...mockCustomOption,
-                    key: "random",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("``bar``");
-            });
-        });
-
-        describe("Emoji", () => {
-            it("should return the custom emoji if the value is an emoji ID", () => {
-                settings.emojiID = "123";
-                settings.emojiName = "mock";
-
-                const result = command.formatValue(settings, {
-                    ...mockEmojiOption,
-                    key: "emojiID",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("<:mock:123>");
-            });
-
-            it("should return the emoji if the value is an emoji name", () => {
-                settings.emojiID = null;
-                settings.emojiName = "😄";
-
-                const result = command.formatValue(settings, {
-                    ...mockEmojiOption,
-                    key: "emojiName",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("😄");
-            });
-        });
-
-        describe("Role", () => {
-            it("should return the role mention if the value is a role ID", () => {
-                settings.roleID = "123";
-
-                const result = command.formatValue(settings, {
-                    ...mockRoleOption,
-                    key: "roleID",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("<@&123>");
-            });
-        });
-
-        describe("Role Array", () => {
-            it("should return the role mentions if the value is an array of role IDs", () => {
-                settings.roles = ["123", "456"];
-
-                const result = command.formatValue(settings, {
-                    ...mockRoleArrayOption,
-                    key: "roles",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("<@&123>, <@&456>");
-            });
-        });
-
-        describe("String", () => {
-            it("should return the value if it is a string", () => {
-                settings.text = "bar";
-
-                const result = command.formatValue(settings, {
-                    ...mockStringOption,
-                    key: "text",
-                    repository: mockModule.settings
-                });
-
-                expect(result).toBe("``bar``");
-            });
-        });
-    });
-
     describe("getEmoji", () => {
         it("should return the 'unknown' emoji if the value is 'null'", () => {
-            const result = command.getEmoji(GuildSettingType.Channel, null);
+            const result = command.getEmoji(mockChannelOption as unknown as AnyGuildSettingOption, null);
 
             expect(result.toString()).toBe("<:unknown:123>");
         });
 
         it("should return the 'check' emoji if the value is 'true'", () => {
-            const result = command.getEmoji(GuildSettingType.Boolean, true);
+            const result = command.getEmoji(mockBooleanOption as unknown as AnyGuildSettingOption, true);
 
             expect(result.toString()).toBe("<:check:123>");
         });
 
         it("should return the 'unavailable' emoji if the value is 'false'", () => {
-            const result = command.getEmoji(GuildSettingType.Boolean, false);
+            const result = command.getEmoji(mockBooleanOption as unknown as AnyGuildSettingOption, false);
 
             expect(result.toString()).toBe("<:unavailable:123>");
         });
 
         it("should return the 'channel' emoji if the value is of type 'Channel'", () => {
-            const result = command.getEmoji(GuildSettingType.Channel, "123");
+            const result = command.getEmoji(mockChannelOption as unknown as AnyGuildSettingOption, "123");
 
             expect(result.toString()).toBe("<:channel:123>");
         });
 
         it("should return the 'channel' emoji if the value is of type 'Channel Array'", () => {
-            const result = command.getEmoji(GuildSettingType.ChannelArray, ["123"]);
+            const result = command.getEmoji(mockChannelArrayOption as unknown as AnyGuildSettingOption, ["123"]);
 
             expect(result.toString()).toBe("<:channel:123>");
         });
 
         it("should return the 'role' emoji if the value is of type 'Role'", () => {
-            const result = command.getEmoji(GuildSettingType.Role, "123");
+            const result = command.getEmoji(mockRoleOption as unknown as AnyGuildSettingOption, "123");
 
             expect(result.toString()).toBe("<:role:123>");
         });
 
         it("should return the 'role' emoji if the value is of type 'Role Array'", () => {
-            const result = command.getEmoji(GuildSettingType.RoleArray, ["123"]);
+            const result = command.getEmoji(mockRoleArrayOption as unknown as AnyGuildSettingOption, ["123"]);
 
             expect(result.toString()).toBe("<:role:123>");
         });
 
         it("should return the 'emoji' emoji if the value is of type 'Emoji'", () => {
-            const result = command.getEmoji(GuildSettingType.Emoji, "😄");
+            const result = command.getEmoji(mockEmojiOption as unknown as AnyGuildSettingOption, "😄");
 
             expect(result.toString()).toBe("<:emoji:123>");
         });
 
         it("should return the 'add' emoji if the value is of type 'String'", () => {
-            const result = command.getEmoji(GuildSettingType.String, "foo");
+            const result = command.getEmoji(mockStringOption as unknown as AnyGuildSettingOption, "foo");
 
             expect(result.toString()).toBe("<:add:123>");
         });
@@ -324,17 +167,13 @@ describe("/config", () => {
                 return expect.unreachable("Expected the interaction to be a string select interaction.");
             }
 
-            const handlerSpy = vi.spyOn(ModifyGuildSettingHandlers.prototype, "handle").mockResolvedValue();
-            response.data.values = ["channelID"];
+            const handlerSpy = vi.spyOn(mockChannelOption, "onEdit").mockResolvedValue();
+            response.data.values = ["0"];
 
-            await command.showModule(interaction, "mock", {});
+            await command.showModule(interaction, "mock");
 
             expect(handlerSpy).toHaveBeenCalledOnce();
-            expect(handlerSpy).toHaveBeenCalledWith(response, settings, {
-                ...mockChannelOption,
-                key: "channelID",
-                repository: mockModule.settings
-            });
+            expect(handlerSpy).toHaveBeenCalledWith(mockChannelOption, response);
         });
 
         it("should continue listening for interactions if the user selects an option", async () => {
@@ -342,22 +181,20 @@ describe("/config", () => {
                 return expect.unreachable("Expected the interaction to be a string select interaction.");
             }
 
-            response.data.values = ["channelID"];
+            response.data.values = ["0"];
             const showSpy = vi.spyOn(command, "showModule");
 
-            await command.showModule(interaction, "mock", {});
+            await command.showModule(interaction, "mock");
 
             expect(showSpy).toHaveBeenCalledTimes(2);
-            expect(showSpy).toHaveBeenCalledWith(response, "mock", {
-                [mockModule.settings.constructor.name]: settings
-            });
+            expect(showSpy).toHaveBeenCalledWith(response, "mock");
         });
 
         it("should show the module's dependencies if the module has any", async () => {
             await command.client.modules.add(command.module);
             await command.module.dependencies.add(mockModule);
 
-            await command.showModule(interaction, command.module.id, {});
+            await command.showModule(interaction, command.module.id);
 
             expect(interaction.editParent).toHaveBeenCalledOnce();
             expect(interaction.editParent).toHaveBeenCalledWith(
@@ -381,7 +218,7 @@ describe("/config", () => {
         });
 
         it("should show the module's settings if the module has any", async () => {
-            await command.showModule(interaction, "mock", {});
+            await command.showModule(interaction, "mock");
 
             expect(interaction.editParent).toHaveBeenCalledOnce();
             expect(interaction.editParent).toHaveBeenCalledWith(
@@ -393,7 +230,7 @@ describe("/config", () => {
                                 description: mockChannelOption.description,
                                 emoji: expect.any(Object),
                                 label: mockChannelOption.name,
-                                value: "channelID"
+                                value: "0"
                             }]),
                             placeholder: "Select an option.",
                             type: ComponentType.StringSelect
@@ -404,23 +241,8 @@ describe("/config", () => {
             );
         });
 
-        it("should fetch the settings from the module", async () => {
-            await command.showModule(interaction, "mock", {});
-
-            expect(mockModule.settings.getOrCreate).toHaveBeenCalledOnce();
-            expect(mockModule.settings.getOrCreate).toHaveBeenCalledWith(interaction.guildID);
-        });
-
-        it("should use the cached settings if they exist", async () => {
-            await command.showModule(interaction, "mock", {
-                [mockModule.settings.constructor.name]: settings
-            });
-
-            expect(mockModule.settings.getOrCreate).not.toHaveBeenCalled();
-        });
-
         it("should go back to the module overview if the user selects the 'back' option", async () => {
-            await command.showModule(interaction, "mock", {});
+            await command.showModule(interaction, "mock");
 
             expect(command.showModules).toHaveBeenCalledOnce();
             expect(command.showModules).toHaveBeenCalledWith(response);
@@ -436,19 +258,17 @@ describe("/config", () => {
             const showSpy = vi.spyOn(command, "showModule");
             await mockModule.dependencies.add(mockModule);
 
-            await command.showModule(interaction, "mock", {});
+            await command.showModule(interaction, "mock");
 
             expect(showSpy).toHaveBeenCalledTimes(2);
-            expect(showSpy).toHaveBeenCalledWith(response, `${mockModule.id}.${mockModule.id}`, {
-                [mockModule.settings.constructor.name]: settings
-            });
+            expect(showSpy).toHaveBeenCalledWith(response, `${mockModule.id}.${mockModule.id}`);
         });
 
         it("should ignore if the interaction was invoked outside of a guild", async () => {
             const getSpy = vi.spyOn(command.client.modules, "get").mockReturnValue(mockModule);
             delete interaction.guildID;
 
-            await command.showModule(interaction, "mock", {});
+            await command.showModule(interaction, "mock");
 
             expect(getSpy).not.toHaveBeenCalled();
         });
@@ -456,7 +276,7 @@ describe("/config", () => {
         it("should throw an error if the module does not exist", async () => {
             vi.spyOn(command.client.modules, "get").mockReturnValue(undefined);
 
-            await expect(() => command.showModule(interaction, "mock", {})).rejects.toThrowError(
+            await expect(() => command.showModule(interaction, "mock")).rejects.toThrowError(
                 "Module 'mock' not found."
             );
         });
@@ -470,20 +290,8 @@ describe("/config", () => {
 
             await command.client.modules.add(command.module);
 
-            await expect(() => command.showModule(interaction, command.module.id, {})).rejects.toThrowError(
+            await expect(() => command.showModule(interaction, command.module.id)).rejects.toThrowError(
                 `Module '${command.module.id}' is not configurable.`
-            );
-        });
-
-        it("should throw an error if the setting does not exist", async () => {
-            if (!response.data.isStringSelect()) {
-                return expect.unreachable("Expected the interaction to be a string select interaction.");
-            }
-
-            response.data.values = ["foo"];
-
-            await expect(() => command.showModule(interaction, "mock", {})).rejects.toThrowError(
-                "Option 'foo' not found."
             );
         });
     });

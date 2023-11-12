@@ -27,6 +27,12 @@ export type AnyTypedGuildSettingOption<T extends BaseSettings, K extends keyof T
     = TypedGuildSettingOptionMap<T, K>[keyof TypedGuildSettingOptionMap<T, K>];
 
 /**
+ * Represents the data for configuring a module.
+ */
+export type AnyGuildSettingOptionsRepositoryData<T extends ConfigurableModule<T>> =
+    GuildSettingOptionsRepositoryData<ExtractRepositoryValues<T>>;
+
+/**
  * Represents any guild setting option.
  */
 export type AnyGuildSettingOption<
@@ -44,6 +50,13 @@ type Entries<T extends object> = Array<{ [P in keyof T]: [P, T[P]] }[keyof T]>;
  */
 export type ExtractRepositoryKeys<T extends ConfigurableModule<T>> = {
     [P in keyof T]: T[P] extends SettingsRepository<BaseSettings> ? P : never;
+}[keyof T];
+
+/**
+ * Represents the values of all repositories on a module.
+ */
+export type ExtractRepositoryValues<T extends ConfigurableModule<T>> = {
+    [P in keyof T]: T[P] extends SettingsRepository<infer U> ? U : never;
 }[keyof T];
 
 /**
@@ -100,7 +113,7 @@ export abstract class ConfigurableModule<
     /**
      * The configuration for the module.
      */
-    #options: AnyGuildSettingOption[] = [];
+    #options: Array<AnyGuildSettingOption<ExtractRepositoryValues<T>>> = [];
 
     /**
      * Defines the configuration for the module.
@@ -113,12 +126,12 @@ export abstract class ConfigurableModule<
                 continue;
             }
 
-            for (const [optionKey, option] of getEntries(options as GuildSettingOptionsRepositoryData<BaseSettings>)) {
+            for (const [optionKey, option] of getEntries(options as AnyGuildSettingOptionsRepositoryData<T>)) {
                 if (option === undefined) {
                     continue;
                 }
 
-                const repository = this[repositoryKey as keyof this] as SettingsRepository<BaseSettings>;
+                const repository = this[repositoryKey as keyof this] as SettingsRepository<ExtractRepositoryValues<T>>;
                 if (option instanceof EmojiGuildSettingOption) {
                     option.idStore.setRepository(repository);
                     option.nameStore.setRepository(repository);
@@ -147,7 +160,7 @@ export abstract class ConfigurableModule<
      *
      * @returns The configuration for the module.
      */
-    getConfig(): AnyGuildSettingOption[] {
+    getConfig(): Array<AnyGuildSettingOption<ExtractRepositoryValues<T>>> {
         return this.#options;
     }
 }

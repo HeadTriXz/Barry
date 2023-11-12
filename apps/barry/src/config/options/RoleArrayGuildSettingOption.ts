@@ -98,9 +98,7 @@ export class RoleArrayGuildSettingOption<
 
         await response.deferUpdate();
 
-        const newValue = response.data.values;
-        if (newValue !== value) {
-            await this.store.set(interaction.guildID, newValue as T[K]);
-        }
+        const roleIDs = response.data.values;
+        await this.store.set(interaction.guildID, roleIDs as T[K]);
     }
 }

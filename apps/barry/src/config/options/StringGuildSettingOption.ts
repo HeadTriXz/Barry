@@ -65,6 +65,7 @@ export class StringGuildSettingOption<
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
         const value = await this.store.get(interaction.guildID) as string | null;
+
         if (typeof value !== "string" && !(this.nullable && value === null)) {
             throw new Error(`The setting '${String(this.store.getKey())}' is not of type 'string'.`);
         }

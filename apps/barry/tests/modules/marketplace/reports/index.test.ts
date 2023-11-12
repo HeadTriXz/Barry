@@ -10,7 +10,6 @@ import {
 import { createMockMessageComponentInteraction, mockChannel } from "@barry/testing";
 
 import { LocalReportRepository } from "../../../../src/modules/marketplace/dependencies/reports/database/LocalReportRepository.js";
-import { ModifyGuildSettingHandlers } from "../../../../src/modules/general/commands/chatinput/config/handlers.js";
 import { REPORT_CHANNEL_GUIDELINES } from "../../../../src/modules/marketplace/dependencies/reports/content.js";
 import { ReportRepository } from "../../../../src/modules/marketplace/dependencies/reports/database/ReportRepository.js";
 import { ReportsSettingsRepository } from "../../../../src/modules/marketplace/dependencies/reports/database/ReportsSettingsRepository.js";
@@ -18,6 +17,7 @@ import { createMockApplication } from "../../../mocks/application.js";
 import { timeoutContent } from "../../../../src/common.js";
 
 import ReportsModule from "../../../../src/modules/marketplace/dependencies/reports/index.js";
+import { ChannelGuildSettingOption } from "../../../../src/config/options/ChannelGuildSettingOption.js";
 
 describe("ReportsModule", () => {
     let module: ReportsModule;
@@ -218,7 +218,6 @@ describe("ReportsModule", () => {
     describe("handleChannel", () => {
         let interaction: UpdatableInteraction;
         let response: MessageComponentInteraction;
-        let settings: ReportsSettings;
 
         beforeEach(() => {
             const data = createMockMessageComponentInteraction();
@@ -230,21 +229,8 @@ describe("ReportsModule", () => {
             response.appPermissions = PermissionFlagsBits.ManageChannels;
             response.editParent = vi.fn();
 
-            settings = {
-                channelID: mockChannel.id,
-                guildID: "68239102456844360",
-                tagAccepted: "79072635294295180",
-                tagCopyright: "79072635294295180",
-                tagFalseInformation: "79072635294295180",
-                tagIgnored: "79072635294295180",
-                tagInappropriate: "79072635294295180",
-                tagOpen: "79072635294295180",
-                tagOther: "79072635294295180",
-                tagScamsFraud: "79072635294295180"
-            };
-
             module.createChannel = vi.fn();
-            vi.spyOn(ModifyGuildSettingHandlers.prototype, "channel").mockResolvedValue(undefined);
+            ChannelGuildSettingOption.prototype.handle = vi.fn();
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
         });
 
@@ -254,7 +240,7 @@ describe("ReportsModule", () => {
             });
 
             it("should create a new channel if the user selects 'New Channel'", async () => {
-                await module.handleChannel(interaction, settings);
+                await module.handleChannel(interaction);
 
                 expect(module.createChannel).toHaveBeenCalledOnce();
                 expect(module.createChannel).toHaveBeenCalledWith("68239102456844360");
@@ -263,7 +249,7 @@ describe("ReportsModule", () => {
             it("should ignore if the interaction was not invoked in a guild", async () => {
                 delete response.guildID;
 
-                await module.handleChannel(interaction, settings);
+                await module.handleChannel(interaction);
 
                 expect(module.createChannel).not.toHaveBeenCalled();
             });
@@ -271,7 +257,7 @@ describe("ReportsModule", () => {
             it("should show an error message if the bot does not have sufficient permissions", async () => {
                 response.appPermissions = 0n;
 
-                await module.handleChannel(interaction, settings);
+                await module.handleChannel(interaction);
 
                 expect(response.editParent).toHaveBeenCalledOnce();
                 expect(response.editParent).toHaveBeenCalledWith({
@@ -287,17 +273,17 @@ describe("ReportsModule", () => {
             });
 
             it("should use an existing channel if the user selects 'Existing Channel'", async () => {
-                await module.handleChannel(interaction, settings);
+                await module.handleChannel(interaction);
 
                 expect(module.createChannel).not.toHaveBeenCalled();
-                expect(ModifyGuildSettingHandlers.prototype.channel).toHaveBeenCalledOnce();
+                expect(ChannelGuildSettingOption.prototype.handle).toHaveBeenCalledOnce();
             });
         });
 
         it("should show a timeout message if the user does not respond", async () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
 
-            await module.handleChannel(interaction, settings);
+            await module.handleChannel(interaction);
 
             expect(interaction.editParent).toHaveBeenCalledTimes(2);
             expect(interaction.editParent).toHaveBeenCalledWith(timeoutContent);
