@@ -11,6 +11,7 @@ import {
 } from "@barry/testing";
 import { IntegerGuildSettingOption } from "../../../src/config/options/IntegerGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { timeoutContent } from "../../../src/common.js";
 
@@ -30,7 +31,8 @@ describe("IntegerGuildSettingOption", () => {
             description: "The number of users to ban."
         });
 
-        option.store.setKey("count");
+        option.key = "count";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -59,14 +61,14 @@ describe("IntegerGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return '42' if the value is 42", async () => {
-            await option.store.set(interaction.guildID, 42);
+            await option.set(interaction.guildID, 42);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("``42``");
         });
 
         it("should return 'None' if the value is null", async () => {
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
@@ -94,7 +96,7 @@ describe("IntegerGuildSettingOption", () => {
 
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
 
-            await option.store.set(interaction.guildID, 15);
+            await option.set(interaction.guildID, 15);
         });
 
         it("should set the value to '42' if the user responds with '42'", async () => {
@@ -102,7 +104,7 @@ describe("IntegerGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(42);
         });
 
@@ -112,7 +114,7 @@ describe("IntegerGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(null);
         });
 
@@ -189,7 +191,7 @@ describe("IntegerGuildSettingOption", () => {
         });
 
         it("should throw an error if the value is not a number", async () => {
-            await option.store.set(interaction.guildID, "random");
+            await option.set(interaction.guildID, "random");
 
             await expect(() => option.handle(interaction)).rejects.toThrowError(
                 "The setting 'count' is not of type 'number'."
@@ -200,7 +202,7 @@ describe("IntegerGuildSettingOption", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
             option.nullable = true;
 
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await expect(option.handle(interaction)).resolves.not.toThrowError();
         });

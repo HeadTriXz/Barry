@@ -15,7 +15,7 @@ import { timeoutContent } from "../../common.js";
  */
 export class RoleGuildSettingOption<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends TypedGuildSettingOption<RoleGuildSettingOption<T, K>, T, K> {
     /**
      * Represents a role guild setting.
@@ -38,7 +38,7 @@ export class RoleGuildSettingOption<
      * @returns The formatted string.
      */
     async getValue(interaction: GuildInteraction<UpdatableInteraction>): Promise<string> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
         return value !== null
             ? `<@&${value}>`
             : "`None`";
@@ -50,10 +50,10 @@ export class RoleGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
 
         if (typeof value !== "string" && !(this.nullable && value === null)) {
-            throw new Error(`The setting '${String(this.store.getKey())}' is not of type 'string'.`);
+            throw new Error(`The setting '${this.key}' is not of type 'string'.`);
         }
 
         await interaction.editParent({
@@ -85,7 +85,7 @@ export class RoleGuildSettingOption<
 
         const newValue = response.data.values[0] || null;
         if (newValue !== value) {
-            await this.store.set(interaction.guildID, newValue as T[K]);
+            await this.set(interaction.guildID, newValue as T[K]);
         }
     }
 }

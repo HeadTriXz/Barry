@@ -4,26 +4,27 @@ import {
     CustomGuildSettingOption
 } from "./option.js";
 import type { BaseSettings, SettingsRepository } from "../types/modules.js";
-import {
-    type BooleanGuildSettingOption,
-    type ChannelArrayGuildSettingOption,
-    type ChannelGuildSettingOption,
-    type EnumGuildSettingOption,
-    type FloatGuildSettingOption,
-    type IntegerGuildSettingOption,
-    type RoleArrayGuildSettingOption,
-    type RoleGuildSettingOption,
-    type StringGuildSettingOption,
-    EmojiGuildSettingOption
+import type {
+    BooleanGuildSettingOption,
+    ChannelArrayGuildSettingOption,
+    ChannelGuildSettingOption,
+    EmojiGuildSettingOption,
+    EnumGuildSettingOption,
+    FloatGuildSettingOption,
+    IntegerGuildSettingOption,
+    RoleArrayGuildSettingOption,
+    RoleGuildSettingOption,
+    StringGuildSettingOption
 } from "./options/index.js";
 import type { Application } from "../Application.js";
 
+import { GuildSettingsStore } from "./store.js";
 import { Module } from "@barry/core";
 
 /**
  * Represents any typed guild setting option.
  */
-export type AnyTypedGuildSettingOption<T extends BaseSettings, K extends keyof T>
+export type AnyTypedGuildSettingOption<T extends BaseSettings, K extends Extract<keyof T, string>>
     = TypedGuildSettingOptionMap<T, K>[keyof TypedGuildSettingOptionMap<T, K>];
 
 /**
@@ -37,8 +38,8 @@ export type AnyGuildSettingOptionsRepositoryData<T extends ConfigurableModule<T>
  */
 export type AnyGuildSettingOption<
     T extends BaseSettings = BaseSettings,
-    K extends keyof T = keyof T
-> = AnyTypedGuildSettingOption<T, K> | CustomGuildSettingOption;
+    K extends Extract<keyof T, string> = Extract<keyof T, string>
+> = AnyTypedGuildSettingOption<T, K> | CustomGuildSettingOption<unknown>;
 
 /**
  * Represents entries ([key, value][]) of an object.
@@ -72,7 +73,7 @@ export type GuildSettingOptionsData<T extends ConfigurableModule<T>> = {
  * Represents the data for configuring a repository.
  */
 export type GuildSettingOptionsRepositoryData<T extends BaseSettings> = {
-    [K in keyof T]: AnyTypedGuildSettingOption<T, K>;
+    [K in Extract<keyof T, string>]: AnyTypedGuildSettingOption<T, K>;
 };
 
 /**
@@ -80,12 +81,12 @@ export type GuildSettingOptionsRepositoryData<T extends BaseSettings> = {
  */
 export interface TypedGuildSettingOptionMap<
     T extends BaseSettings,
-    K extends keyof T = keyof T
+    K extends Extract<keyof T, string> = Extract<keyof T, string>
 > {
     [GuildSettingType.Boolean]: BooleanGuildSettingOption<T, K>;
     [GuildSettingType.Channel]: ChannelGuildSettingOption<T, K>;
     [GuildSettingType.ChannelArray]: ChannelArrayGuildSettingOption<T, K>;
-    [GuildSettingType.Emoji]: EmojiGuildSettingOption<T, any, any>;
+    [GuildSettingType.Emoji]: EmojiGuildSettingOption<T, any, K>;
     [GuildSettingType.Enum]: EnumGuildSettingOption<T, K>;
     [GuildSettingType.Float]: FloatGuildSettingOption<T, K>;
     [GuildSettingType.Integer]: IntegerGuildSettingOption<T, K>;
@@ -126,19 +127,17 @@ export abstract class ConfigurableModule<
                 continue;
             }
 
+            const repository = this[repositoryKey as keyof this] as SettingsRepository<ExtractRepositoryValues<T>>;
+            const store = new GuildSettingsStore<ExtractRepositoryValues<T>>()
+                .setRepository(repository);
+
             for (const [optionKey, option] of getEntries(options as AnyGuildSettingOptionsRepositoryData<T>)) {
                 if (option === undefined) {
                     continue;
                 }
 
-                const repository = this[repositoryKey as keyof this] as SettingsRepository<ExtractRepositoryValues<T>>;
-                if (option instanceof EmojiGuildSettingOption) {
-                    option.idStore.setRepository(repository);
-                    option.nameStore.setRepository(repository);
-                } else {
-                    option.store.setKey(optionKey);
-                    option.store.setRepository(repository);
-                }
+                option.store = store;
+                option.key = optionKey;
 
                 this.#options.push(option);
             }
@@ -150,7 +149,7 @@ export abstract class ConfigurableModule<
      *
      * @param data The data for the custom option.
      */
-    defineCustom(data: BaseGuildSettingOptionData<CustomGuildSettingOption>): void {
+    defineCustom(data: BaseGuildSettingOptionData<CustomGuildSettingOption<any>>): void {
         const option = new CustomGuildSettingOption(data);
         this.#options.push(option);
     }

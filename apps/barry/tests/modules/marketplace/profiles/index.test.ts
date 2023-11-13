@@ -58,10 +58,12 @@ describe("ProfilesModule", () => {
 
             const config = module.getConfig();
             const option = config.find((option) => {
-                return "store" in option && option.store.getKey() === "channelID";
+                return "key" in option && option.key === "channelID";
             }) as ChannelGuildSettingOption<any, any>;
 
-            await option.store.set(guildID, channelID);
+            vi.spyOn(module.settings, "upsert").mockResolvedValue(settings);
+
+            await option.set(guildID, channelID);
             const data = createMockMessageComponentInteraction();
             const interaction = new UpdatableInteraction(data, module.client, vi.fn());
 

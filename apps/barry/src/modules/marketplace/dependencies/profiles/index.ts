@@ -88,7 +88,7 @@ export default class ProfilesModule extends ConfigurableModule<ProfilesModule> i
                     onEdit: async (self, interaction) => {
                         await self.handle(interaction);
 
-                        const channelID = await self.store.get(interaction.guildID);
+                        const channelID = await self.get(interaction.guildID);
                         if (channelID !== null) {
                             await this.postButtons(channelID);
                         }

@@ -11,6 +11,7 @@ import {
 } from "@barry/testing";
 import { FloatGuildSettingOption } from "../../../src/config/options/FloatGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { timeoutContent } from "../../../src/common.js";
 
@@ -30,7 +31,8 @@ describe("FloatGuildSettingOption", () => {
             description: "The chance to ban all users."
         });
 
-        option.store.setKey("chance");
+        option.key = "chance";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -59,14 +61,14 @@ describe("FloatGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return '0.5' if the value is 0.5", async () => {
-            await option.store.set(interaction.guildID, 0.5);
+            await option.set(interaction.guildID, 0.5);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("``0.5``");
         });
 
         it("should return 'None' if the value is null", async () => {
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
@@ -94,7 +96,7 @@ describe("FloatGuildSettingOption", () => {
 
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
 
-            await option.store.set(interaction.guildID, 0.5);
+            await option.set(interaction.guildID, 0.5);
         });
 
         it("should set the value to '0.7' if the user responds with '0.7'", async () => {
@@ -102,7 +104,7 @@ describe("FloatGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(0.7);
         });
 
@@ -112,7 +114,7 @@ describe("FloatGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(null);
         });
 
@@ -177,7 +179,7 @@ describe("FloatGuildSettingOption", () => {
         });
 
         it("should throw an error if the value is not a number", async () => {
-            await option.store.set(interaction.guildID, "random");
+            await option.set(interaction.guildID, "random");
 
             await expect(() => option.handle(interaction)).rejects.toThrowError(
                 "The setting 'chance' is not of type 'number'."
@@ -188,7 +190,7 @@ describe("FloatGuildSettingOption", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
             option.nullable = true;
 
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await expect(option.handle(interaction)).resolves.not.toThrowError();
         });

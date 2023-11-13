@@ -217,6 +217,7 @@ describe("ReportsModule", () => {
 
     describe("handleChannel", () => {
         let interaction: UpdatableInteraction;
+        let option: ChannelGuildSettingOption<ReportsSettings, "channelID">;
         let response: MessageComponentInteraction;
 
         beforeEach(() => {
@@ -229,6 +230,11 @@ describe("ReportsModule", () => {
             response.appPermissions = PermissionFlagsBits.ManageChannels;
             response.editParent = vi.fn();
 
+            const config = module.getConfig();
+            option = config.find((option) => {
+                return "key" in option && option.key === "channelID";
+            }) as ChannelGuildSettingOption<ReportsSettings, "channelID">;
+
             module.createChannel = vi.fn();
             ChannelGuildSettingOption.prototype.handle = vi.fn();
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(response);
@@ -240,7 +246,7 @@ describe("ReportsModule", () => {
             });
 
             it("should create a new channel if the user selects 'New Channel'", async () => {
-                await module.handleChannel(interaction);
+                await module.handleChannel(option, interaction);
 
                 expect(module.createChannel).toHaveBeenCalledOnce();
                 expect(module.createChannel).toHaveBeenCalledWith("68239102456844360");
@@ -249,7 +255,7 @@ describe("ReportsModule", () => {
             it("should ignore if the interaction was not invoked in a guild", async () => {
                 delete response.guildID;
 
-                await module.handleChannel(interaction);
+                await module.handleChannel(option, interaction);
 
                 expect(module.createChannel).not.toHaveBeenCalled();
             });
@@ -257,7 +263,7 @@ describe("ReportsModule", () => {
             it("should show an error message if the bot does not have sufficient permissions", async () => {
                 response.appPermissions = 0n;
 
-                await module.handleChannel(interaction);
+                await module.handleChannel(option, interaction);
 
                 expect(response.editParent).toHaveBeenCalledOnce();
                 expect(response.editParent).toHaveBeenCalledWith({
@@ -273,7 +279,7 @@ describe("ReportsModule", () => {
             });
 
             it("should use an existing channel if the user selects 'Existing Channel'", async () => {
-                await module.handleChannel(interaction);
+                await module.handleChannel(option, interaction);
 
                 expect(module.createChannel).not.toHaveBeenCalled();
                 expect(ChannelGuildSettingOption.prototype.handle).toHaveBeenCalledOnce();
@@ -283,7 +289,7 @@ describe("ReportsModule", () => {
         it("should show a timeout message if the user does not respond", async () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
 
-            await module.handleChannel(interaction);
+            await module.handleChannel(option, interaction);
 
             expect(interaction.editParent).toHaveBeenCalledTimes(2);
             expect(interaction.editParent).toHaveBeenCalledWith(timeoutContent);

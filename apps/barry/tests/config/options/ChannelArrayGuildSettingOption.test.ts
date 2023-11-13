@@ -7,6 +7,7 @@ import {
 import { ChannelType, ComponentType } from "@discordjs/core";
 import { ChannelArrayGuildSettingOption } from "../../../src/config/options/ChannelArrayGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { createMockMessageComponentInteraction } from "@barry/testing";
 import { timeoutContent } from "../../../src/common.js";
@@ -26,7 +27,8 @@ describe("ChannelArrayGuildSettingOption", () => {
             description: "The channels to send messages in."
         });
 
-        option.store.setKey("channels");
+        option.key = "channels";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -55,21 +57,21 @@ describe("ChannelArrayGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return '<#general>' if the value is '#general'", async () => {
-            await option.store.set(interaction.guildID, ["general"]);
+            await option.set(interaction.guildID, ["general"]);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("<#general>");
         });
 
         it("should return '<#general>, <#random>' if the value is '#general', '#random'", async () => {
-            await option.store.set(interaction.guildID, ["general", "random"]);
+            await option.set(interaction.guildID, ["general", "random"]);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("<#general>, <#random>");
         });
 
         it("should return '`None`' if the value is null", async () => {
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
@@ -78,7 +80,7 @@ describe("ChannelArrayGuildSettingOption", () => {
 
     describe("handle", () => {
         beforeEach(async () => {
-            await option.store.set(interaction.guildID, ["random"]);
+            await option.set(interaction.guildID, ["random"]);
         });
 
         it("should set the value to '#general' if the users selects '#general'", async () => {
@@ -95,7 +97,7 @@ describe("ChannelArrayGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toEqual(["general"]);
         });
 
@@ -113,7 +115,7 @@ describe("ChannelArrayGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toEqual(["general", "random"]);
         });
 
@@ -190,7 +192,7 @@ describe("ChannelArrayGuildSettingOption", () => {
         });
 
         it("should throw an error if the value is not an array", async () => {
-            await option.store.set(interaction.guildID, "random");
+            await option.set(interaction.guildID, "random");
 
             await expect(option.handle(interaction)).rejects.toThrowError(
                 "The setting 'channels' is not of type 'string[]'."
@@ -201,7 +203,7 @@ describe("ChannelArrayGuildSettingOption", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
 
             option.nullable = true;
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await expect(option.handle(interaction)).resolves.not.toThrowError();
         });

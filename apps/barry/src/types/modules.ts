@@ -27,7 +27,7 @@ export interface SettingsRepository<T extends BaseSettings> {
      * @param settings The settings to update.
      * @returns The updated settings record.
      */
-    upsert(guildID: string, settings: Omit<T, "guildID">): Promise<T>;
+    upsert(guildID: string, settings: Partial<Omit<T, "guildID">>): Promise<T>;
 }
 
 /**

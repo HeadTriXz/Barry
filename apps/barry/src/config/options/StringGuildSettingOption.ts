@@ -16,7 +16,7 @@ import config from "../../config.js";
  */
 export class StringGuildSettingOption<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends TypedGuildSettingOption<StringGuildSettingOption<T, K>, T, K> {
     /**
      * The maximum length of the setting.
@@ -52,7 +52,7 @@ export class StringGuildSettingOption<
      * @returns The formatted string.
      */
     async getValue(interaction: GuildInteraction<UpdatableInteraction>): Promise<string> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
         return value !== null
             ? `\`\`${value}\`\``
             : "`None`";
@@ -64,10 +64,10 @@ export class StringGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const value = await this.store.get(interaction.guildID) as string | null;
+        const value = await this.get(interaction.guildID) as string | null;
 
         if (typeof value !== "string" && !(this.nullable && value === null)) {
-            throw new Error(`The setting '${String(this.store.getKey())}' is not of type 'string'.`);
+            throw new Error(`The setting '${this.key}' is not of type 'string'.`);
         }
 
         const key = `config-string-${Date.now()}`;
@@ -105,7 +105,7 @@ export class StringGuildSettingOption<
         }
 
         if (string !== value) {
-            await this.store.set(interaction.guildID, string as T[K]);
+            await this.set(interaction.guildID, string as T[K]);
         }
     }
 }

@@ -9,6 +9,7 @@ import {
     createMockModalSubmitInteraction
 } from "@barry/testing";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { StringGuildSettingOption } from "../../../src/config/options/StringGuildSettingOption.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { timeoutContent } from "../../../src/common.js";
@@ -29,7 +30,8 @@ describe("StringGuildSettingOption", () => {
             description: "The prefix to use for commands."
         });
 
-        option.store.setKey("prefix");
+        option.key = "prefix";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -58,7 +60,7 @@ describe("StringGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return the value if it exists", async () => {
-            await option.store.set(interaction.guildID, "!");
+            await option.set(interaction.guildID, "!");
 
             const value = await option.getValue(interaction);
 
@@ -93,7 +95,7 @@ describe("StringGuildSettingOption", () => {
 
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
 
-            await option.store.set(interaction.guildID, "!");
+            await option.set(interaction.guildID, "!");
         });
 
         it("should set the value to '?' if the user submits '?'", async () => {
@@ -101,7 +103,7 @@ describe("StringGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe("?");
         });
 
@@ -110,7 +112,7 @@ describe("StringGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBeNull();
         });
 
@@ -180,7 +182,7 @@ describe("StringGuildSettingOption", () => {
         });
 
         it("should throw an error if the value is not a string", async () => {
-            await option.store.set(interaction.guildID, 1);
+            await option.set(interaction.guildID, 1);
 
             await expect(() => option.handle(interaction)).rejects.toThrowError(
                 "The setting 'prefix' is not of type 'string'."
@@ -191,7 +193,7 @@ describe("StringGuildSettingOption", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
             option.nullable = true;
 
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await expect(option.handle(interaction)).resolves.not.toThrowError();
         });

@@ -15,7 +15,7 @@ import { timeoutContent } from "../../common.js";
  */
 export interface ChannelGuildSettingOptionData<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends BaseGuildSettingOptionData<ChannelGuildSettingOption<T, K>> {
     /**
      * The types of channels that can be selected.
@@ -28,7 +28,7 @@ export interface ChannelGuildSettingOptionData<
  */
 export class ChannelGuildSettingOption<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends TypedGuildSettingOption<ChannelGuildSettingOption<T, K>, T, K> {
     /**
      * The types of channels that can be selected.
@@ -58,7 +58,7 @@ export class ChannelGuildSettingOption<
      * @returns The formatted string.
      */
     async getValue(interaction: GuildInteraction<UpdatableInteraction>): Promise<string> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
         return value !== null
             ? `<#${value}>`
             : "`None`";
@@ -70,10 +70,10 @@ export class ChannelGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
 
         if (typeof value !== "string" && !(this.nullable && value === null)) {
-            throw new Error(`The setting '${String(this.store.getKey())}' is not of type 'string'.`);
+            throw new Error(`The setting '${this.key}' is not of type 'string'.`);
         }
 
         await interaction.editParent({
@@ -106,7 +106,7 @@ export class ChannelGuildSettingOption<
 
         const channelID = response.data.values[0] || null;
         if (channelID !== value) {
-            await this.store.set(interaction.guildID, channelID as T[K]);
+            await this.set(interaction.guildID, channelID as T[K]);
         }
     }
 }

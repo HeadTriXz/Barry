@@ -1,6 +1,7 @@
 import { type GuildInteraction, UpdatableInteraction } from "@barry/core";
 import { BooleanGuildSettingOption } from "../../../src/config/options/BooleanGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { createMockMessageComponentInteraction } from "@barry/testing";
 
@@ -18,7 +19,8 @@ describe("BooleanGuildSettingOption", () => {
             description: "Whether the module is enabled."
         });
 
-        option.store.setKey("enabled");
+        option.key = "enabled";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -47,21 +49,21 @@ describe("BooleanGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return '`True`' if the value is true", async () => {
-            await option.store.set(interaction.guildID, true);
+            await option.set(interaction.guildID, true);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`True`");
         });
 
         it("should return '`False`' if the value is false", async () => {
-            await option.store.set(interaction.guildID, false);
+            await option.set(interaction.guildID, false);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`False`");
         });
 
         it("should return '`None`' if the value is null", async () => {
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
@@ -70,35 +72,35 @@ describe("BooleanGuildSettingOption", () => {
 
     describe("handle", () => {
         it("should set the value to true if it is false", async () => {
-            await option.store.set(interaction.guildID, false);
+            await option.set(interaction.guildID, false);
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(true);
         });
 
         it("should set the value to false if it is true", async () => {
-            await option.store.set(interaction.guildID, true);
+            await option.set(interaction.guildID, true);
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(false);
         });
 
         it("should set the value to true if it is null", async () => {
             option.nullable = true;
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(true);
         });
 
         it("should throw an error if the value is not a boolean", async () => {
-            await option.store.set(interaction.guildID, "test");
+            await option.set(interaction.guildID, "test");
 
             await expect(() => option.handle(interaction)).rejects.toThrow("The setting 'enabled' is not of type 'boolean'.");
         });

@@ -15,7 +15,7 @@ import { timeoutContent } from "../../common.js";
  */
 export interface EnumGuildSettingOptionData<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends BaseGuildSettingOptionData<EnumGuildSettingOption<T, K>> {
     /**
      * The values of the setting.
@@ -28,7 +28,7 @@ export interface EnumGuildSettingOptionData<
  */
 export class EnumGuildSettingOption<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends TypedGuildSettingOption<EnumGuildSettingOption<T, K>, T, K> {
     /**
      * The values that can be selected.
@@ -58,7 +58,7 @@ export class EnumGuildSettingOption<
      * @returns The formatted string.
      */
     async getValue(interaction: GuildInteraction<UpdatableInteraction>): Promise<string> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
         return value !== null
             ? `\`\`${value}\`\``
             : "`None`";
@@ -70,10 +70,10 @@ export class EnumGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const oldValue = await this.store.get(interaction.guildID);
+        const oldValue = await this.get(interaction.guildID);
 
         if (typeof oldValue !== "string" && !(this.nullable && oldValue === null)) {
-            throw new Error(`The setting '${String(this.store.getKey())}' is not of type 'string'.`);
+            throw new Error(`The setting '${this.key}' is not of type 'string'.`);
         }
 
         await interaction.editParent({
@@ -106,7 +106,7 @@ export class EnumGuildSettingOption<
 
         const newValue = response.data.values[0] || null;
         if (newValue !== oldValue) {
-            await this.store.set(interaction.guildID, newValue as T[K]);
+            await this.set(interaction.guildID, newValue as T[K]);
         }
     }
 }

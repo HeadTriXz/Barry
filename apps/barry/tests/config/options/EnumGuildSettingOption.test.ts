@@ -7,6 +7,7 @@ import {
 import { ComponentType } from "@discordjs/core";
 import { EnumGuildSettingOption } from "../../../src/config/options/EnumGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { createMockMessageComponentInteraction } from "@barry/testing";
 import { timeoutContent } from "../../../src/common.js";
@@ -27,7 +28,8 @@ describe("EnumGuildSettingOption", () => {
             values: ["!", "?", "/"]
         });
 
-        option.store.setKey("prefix");
+        option.key = "prefix";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -56,7 +58,7 @@ describe("EnumGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return the value if it exists", async () => {
-            await option.store.set(interaction.guildID, "?");
+            await option.set(interaction.guildID, "?");
 
             const value = await option.getValue(interaction);
 
@@ -72,7 +74,7 @@ describe("EnumGuildSettingOption", () => {
 
     describe("handle", () => {
         beforeEach(async () => {
-            await option.store.set(interaction.guildID, "?");
+            await option.set(interaction.guildID, "?");
         });
 
         it("should set the value to '!' if the user selects '!'", async () => {
@@ -86,7 +88,7 @@ describe("EnumGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe("!");
         });
 
@@ -103,7 +105,7 @@ describe("EnumGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBeNull();
         });
 
@@ -117,7 +119,7 @@ describe("EnumGuildSettingOption", () => {
         });
 
         it("should throw an error if the value is not a string", async () => {
-            await option.store.set(interaction.guildID, 100);
+            await option.set(interaction.guildID, 100);
 
             await expect(option.handle(interaction)).rejects.toThrowError(
                 "The setting 'prefix' is not of type 'string'."
@@ -128,7 +130,7 @@ describe("EnumGuildSettingOption", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
             option.nullable = true;
 
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await expect(option.handle(interaction)).resolves.not.toThrowError();
         });

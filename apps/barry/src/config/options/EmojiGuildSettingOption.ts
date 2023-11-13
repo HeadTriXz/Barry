@@ -1,15 +1,14 @@
 import {
     type BaseGuildSettingOptionData,
     type OptionalCallback,
-    BaseGuildSettingOption,
-    GuildSettingType
+    GuildSettingType,
+    TypedGuildSettingOption
 } from "../option.js";
 import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
 import type { BaseSettings } from "../../types/modules.js";
 
 import { ComponentType, MessageFlags, TextInputStyle } from "@discordjs/core";
 import { getEmoji, normalizeEmoji } from "../emojis.js";
-import { GuildSettingStore } from "../store.js";
 import { timeoutContent } from "../../common.js";
 import config from "../../config.js";
 
@@ -37,8 +36,8 @@ export interface EmojiGuildSettingOptionKeys<
  */
 export interface EmojiGuildSettingOptionData<
     T extends BaseSettings,
-    IK extends keyof T,
-    NK extends keyof T
+    IK extends Extract<keyof T, string>,
+    NK extends Extract<keyof T, string>
 > extends BaseGuildSettingOptionData<EmojiGuildSettingOption<T, IK, NK>> {
     /**
      * The keys for the emoji option.
@@ -51,18 +50,18 @@ export interface EmojiGuildSettingOptionData<
  */
 export class EmojiGuildSettingOption<
     T extends BaseSettings,
-    IK extends keyof T,
-    NK extends keyof T
-> extends BaseGuildSettingOption<EmojiGuildSettingOption<T, IK, NK>> {
+    IK extends Extract<keyof T, string>,
+    NK extends Extract<keyof T, string>
+> extends TypedGuildSettingOption<EmojiGuildSettingOption<T, IK, NK>, T, NK> {
     /**
-     * The store for the emoji ID.
+     * The key of the emoji ID.
      */
-    idStore: GuildSettingStore<T, IK> = new GuildSettingStore();
+    idKey: IK;
 
     /**
-     * The store for the emoji name.
+     * The key of the emoji name.
      */
-    nameStore: GuildSettingStore<T, NK> = new GuildSettingStore();
+    nameKey: NK;
 
     /**
      * The type of the setting.
@@ -78,11 +77,12 @@ export class EmojiGuildSettingOption<
         super({
             onEdit: (self, interaction) => this.handle(interaction),
             onView: (self, interaction) => this.getValue(interaction),
+            type: GuildSettingType.Emoji,
             ...options
         });
 
-        this.idStore.setKey(options.emojiKeys.id);
-        this.nameStore.setKey(options.emojiKeys.name);
+        this.idKey = options.emojiKeys.id;
+        this.nameKey = options.emojiKeys.name;
     }
 
     /**
@@ -92,8 +92,12 @@ export class EmojiGuildSettingOption<
      * @returns The formatted string.
      */
     async getValue(interaction: GuildInteraction<UpdatableInteraction>): Promise<string> {
-        const id = await this.idStore.get(interaction.guildID) as string | null;
-        const name = await this.nameStore.get(interaction.guildID) as string | null;
+        if (this.store === undefined) {
+            throw new Error("The store of the setting is undefined.");
+        }
+
+        const id = await this.store.getValue(interaction.guildID, this.idKey) as string | null;
+        const name = await this.store.getValue(interaction.guildID, this.nameKey) as string | null;
 
         if (name === null) {
             return "`None`";
@@ -110,15 +114,19 @@ export class EmojiGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const id = await this.idStore.get(interaction.guildID) as string | null;
-        const name = await this.nameStore.get(interaction.guildID) as string | null;
+        if (this.store === undefined) {
+            throw new Error("The store of the setting is undefined.");
+        }
+
+        const id = await this.store.getValue(interaction.guildID, this.idKey) as string | null;
+        const name = await this.store.getValue(interaction.guildID, this.nameKey) as string | null;
 
         if (typeof id !== "string" && id !== null) {
-            throw new Error(`The setting '${String(this.idStore.getKey())}' is not of type 'string'.`);
+            throw new Error(`The setting '${this.idKey}' is not of type 'string'.`);
         }
 
         if (typeof name !== "string" && !(this.nullable && name === null)) {
-            throw new Error(`The setting '${String(this.nameStore.getKey())}' is not of type 'string'.`);
+            throw new Error(`The setting '${this.nameKey}' is not of type 'string'.`);
         }
 
         const key = `config-emoji-${Date.now()}`;
@@ -172,12 +180,11 @@ export class EmojiGuildSettingOption<
             });
         }
 
-        if (emojiID !== id) {
-            await this.idStore.set(interaction.guildID, emojiID as T[IK]);
-        }
-
-        if (emojiName !== name) {
-            await this.nameStore.set(interaction.guildID, emojiName as T[NK]);
+        if (emojiID !== id || emojiName !== name) {
+            await this.store.set(interaction.guildID, {
+                [this.idKey]: emojiID,
+                [this.nameKey]: emojiName
+            } as unknown as T);
         }
     }
 }

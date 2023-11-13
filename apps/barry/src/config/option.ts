@@ -1,7 +1,7 @@
 import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
+import type { GuildSettingsStore, Nullable } from "./store.js";
 import type { BaseSettings } from "../types/modules.js";
 
-import { GuildSettingStore } from "./store.js";
 import { ChannelType } from "@discordjs/core";
 
 /**
@@ -117,7 +117,7 @@ export interface TypedGuildSettingOptionData<
 /**
  * Represents a configurable guild setting.
  */
-export class BaseGuildSettingOption<T extends BaseGuildSettingOption<T>> {
+export abstract class BaseGuildSettingOption<T extends BaseGuildSettingOption<T>> {
     /**
      * The description of the setting.
      */
@@ -160,6 +160,22 @@ export class BaseGuildSettingOption<T extends BaseGuildSettingOption<T>> {
         this.onEdit = options.onEdit;
         this.onView = options.onView;
     }
+
+    /**
+     * Retrieves the value of the setting.
+     *
+     * @param guildID The ID of the guild.
+     * @returns The value of the setting.
+     */
+    abstract get(guildID: string): unknown;
+
+    /**
+     * Sets the value of the setting.
+     *
+     * @param guildID The ID of the guild.
+     * @param value The value of the setting.
+     */
+    abstract set(guildID: string, value: unknown): void;
 }
 
 /**
@@ -168,12 +184,17 @@ export class BaseGuildSettingOption<T extends BaseGuildSettingOption<T>> {
 export class TypedGuildSettingOption<
     S extends TypedGuildSettingOption<S, T, K>,
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends BaseGuildSettingOption<S> {
+    /**
+     * The key of the setting.
+     */
+    key?: K;
+
     /**
      * The store to use to store the setting.
      */
-    store: GuildSettingStore<T, K> = new GuildSettingStore();
+    store?: GuildSettingsStore<T>;
 
     /**
      * The type of the setting.
@@ -190,14 +211,70 @@ export class TypedGuildSettingOption<
 
         this.type = options.type;
     }
+
+    /**
+     * Retrieves the value of the setting.
+     *
+     * @param guildID The ID of the guild.
+     * @returns The value of the setting.
+     */
+    async get(guildID: string): Promise<Nullable<T>[K] | null> {
+        if (this.key === undefined) {
+            throw new Error("The key of the setting is undefined.");
+        }
+
+        if (this.store === undefined) {
+            throw new Error("The store of the setting is undefined.");
+        }
+
+        return this.store.getValue(guildID, this.key);
+    }
+
+    /**
+     * Sets the value of the setting.
+     *
+     * @param guildID The ID of the guild.
+     * @param value The value of the setting.
+     */
+    async set(guildID: string, value: Nullable<T>[K]): Promise<void> {
+        if (this.key === undefined) {
+            throw new Error("The key of the setting is undefined.");
+        }
+
+        if (this.store === undefined) {
+            throw new Error("The store of the setting is undefined.");
+        }
+
+        await this.store.setValue(guildID, this.key, value);
+    }
 }
 
 /**
  * Represents a custom guild setting.
  */
-export class CustomGuildSettingOption extends BaseGuildSettingOption<CustomGuildSettingOption> {
+export class CustomGuildSettingOption<T> extends BaseGuildSettingOption<CustomGuildSettingOption<T>> {
     /**
-     * The store to use to store the setting.
+     * The internal cache to use to store the settings.
      */
-    store: GuildSettingStore = new GuildSettingStore();
+    #cache: Map<string, T> = new Map();
+
+    /**
+     * Retrieves the value of the setting.
+     *
+     * @param guildID The ID of the guild.
+     * @returns The value of the setting.
+     */
+    get(guildID: string): T | null {
+        return this.#cache.get(guildID) ?? null;
+    }
+
+    /**
+     * Sets the value of the setting.
+     *
+     * @param guildID The ID of the guild.
+     * @param value The value of the setting.
+     */
+    set(guildID: string, value: T): void {
+        this.#cache.set(guildID, value);
+    }
 }

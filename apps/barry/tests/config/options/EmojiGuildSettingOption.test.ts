@@ -1,10 +1,15 @@
-import { UpdatableInteraction, type GuildInteraction, ModalSubmitInteraction } from "@barry/core";
-import { EmojiGuildSettingOption } from "../../../src/config/options/EmojiGuildSettingOption.js";
-import { createMockApplication } from "../../mocks/index.js";
-import { createMockMessageComponentInteraction, createMockModalSubmitInteraction } from "@barry/testing";
+import {
+    type GuildInteraction,
+    ModalSubmitInteraction,
+    UpdatableInteraction
+} from "@barry/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { timeoutContent } from "../../../src/common.js";
+import { createMockMessageComponentInteraction, createMockModalSubmitInteraction } from "@barry/testing";
+import { EmojiGuildSettingOption } from "../../../src/config/options/EmojiGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
+import { createMockApplication } from "../../mocks/index.js";
+import { timeoutContent } from "../../../src/common.js";
 
 describe("EmojiGuildSettingOption", () => {
     let interaction: GuildInteraction<UpdatableInteraction>;
@@ -25,6 +30,8 @@ describe("EmojiGuildSettingOption", () => {
                 name: "emojiName"
             }
         });
+
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -49,36 +56,34 @@ describe("EmojiGuildSettingOption", () => {
             expect(getValueSpy).toHaveBeenCalledOnce();
             expect(getValueSpy).toHaveBeenCalledWith(interaction);
         });
-
-        it("should set the 'idStore' key to the 'emojiKeys.id' value", () => {
-            expect(option.idStore.getKey()).toBe("emojiID");
-        });
-
-        it("should set the 'nameStore' key to the 'emojiKeys.name' value", () => {
-            expect(option.nameStore.getKey()).toBe("emojiName");
-        });
     });
 
     describe("getValue", () => {
         it("should return '👍' if the name is '👍'", async () => {
-            await option.idStore.set(interaction.guildID, null);
-            await option.nameStore.set(interaction.guildID, "👍");
+            await option.store?.set(interaction.guildID, {
+                emojiID: null,
+                emojiName: "👍"
+            });
 
             const value = await option.getValue(interaction);
             expect(value).toBe("👍");
         });
 
         it("should return a custom emoji if an id exists", async () => {
-            await option.idStore.set(interaction.guildID, "emoji_id");
-            await option.nameStore.set(interaction.guildID, "foo");
+            await option.store?.set(interaction.guildID, {
+                emojiID: "emoji_id",
+                emojiName: "foo"
+            });
 
             const value = await option.getValue(interaction);
             expect(value).toBe("<:foo:emoji_id>");
         });
 
         it("should return '`None`' if the value is null", async () => {
-            await option.idStore.set(interaction.guildID, null);
-            await option.nameStore.set(interaction.guildID, null);
+            await option.store?.set(interaction.guildID, {
+                emojiID: null,
+                emojiName: null
+            });
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
@@ -111,8 +116,10 @@ describe("EmojiGuildSettingOption", () => {
                 name: "custom"
             }]);
 
-            await option.idStore.set(interaction.guildID, "emoji_id");
-            await option.nameStore.set(interaction.guildID, "foo");
+            await option.store?.set(interaction.guildID, {
+                emojiID: "emoji_id",
+                emojiName: "foo"
+            });
         });
 
         it("should set the 'emojiName' setting to the unicode emoji", async () => {
@@ -120,8 +127,8 @@ describe("EmojiGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const id = await option.idStore.get(interaction.guildID);
-            const name = await option.nameStore.get(interaction.guildID);
+            const id = await option.store?.getValue(interaction.guildID, "emojiID");
+            const name = await option.store?.getValue(interaction.guildID, "emojiName");
 
             expect(id).toBeNull();
             expect(name).toBe("😀");
@@ -132,8 +139,8 @@ describe("EmojiGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const id = await option.idStore.get(interaction.guildID);
-            const name = await option.nameStore.get(interaction.guildID);
+            const id = await option.store?.getValue(interaction.guildID, "emojiID");
+            const name = await option.store?.getValue(interaction.guildID, "emojiName");
 
             expect(id).toBeNull();
             expect(name).toBe("😀");
@@ -144,8 +151,8 @@ describe("EmojiGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const id = await option.idStore.get(interaction.guildID);
-            const name = await option.nameStore.get(interaction.guildID);
+            const id = await option.store?.getValue(interaction.guildID, "emojiID");
+            const name = await option.store?.getValue(interaction.guildID, "emojiName");
 
             expect(id).toBeNull();
             expect(name).toBe("😀");
@@ -156,8 +163,8 @@ describe("EmojiGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const id = await option.idStore.get(interaction.guildID);
-            const name = await option.nameStore.get(interaction.guildID);
+            const id = await option.store?.getValue(interaction.guildID, "emojiID");
+            const name = await option.store?.getValue(interaction.guildID, "emojiName");
 
             expect(id).toBe("71272489110250160");
             expect(name).toBe("custom");
@@ -168,8 +175,8 @@ describe("EmojiGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const id = await option.idStore.get(interaction.guildID);
-            const name = await option.nameStore.get(interaction.guildID);
+            const id = await option.store?.getValue(interaction.guildID, "emojiID");
+            const name = await option.store?.getValue(interaction.guildID, "emojiName");
 
             expect(id).toBe("71272489110250160");
             expect(name).toBe("custom");
@@ -181,8 +188,8 @@ describe("EmojiGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const id = await option.idStore.get(interaction.guildID);
-            const name = await option.nameStore.get(interaction.guildID);
+            const id = await option.store?.getValue(interaction.guildID, "emojiID");
+            const name = await option.store?.getValue(interaction.guildID, "emojiName");
 
             expect(id).toBeNull();
             expect(name).toBeNull();
@@ -208,8 +215,10 @@ describe("EmojiGuildSettingOption", () => {
 
         it("should not use a default value if the setting is 'null'", async () => {
             option.nullable = true;
-            await option.idStore.set(interaction.guildID, null);
-            await option.nameStore.set(interaction.guildID, null);
+            await option.store?.set(interaction.guildID, {
+                emojiID: null,
+                emojiName: null
+            });
 
             await option.handle(interaction);
 
@@ -243,7 +252,7 @@ describe("EmojiGuildSettingOption", () => {
         });
 
         it("should throw an error if the 'emojiID' setting is not of type 'string'", async () => {
-            await option.idStore.set(interaction.guildID, 10);
+            await option.store?.setValue(interaction.guildID, "emojiID", 10);
 
             await expect(() => option.handle(interaction)).rejects.toThrowError(
                 "The setting 'emojiID' is not of type 'string'."
@@ -251,7 +260,7 @@ describe("EmojiGuildSettingOption", () => {
         });
 
         it("should throw an error if the 'emojiName' setting is not of type 'string'", async () => {
-            await option.nameStore.set(interaction.guildID, 10);
+            await option.store?.setValue(interaction.guildID, "emojiName", 10);
 
             await expect(() => option.handle(interaction)).rejects.toThrowError(
                 "The setting 'emojiName' is not of type 'string'."

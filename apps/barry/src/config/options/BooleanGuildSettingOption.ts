@@ -12,7 +12,7 @@ import type { BaseSettings } from "../../types/modules.js";
  */
 export class BooleanGuildSettingOption<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends TypedGuildSettingOption<BooleanGuildSettingOption<T, K>, T, K> {
     /**
      * Represents a boolean guild setting.
@@ -35,7 +35,7 @@ export class BooleanGuildSettingOption<
      * @returns The formatted string.
      */
     async getValue(interaction: GuildInteraction<UpdatableInteraction>): Promise<string> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
         if (value === null) {
             return "`None`";
         }
@@ -49,12 +49,12 @@ export class BooleanGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const value = await this.store.get(interaction.guildID);
+        const value = await this.get(interaction.guildID);
 
         if (typeof value !== "boolean" && !(this.nullable && value === null)) {
-            throw new Error(`The setting '${String(this.store.getKey())}' is not of type 'boolean'.`);
+            throw new Error(`The setting '${this.key}' is not of type 'boolean'.`);
         }
 
-        await this.store.set(interaction.guildID, !value as T[K]);
+        await this.set(interaction.guildID, !value as T[K]);
     }
 }

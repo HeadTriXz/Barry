@@ -13,10 +13,10 @@ import {
     type UpdatableInteraction,
     getAvatarURL
 } from "@barry/core";
-import type { Prisma, WelcomerSettings } from "@prisma/client";
 import type { Application } from "../../Application.js";
 import type { Image } from "@napi-rs/canvas";
 import type { ModuleWithSettings } from "../../types/modules.js";
+import type { WelcomerSettings } from "@prisma/client";
 
 import {
     BooleanGuildSettingOption,
@@ -90,7 +90,7 @@ export default class WelcomerModule extends ConfigurableModule<WelcomerModule> i
                     nullable: true,
                     onEdit: async (self, interaction) => this.handleColor(self, interaction),
                     onView: async (self, interaction) => {
-                        const embedColor = await self.store.get(interaction.guildID);
+                        const embedColor = await self.get(interaction.guildID);
                         if (embedColor !== null) {
                             return `#${embedColor.toString(16).padStart(6, "0")}`;
                         }
@@ -275,10 +275,10 @@ export default class WelcomerModule extends ConfigurableModule<WelcomerModule> i
      * @param settings The settings of the guild.
      */
     async handleColor(
-        self: IntegerGuildSettingOption<Prisma.WelcomerSettingsCreateInput, "embedColor">,
+        self: IntegerGuildSettingOption<WelcomerSettings, "embedColor">,
         interaction: GuildInteraction<UpdatableInteraction>
     ): Promise<void> {
-        const oldColor = await self.store.get(interaction.guildID);
+        const oldColor = await self.get(interaction.guildID);
 
         const key = `config-color-${Date.now()}`;
         await interaction.createModal({
@@ -318,7 +318,7 @@ export default class WelcomerModule extends ConfigurableModule<WelcomerModule> i
             });
         }
 
-        await self.store.set(interaction.guildID, color);
+        await self.set(interaction.guildID, color);
     }
 
     /**

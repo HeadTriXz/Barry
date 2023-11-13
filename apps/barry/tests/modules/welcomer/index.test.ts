@@ -5,8 +5,8 @@ import {
     UpdatableInteraction,
     getAvatarURL
 } from "@barry/core";
-import type { Prisma, WelcomerSettings } from "@prisma/client";
 import type { IntegerGuildSettingOption } from "../../../src/config/options/index.js";
+import type { WelcomerSettings } from "@prisma/client";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { createMockModalSubmitInteraction, mockGuild, mockUser } from "@barry/testing";
@@ -353,7 +353,7 @@ describe("WelcomerModule", () => {
 
     describe("handleColor", () => {
         let interaction: GuildInteraction<UpdatableInteraction>;
-        let option: IntegerGuildSettingOption<Prisma.WelcomerSettingsCreateInput, "embedColor">;
+        let option: IntegerGuildSettingOption<WelcomerSettings, "embedColor">;
         let response: ModalSubmitInteraction;
 
         beforeEach(() => {
@@ -382,15 +382,18 @@ describe("WelcomerModule", () => {
             response.createMessage = vi.fn();
 
             const config = module.getConfig();
-            option = config.find((o) => "store" in o && o.store.getKey() === "embedColor") as IntegerGuildSettingOption<Prisma.WelcomerSettingsCreateInput, "embedColor">;
+            option = config.find((option) => {
+                return "key" in option && option.key === "embedColor";
+            }) as IntegerGuildSettingOption<WelcomerSettings, "embedColor">;
 
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
+            vi.spyOn(module.settings, "upsert").mockImplementation((guildID, settings) => settings as Promise<WelcomerSettings>);
         });
 
         it("should update the embed color if a valid color is provided", async () => {
             await module.handleColor(option, interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(0xFF0000);
         });
 
@@ -432,7 +435,7 @@ describe("WelcomerModule", () => {
 
             await module.handleColor(option, interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe(0xFF0000);
         });
 

@@ -6,6 +6,7 @@ import {
 
 import { ComponentType } from "@discordjs/core";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { RoleGuildSettingOption } from "../../../src/config/options/RoleGuildSettingOption.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { createMockMessageComponentInteraction } from "@barry/testing";
@@ -26,7 +27,8 @@ describe("RoleGuildSettingOption", () => {
             description: "The role that will be awarded."
         });
 
-        option.store.setKey("roleID");
+        option.key = "roleID";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -55,14 +57,14 @@ describe("RoleGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return '<@&role_id>' if the value is 'role_id'", async () => {
-            await option.store.set(interaction.guildID, "role_id");
+            await option.set(interaction.guildID, "role_id");
 
             const value = await option.getValue(interaction);
             expect(value).toBe("<@&role_id>");
         });
 
         it("should return 'None' if the value is null", async () => {
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
@@ -71,7 +73,7 @@ describe("RoleGuildSettingOption", () => {
 
     describe("handle", () => {
         beforeEach(async () => {
-            await option.store.set(interaction.guildID, "other_role_id");
+            await option.set(interaction.guildID, "other_role_id");
         });
 
         it("should set the value to 'role_id' if the user selected 'role_id'", async () => {
@@ -88,7 +90,7 @@ describe("RoleGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBe("role_id");
         });
 
@@ -107,7 +109,7 @@ describe("RoleGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toBeNull();
         });
 
@@ -121,7 +123,7 @@ describe("RoleGuildSettingOption", () => {
         });
 
         it("should throw an error if the value is not a string", async () => {
-            await option.store.set(interaction.guildID, 1234);
+            await option.set(interaction.guildID, 1234);
 
             await expect(() => option.handle(interaction)).rejects.toThrowError(
                 "The setting 'roleID' is not of type 'string'."
@@ -132,7 +134,7 @@ describe("RoleGuildSettingOption", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
             option.nullable = true;
 
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await expect(option.handle(interaction)).resolves.not.toThrowError();
         });

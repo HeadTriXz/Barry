@@ -5,7 +5,6 @@ import {
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
-import { type AnyGuildSettingOption, ConfigurableModule } from "../../../../../config/module.js";
 import {
     type ApplicationCommandInteraction,
     type ModuleRegistry,
@@ -13,11 +12,15 @@ import {
     SlashCommand,
     UpdatableInteraction
 } from "@barry/core";
-import { type TypedGuildSettingOption, GuildSettingType } from "../../../../../config/option.js";
+import {
+    type BaseGuildSettingOption,
+    type TypedGuildSettingOption,
+    GuildSettingType
+} from "../../../../../config/option.js";
 import type { BaseSettings } from "../../../../../types/modules.js";
 import type GeneralModule from "../../../index.js";
 
-import { EmojiGuildSettingOption } from "../../../../../config/options/EmojiGuildSettingOption.js";
+import { ConfigurableModule } from "../../../../../config/module.js";
 import { timeoutContent } from "../../../../../common.js";
 
 import config, { type Emoji } from "../../../../../config.js";
@@ -73,7 +76,7 @@ export default class extends SlashCommand<GeneralModule> {
      * @param value The value of the setting.
      * @returns The emoji for the setting.
      */
-    getEmoji(option: AnyGuildSettingOption, value?: unknown): Emoji {
+    getEmoji(option: BaseGuildSettingOption<any>, value?: unknown): Emoji {
         if (value === null) {
             return config.emotes.unknown;
         }
@@ -140,11 +143,8 @@ export default class extends SlashCommand<GeneralModule> {
             const options = module.getConfig();
             for (let i = 0; i < options.length; i++) {
                 const option = options[i] as TypedGuildSettingOption<any, BaseSettings, keyof BaseSettings>;
-                if (option instanceof EmojiGuildSettingOption) {
-                    continue;
-                }
 
-                const value = await option.store.get(interaction.guildID);
+                const value = await option.get(interaction.guildID);
                 const emoji = this.getEmoji(option, value);
 
                 selectOptions.push({

@@ -4,32 +4,26 @@ import type { SettingsRepository } from "../types/modules.js";
 /**
  * Utility type for making a partial property nullable.
  */
-export type Nullable<T> = T extends undefined ? null : T;
+export type Nullable<T> = {
+    [P in keyof T]-?: T[P] | null;
+};
 
 /**
- * Represents a store for a guild setting.
+ * Represents a store for guild settings.
  */
-export class GuildSettingStore<
-    T extends BaseSettings = BaseSettings,
-    K extends keyof T = keyof T
-> {
+export class GuildSettingsStore<T extends BaseSettings> {
     /**
-     * The internal cache to use to store the setting.
+     * The internal cache to use to store the settings.
      */
-    #cache: Map<string, Nullable<T[K]>> = new Map();
+    #cache: Map<string, Nullable<T>> = new Map();
 
     /**
-     * The key of the setting.
-     */
-    #key?: K;
-
-    /**
-     * The repository to use to store the setting.
+     * The repository to use to retrieve the settings.
      */
     #repository?: SettingsRepository<T>;
 
     /**
-     * Removes the setting from the cache.
+     * Removes the settings from the cache.
      *
      * @param guildID The ID of the guild.
      */
@@ -38,72 +32,83 @@ export class GuildSettingStore<
     }
 
     /**
-     * Retrieves the value of the setting.
+     * Retrieves the settings of the guild.
      *
      * @param guildID The ID of the guild.
-     * @returns The value of the setting.
+     * @returns The settings of the guild.
      */
-    async get(guildID: string): Promise<Nullable<T[K]> | null> {
+    async get(guildID: string): Promise<Nullable<T> | null> {
         const cached = this.#cache.get(guildID);
         if (cached !== undefined) {
             return cached;
         }
 
-        if (this.#repository !== undefined && this.#key !== undefined) {
-            const settings = await this.#repository.getOrCreate(guildID);
+        if (this.#repository !== undefined) {
+            const settings = await this.#repository.getOrCreate(guildID) as Nullable<T>;
 
-            if (settings !== undefined) {
-                const value = settings[this.#key] as Nullable<T[K]>;
-                this.#cache.set(guildID, value);
-                return value;
-            }
+            this.#cache.set(guildID, settings);
+            return settings;
         }
 
         return null;
     }
 
     /**
-     * Retrieves the key of the setting.
-     *
-     * @returns The key of the setting.
-     */
-    getKey(): K | undefined {
-        return this.#key;
-    }
-
-    /**
-     * Sets the value of the setting.
+     * Retrieves the value of a specific setting.
      *
      * @param guildID The ID of the guild.
-     * @param value The value of the setting.
-     */
-    async set(guildID: string, value: T[K]): Promise<void> {
-        this.#cache.set(guildID, value as Nullable<T[K]>);
-
-        if (this.#repository !== undefined && this.#key !== undefined) {
-            await this.#repository.upsert(guildID, {
-                [this.#key]: value
-            } as unknown as T);
-        }
-    }
-
-    /**
-     * Sets the key of the setting.
-     *
      * @param key The key of the setting.
+     * @returns The value of the setting.
      */
-    setKey(key: K): this {
-        this.#key = key;
-        return this;
+    async getValue<K extends Extract<keyof T, string>>(guildID: string, key: K): Promise<Nullable<T>[K] | null> {
+        const settings = await this.get(guildID);
+        if (settings !== null) {
+            return settings[key];
+        }
+
+        return null;
     }
 
     /**
-     * Sets the repository of the setting.
+     * Sets the settings of the guild.
      *
-     * @param repository The repository of the setting.
+     * @param guildID The ID of the guild.
+     * @param settings The settings of the guild.
+     */
+    async set(guildID: string, settings: Partial<T>): Promise<void> {
+        if (this.#repository !== undefined) {
+            settings = await this.#repository.upsert(guildID, settings);
+        }
+
+        this.#cache.set(guildID, settings as Nullable<T>);
+    }
+
+    /**
+     * Sets the repository of the settings.
+     *
+     * @param repository The repository of the settings.
      */
     setRepository(repository: SettingsRepository<T>): this {
         this.#repository = repository;
         return this;
+    }
+
+    /**
+     * Sets the value of a specific setting.
+     *
+     * @param guildID The ID of the guild.
+     * @param key The key of the setting.
+     * @param value The value of the setting.
+     */
+    async setValue<K extends keyof T>(guildID: string, key: K, value: Nullable<T>[K]): Promise<void> {
+        const settings = (await this.#repository?.upsert(guildID, { [key]: value } as unknown as T)
+            || this.#cache.get(guildID)
+            || {}) as Nullable<T>;
+
+        if (this.#repository === undefined) {
+            settings[key] = value as T[K];
+        }
+
+        this.#cache.set(guildID, settings);
     }
 }

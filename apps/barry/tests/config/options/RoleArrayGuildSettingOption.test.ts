@@ -6,6 +6,7 @@ import {
 
 import { ComponentType } from "@discordjs/core";
 import { GuildSettingType } from "../../../src/config/option.js";
+import { GuildSettingsStore } from "../../../src/config/store.js";
 import { RoleArrayGuildSettingOption } from "../../../src/config/options/RoleArrayGuildSettingOption.js";
 import { createMockApplication } from "../../mocks/index.js";
 import { createMockMessageComponentInteraction } from "@barry/testing";
@@ -26,7 +27,8 @@ describe("RoleArrayGuildSettingOption", () => {
             description: "The roles that will be banned."
         });
 
-        option.store.setKey("roles");
+        option.key = "roles";
+        option.store = new GuildSettingsStore();
     });
 
     describe("constructor", () => {
@@ -55,28 +57,28 @@ describe("RoleArrayGuildSettingOption", () => {
 
     describe("getValue", () => {
         it("should return '<@&role_id>' if the value is 'role_id'", async () => {
-            await option.store.set(interaction.guildID, ["role_id"]);
+            await option.set(interaction.guildID, ["role_id"]);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("<@&role_id>");
         });
 
         it("should return '<@&role_id>, <@&other_role_id>' if the value is 'role_id', 'other_role_id'", async () => {
-            await option.store.set(interaction.guildID, ["role_id", "other_role_id"]);
+            await option.set(interaction.guildID, ["role_id", "other_role_id"]);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("<@&role_id>, <@&other_role_id>");
         });
 
         it("should return 'None' if the value is null", async () => {
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
         });
 
         it("should return 'None' if the value is an empty array", async () => {
-            await option.store.set(interaction.guildID, []);
+            await option.set(interaction.guildID, []);
 
             const value = await option.getValue(interaction);
             expect(value).toBe("`None`");
@@ -85,7 +87,7 @@ describe("RoleArrayGuildSettingOption", () => {
 
     describe("handle", () => {
         beforeEach(async () => {
-            await option.store.set(interaction.guildID, ["role_id"]);
+            await option.set(interaction.guildID, ["role_id"]);
         });
 
         it("should set the value to 'other_role_id' if the user selects 'other_role_id'", async () => {
@@ -102,7 +104,7 @@ describe("RoleArrayGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toEqual(["other_role_id"]);
         });
 
@@ -120,7 +122,7 @@ describe("RoleArrayGuildSettingOption", () => {
 
             await option.handle(interaction);
 
-            const value = await option.store.get(interaction.guildID);
+            const value = await option.get(interaction.guildID);
             expect(value).toEqual(["role_id", "other_role_id"]);
         });
 
@@ -134,7 +136,7 @@ describe("RoleArrayGuildSettingOption", () => {
         });
 
         it("should throw an error if the value is not an array", async () => {
-            await option.store.set(interaction.guildID, "role_id");
+            await option.set(interaction.guildID, "role_id");
 
             await expect(() => option.handle(interaction)).rejects.toThrowError(
                 "The setting 'roles' is not of type 'string[]'."
@@ -145,7 +147,7 @@ describe("RoleArrayGuildSettingOption", () => {
             vi.spyOn(interaction, "awaitMessageComponent").mockResolvedValue(undefined);
             option.nullable = true;
 
-            await option.store.set(interaction.guildID, null);
+            await option.set(interaction.guildID, null);
 
             await expect(option.handle(interaction)).resolves.not.toThrowError();
         });

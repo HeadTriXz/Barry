@@ -81,10 +81,11 @@ export default class ReportsModule extends ConfigurableModule<ReportsModule> imp
         this.defineConfig({
             settings: {
                 channelID: new ChannelGuildSettingOption({
+                    channelTypes: [ChannelType.GuildForum],
                     description: "The channel where reports are posted.",
                     name: "Reports Channel",
                     nullable: true,
-                    onEdit: (self, interaction) => this.handleChannel(interaction)
+                    onEdit: (self, interaction) => this.handleChannel(self, interaction)
                 })
             }
         });
@@ -179,7 +180,7 @@ export default class ReportsModule extends ConfigurableModule<ReportsModule> imp
      * @param interaction The interaction that triggered the option.
      * @param settings The settings of the guild.
      */
-    async handleChannel(interaction: UpdatableInteraction): Promise<void> {
+    async handleChannel(self: ChannelGuildSettingOption<ReportsSettings, "channelID">, interaction: UpdatableInteraction): Promise<void> {
         await interaction.editParent({
             components: [{
                 components: [{
@@ -219,17 +220,7 @@ export default class ReportsModule extends ConfigurableModule<ReportsModule> imp
         }
 
         if (response.data.customID === "existing_channel") {
-            const option = new ChannelGuildSettingOption<ReportsSettings, "channelID">({
-                channelTypes: [ChannelType.GuildForum],
-                description: "The channel where reports are posted.",
-                name: "Reports Channel",
-                nullable: true
-            });
-
-            option.store.setKey("channelID");
-            option.store.setRepository(this.settings);
-
-            await option.handle(response);
+            await self.handle(response);
         }
     }
 

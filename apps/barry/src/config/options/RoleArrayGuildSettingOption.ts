@@ -15,7 +15,7 @@ import { timeoutContent } from "../../common.js";
  */
 export class RoleArrayGuildSettingOption<
     T extends BaseSettings,
-    K extends keyof T
+    K extends Extract<keyof T, string>
 > extends TypedGuildSettingOption<RoleArrayGuildSettingOption<T, K>, T, K> {
     /**
      * The maximum amount of roles that can be selected.
@@ -51,7 +51,7 @@ export class RoleArrayGuildSettingOption<
      * @returns The formatted string.
      */
     async getValue(interaction: GuildInteraction<UpdatableInteraction>): Promise<string> {
-        const value = await this.store.get(interaction.guildID) as string[] | null;
+        const value = await this.get(interaction.guildID) as string[] | null;
         return value !== null && value.length > 0
             ? value.map((id) => `<@&${id}>`).join(", ")
             : "`None`";
@@ -63,10 +63,10 @@ export class RoleArrayGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const value = await this.store.get(interaction.guildID) as string[] | null;
+        const value = await this.get(interaction.guildID) as string[] | null;
 
         if (!Array.isArray(value) && !(this.nullable && value === null)) {
-            throw new Error(`The setting '${String(this.store.getKey())}' is not of type 'string[]'.`);
+            throw new Error(`The setting '${this.key}' is not of type 'string[]'.`);
         }
 
         await interaction.editParent({
@@ -99,6 +99,6 @@ export class RoleArrayGuildSettingOption<
         await response.deferUpdate();
 
         const roleIDs = response.data.values;
-        await this.store.set(interaction.guildID, roleIDs as T[K]);
+        await this.set(interaction.guildID, roleIDs as T[K]);
     }
 }
