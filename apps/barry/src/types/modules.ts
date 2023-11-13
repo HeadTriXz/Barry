@@ -1,6 +1,3 @@
-import type { Application } from "../Application.js";
-import type { Module } from "@barry/core";
-
 /**
  * Represents the base settings for a module.
  */
@@ -30,13 +27,13 @@ export interface SettingsRepository<T extends BaseSettings> {
      * @param settings The settings to update.
      * @returns The updated settings record.
      */
-    upsert(guildID: string, settings: Omit<T, "guildID">): Promise<T>;
+    upsert(guildID: string, settings: Partial<Omit<T, "guildID">>): Promise<T>;
 }
 
 /**
  * Represents a module with settings.
  */
-export interface ModuleWithSettings<T extends BaseSettings> extends Module<Application> {
+export interface ModuleWithSettings<T extends BaseSettings = BaseSettings> {
     /**
      * The settings repository for the module.
      */

@@ -1,10 +1,11 @@
+import type { BaseSettings, ModuleWithSettings } from "../../types/modules.js";
 import type { APIUser } from "@discordjs/core";
-import type { ModuleWithSettings, BaseSettings } from "../../types/modules.js";
+import type { Module } from "@barry/core";
 
 /**
  * Represents a module that allows flagging users.
  */
-export interface FlaggableModule extends ModuleWithSettings<SettingsWithChannel> {
+export interface FlaggableModule extends Module, ModuleWithSettings<SettingsWithChannel> {
     /**
      * Flags all items for the specified user.
      *

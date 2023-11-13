@@ -1,14 +1,20 @@
-import type { WelcomerSettings } from "@prisma/client";
 import { type Canvas, loadImage } from "canvas-constructor/napi-rs";
+import {
+    type GuildInteraction,
+    ModalSubmitInteraction,
+    UpdatableInteraction,
+    getAvatarURL
+} from "@barry/core";
+import type { IntegerGuildSettingOption } from "../../../src/config/options/index.js";
+import type { WelcomerSettings } from "@prisma/client";
 
+import { ComponentType, MessageFlags } from "@discordjs/core";
 import { createMockModalSubmitInteraction, mockGuild, mockUser } from "@barry/testing";
+
 import { WelcomerSettingsRepository } from "../../../src/modules/welcomer/database/index.js";
 import { createMockApplication } from "../../mocks/application.js";
-import { ModalSubmitInteraction, UpdatableInteraction, getAvatarURL } from "@barry/core";
-
-import WelcomerModule from "../../../src/modules/welcomer/index.js";
-import { ComponentType, MessageFlags } from "@discordjs/core";
 import { timeoutContent } from "../../../src/common.js";
+import WelcomerModule from "../../../src/modules/welcomer/index.js";
 
 vi.mock("canvas-constructor/napi-rs", () => {
     const image = Buffer.from("Hello World!");
@@ -346,14 +352,18 @@ describe("WelcomerModule", () => {
     });
 
     describe("handleColor", () => {
-        let interaction: UpdatableInteraction;
+        let interaction: GuildInteraction<UpdatableInteraction>;
+        let option: IntegerGuildSettingOption<WelcomerSettings, "embedColor">;
         let response: ModalSubmitInteraction;
 
         beforeEach(() => {
             vi.useFakeTimers().setSystemTime("01-01-2023");
 
-            const data = createMockModalSubmitInteraction();
-            interaction = new UpdatableInteraction(data, module.client, vi.fn());
+            interaction = new UpdatableInteraction(
+                createMockModalSubmitInteraction(),
+                module.client,
+                vi.fn()
+            ) as GuildInteraction<UpdatableInteraction>;
             interaction.createModal = vi.fn();
             interaction.editParent = vi.fn();
 
@@ -371,19 +381,26 @@ describe("WelcomerModule", () => {
             response = new ModalSubmitInteraction(responseData, module.client, vi.fn());
             response.createMessage = vi.fn();
 
+            const config = module.getConfig();
+            option = config.find((option) => {
+                return "key" in option && option.key === "embedColor";
+            }) as IntegerGuildSettingOption<WelcomerSettings, "embedColor">;
+
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
+            vi.spyOn(module.settings, "upsert").mockImplementation((guildID, settings) => settings as Promise<WelcomerSettings>);
         });
 
         it("should update the embed color if a valid color is provided", async () => {
-            await module.handleColor(interaction, settings);
+            await module.handleColor(option, interaction);
 
-            expect(settings.embedColor).toBe(0xFF0000);
+            const value = await option.get(interaction.guildID);
+            expect(value).toBe(0xFF0000);
         });
 
         it("should show the original color if it exists", async () => {
             settings.embedColor = 0xFF0000;
 
-            await module.handleColor(interaction, settings);
+            await module.handleColor(option, interaction);
 
             expect(interaction.createModal).toHaveBeenCalledOnce();
             expect(interaction.createModal).toHaveBeenCalledWith(
@@ -416,9 +433,10 @@ describe("WelcomerModule", () => {
 
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
 
-            await module.handleColor(interaction, settings);
+            await module.handleColor(option, interaction);
 
-            expect(settings.embedColor).toBe(0xFF0000);
+            const value = await option.get(interaction.guildID);
+            expect(value).toBe(0xFF0000);
         });
 
         it("should return an error if an invalid color is provided", async () => {
@@ -438,7 +456,7 @@ describe("WelcomerModule", () => {
 
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(response);
 
-            await module.handleColor(interaction, settings);
+            await module.handleColor(option, interaction);
 
             expect(response.createMessage).toHaveBeenCalledOnce();
             expect(response.createMessage).toHaveBeenCalledWith({
@@ -450,7 +468,7 @@ describe("WelcomerModule", () => {
         it("should show a timeout message if the user does not respond", async () => {
             vi.spyOn(interaction, "awaitModalSubmit").mockResolvedValue(undefined);
 
-            await module.handleColor(interaction, settings);
+            await module.handleColor(option, interaction);
 
             expect(interaction.editParent).toHaveBeenCalledOnce();
             expect(interaction.editParent).toHaveBeenCalledWith(timeoutContent);

@@ -81,6 +81,8 @@ export default {
         // Menu
         channel: new Emoji("channel", "1164796815183462443"),
         close: new Emoji("close", "1164797630988173322"),
+        edit: new Emoji("edit", "1172430605032632320"),
+        delete: new Emoji("delete", "1172430603375882291"),
         emoji: new Emoji("emoji", "1164796819507789834"),
         role: new Emoji("role", "1164796811811237949"),
         unknown: new Emoji("unknown", "1164796817297383495")

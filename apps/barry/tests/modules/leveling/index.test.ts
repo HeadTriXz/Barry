@@ -7,8 +7,9 @@ import {
     MemberActivityRepository
 } from "../../../src/modules/leveling/database/index.js";
 import { createMockApplication } from "../../mocks/application.js";
+import { mockDeep } from "vitest-mock-extended";
 
-import LevelingModule from "../../../src/modules/leveling/index.js";
+import LevelingModule, { type RewardsModule } from "../../../src/modules/leveling/index.js";
 
 describe("LevelingModule", () => {
     let member: MemberActivity;
@@ -88,6 +89,24 @@ describe("LevelingModule", () => {
             expect(module.client.api.channels.createMessage).toHaveBeenCalledWith("30527482987641765", {
                 content: "Hello World"
             });
+        });
+
+        it("should check for rewards if they leveled up", async () => {
+            const rewardsModule = mockDeep<RewardsModule>();
+            vi.spyOn(module.dependencies, "get").mockReturnValue(rewardsModule);
+
+            module.memberActivity.upsert = vi.fn();
+            module.levelUpSettings.getOrCreate = vi.fn().mockResolvedValue({
+                guildID: "68239102456844360",
+                message: "Hello World",
+                notificationChannel: null,
+                notificationType: LevelUpNotificationType.CurrentChannel
+            });
+
+            await module.checkLevel(member, "30527482987641765");
+
+            expect(rewardsModule.claimRewards).toHaveBeenCalledOnce();
+            expect(rewardsModule.claimRewards).toHaveBeenCalledWith("68239102456844360", "257522665441460225", 25);
         });
 
         it("should do nothing if they have not leveled up", async () => {

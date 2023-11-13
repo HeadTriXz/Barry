@@ -1,8 +1,8 @@
+import type { Module, ReplyableInteraction } from "@barry/core";
 import type { APIUser } from "@discordjs/core";
 import type { ModuleWithSettings } from "./modules.js";
 import type { ModerationSettings } from "@prisma/client";
 import type { PartialGuildMember } from "../modules/moderation/functions/permissions.js";
-import type { ReplyableInteraction } from "@barry/core";
 
 /**
  * Bans a user from the guild.
@@ -192,7 +192,7 @@ export interface BaseModerationActions {
 /**
  * Represents a moderation module.
  */
-export interface BaseModerationModule extends ModuleWithSettings<ModerationSettings> {
+export interface BaseModerationModule extends Module, ModuleWithSettings<ModerationSettings> {
     /**
      * Actions that can be performed on a user.
      */

@@ -8,13 +8,22 @@ import {
 } from "@discordjs/core";
 import type { StarboardMessage, StarboardSettings } from "@prisma/client";
 import type { Application } from "../../Application.js";
+import type { ModuleWithSettings } from "../../types/modules.js";
 
-import { ConfigurableModule, GuildSettingOptionBuilder } from "../../ConfigurableModule.js";
+import {
+    BooleanGuildSettingOption,
+    ChannelArrayGuildSettingOption,
+    ChannelGuildSettingOption,
+    EmojiGuildSettingOption,
+    IntegerGuildSettingOption,
+    RoleArrayGuildSettingOption
+} from "../../config/options/index.js";
 import {
     StarboardMessageRepository,
     StarboardReactionRepository,
     StarboardSettingsRepository
 } from "./database/index.js";
+import { ConfigurableModule } from "../../config/module.js";
 import { getAvatarURL } from "@barry/core";
 import { loadEvents } from "../../utils/loadFolder.js";
 
@@ -63,7 +72,9 @@ export interface UpdateMessageOptions {
 /**
  * Represents the starboard module.
  */
-export default class StarboardModule extends ConfigurableModule<StarboardSettings> {
+export default class StarboardModule extends ConfigurableModule<StarboardModule> implements ModuleWithSettings<
+    StarboardSettings
+> {
     /**
      * The repository for managing starboard messages.
      */
@@ -98,24 +109,24 @@ export default class StarboardModule extends ConfigurableModule<StarboardSetting
 
         this.defineConfig({
             settings: {
-                allowedChannels: GuildSettingOptionBuilder.channelArray({
+                allowedChannels: new ChannelArrayGuildSettingOption({
                     description: "The channels where users are allowed to star messages.",
                     name: "Allowed Channels"
                 }),
-                allowedRoles: GuildSettingOptionBuilder.roleArray({
+                allowedRoles: new RoleArrayGuildSettingOption({
                     description: "The roles that are allowed to star messages.",
                     name: "Allowed Roles"
                 }),
-                autoReactChannels: GuildSettingOptionBuilder.channelArray({
+                autoReactChannels: new ChannelArrayGuildSettingOption({
                     description: "The channels where images are automatically starred.",
                     name: "Auto React Channels"
                 }),
-                channelID: GuildSettingOptionBuilder.channel({
+                channelID: new ChannelGuildSettingOption({
                     description: "The channel where starred messages are posted.",
                     name: "Starboard Channel",
                     nullable: true
                 }),
-                emojiName: GuildSettingOptionBuilder.emoji({
+                emojiName: new EmojiGuildSettingOption({
                     description: "The emoji that is used to star messages.",
                     emojiKeys: {
                         id: "emojiID",
@@ -123,19 +134,19 @@ export default class StarboardModule extends ConfigurableModule<StarboardSetting
                     },
                     name: "Star Emoji"
                 }),
-                enabled: GuildSettingOptionBuilder.boolean({
+                enabled: new BooleanGuildSettingOption({
                     description: "Whether this module is enabled.",
                     name: "Enabled"
                 }),
-                ignoredChannels: GuildSettingOptionBuilder.channelArray({
+                ignoredChannels: new ChannelArrayGuildSettingOption({
                     description: "The channels where messages are ignored.",
                     name: "Ignored Channels"
                 }),
-                ignoredRoles: GuildSettingOptionBuilder.roleArray({
+                ignoredRoles: new RoleArrayGuildSettingOption({
                     description: "The roles that are ignored.",
                     name: "Ignored Roles"
                 }),
-                threshold: GuildSettingOptionBuilder.integer({
+                threshold: new IntegerGuildSettingOption({
                     description: "The amount of stars required to post a message in the starboard.",
                     name: "Star Threshold"
                 })

@@ -6,15 +6,14 @@ import {
     OverwriteType,
     PermissionFlagsBits
 } from "@discordjs/core";
-import { type ReportsSettings, ReportCategory } from "@prisma/client";
+import {
+    type ReportsSettings,
+    ReportCategory
+} from "@prisma/client";
 import type { Application } from "../../../../Application.js";
+import type { ModuleWithSettings } from "../../../../types/modules.js";
 import type { UpdatableInteraction } from "@barry/core";
 
-import {
-    ConfigurableModule,
-    GuildSettingOptionBuilder,
-    GuildSettingType
-} from "../../../../ConfigurableModule.js";
 import {
     LocalReportRepository,
     ReportRepository,
@@ -26,7 +25,8 @@ import {
     REPORT_CHANNEL_TAGS
 } from "./constants.js";
 
-import { ModifyGuildSettingHandlers } from "../../../general/commands/chatinput/config/handlers.js";
+import { ChannelGuildSettingOption } from "../../../../config/options/ChannelGuildSettingOption.js";
+import { ConfigurableModule } from "../../../../config/module.js";
 import { REPORT_CHANNEL_GUIDELINES } from "./content.js";
 import { loadEvents } from "../../../../utils/loadFolder.js";
 import { timeoutContent } from "../../../../common.js";
@@ -43,7 +43,9 @@ export enum ReportActionButton {
 /**
  * Represents the reports module.
  */
-export default class ReportsModule extends ConfigurableModule<ReportsSettings> {
+export default class ReportsModule extends ConfigurableModule<ReportsModule> implements ModuleWithSettings<
+    ReportsSettings
+> {
     /**
      * Represents a repository for managing local reports.
      */
@@ -78,12 +80,12 @@ export default class ReportsModule extends ConfigurableModule<ReportsSettings> {
 
         this.defineConfig({
             settings: {
-                channelID: GuildSettingOptionBuilder.custom({
-                    base: GuildSettingType.Channel,
-                    callback: this.handleChannel.bind(this),
+                channelID: new ChannelGuildSettingOption({
+                    channelTypes: [ChannelType.GuildForum],
                     description: "The channel where reports are posted.",
                     name: "Reports Channel",
-                    nullable: true
+                    nullable: true,
+                    onEdit: (self, interaction) => this.handleChannel(self, interaction)
                 })
             }
         });
@@ -178,7 +180,7 @@ export default class ReportsModule extends ConfigurableModule<ReportsSettings> {
      * @param interaction The interaction that triggered the option.
      * @param settings The settings of the guild.
      */
-    async handleChannel(interaction: UpdatableInteraction, settings: ReportsSettings): Promise<void> {
+    async handleChannel(self: ChannelGuildSettingOption<ReportsSettings, "channelID">, interaction: UpdatableInteraction): Promise<void> {
         await interaction.editParent({
             components: [{
                 components: [{
@@ -201,15 +203,11 @@ export default class ReportsModule extends ConfigurableModule<ReportsSettings> {
             customIDs: ["new_channel", "existing_channel"]
         });
 
-        if (response === undefined) {
+        if (!response?.isInvokedInGuild()) {
             return interaction.editParent(timeoutContent);
         }
 
         if (response.data.customID === "new_channel") {
-            if (!response.isInvokedInGuild()) {
-                return;
-            }
-
             if ((response.appPermissions! & PermissionFlagsBits.ManageChannels) === 0n) {
                 return response.editParent({
                     components: [],
@@ -222,16 +220,7 @@ export default class ReportsModule extends ConfigurableModule<ReportsSettings> {
         }
 
         if (response.data.customID === "existing_channel") {
-            const handler = new ModifyGuildSettingHandlers<ReportsModule, ReportsSettings>(this);
-            await handler.channel(response, settings, {
-                channelTypes: [ChannelType.GuildForum],
-                description: "The channel where reports are posted.",
-                key: "channelID",
-                name: "Reports Channel",
-                nullable: true,
-                repository: this.settings,
-                type: GuildSettingType.Channel
-            });
+            await self.handle(response);
         }
     }
 

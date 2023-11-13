@@ -1,3 +1,4 @@
+import { type GuildInteraction, UpdatableInteraction } from "@barry/core";
 import type { RequestsSettings } from "@prisma/client";
 
 import { ButtonStyle, ComponentType } from "@discordjs/core";
@@ -12,9 +13,8 @@ import {
     mockUser
 } from "@barry/testing";
 
+import { ChannelGuildSettingOption } from "../../../../src/config/options/index.js";
 import { DiscordAPIError } from "@discordjs/rest";
-import { GuildSettingType } from "../../../../src/ConfigurableModule.js";
-import { UpdatableInteraction } from "@barry/core";
 import { createMockApplication } from "../../../mocks/application.js";
 import { getRequestContent } from "../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
 import { mockRequest } from "./mocks/request.js";
@@ -53,20 +53,22 @@ describe("RequestsModule", () => {
 
         it("should post the buttons when a new channel is configured", async () => {
             const postSpy = vi.spyOn(module, "postButtons").mockResolvedValue("91256340920236565");
+            const onEditSpy = vi.spyOn(ChannelGuildSettingOption.prototype, "handle").mockResolvedValue();
 
             const config = module.getConfig();
-            const option = config.find((option) => option.key === "channelID");
-            if (option?.type !== GuildSettingType.Custom) {
-                expect.unreachable("Expected option to be of type GuildSettingType.Custom");
-            }
+            const option = config.find((option) => {
+                return "key" in option && option.key === "channelID";
+            }) as ChannelGuildSettingOption<any, any>;
 
+            vi.spyOn(module.settings, "upsert").mockResolvedValue(settings);
+
+            await option.set(guildID, channelID);
             const data = createMockMessageComponentInteraction();
             const interaction = new UpdatableInteraction(data, module.client, vi.fn());
-            const originalHandler = vi.fn();
 
-            await option.callback(interaction, settings, originalHandler);
+            await option.onEdit(option, interaction as GuildInteraction<UpdatableInteraction>);
 
-            expect(originalHandler).toHaveBeenCalledOnce();
+            expect(onEditSpy).toHaveBeenCalledOnce();
             expect(postSpy).toHaveBeenCalledOnce();
             expect(postSpy).toHaveBeenCalledWith(channelID);
         });

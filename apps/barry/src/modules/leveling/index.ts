@@ -4,14 +4,24 @@ import {
     LevelUpNotificationType
 } from "@prisma/client";
 import type { Application } from "../../Application.js";
+import type { Module } from "@barry/core";
+import type { ModuleWithSettings } from "../../types/modules.js";
 
-import { ConfigurableModule, GuildSettingOptionBuilder } from "../../ConfigurableModule.js";
+import {
+    BooleanGuildSettingOption,
+    ChannelArrayGuildSettingOption,
+    ChannelGuildSettingOption,
+    EnumGuildSettingOption,
+    RoleArrayGuildSettingOption,
+    StringGuildSettingOption
+} from "../../config/options/index.js";
 import {
     LevelUpSettingsRepository,
     LevelingSettingsRepository,
     MemberActivityRepository
 } from "./database/index.js";
-import { loadCommands, loadEvents } from "../../utils/index.js";
+import { loadCommands, loadEvents, loadModules } from "../../utils/index.js";
+import { ConfigurableModule } from "../../config/module.js";
 
 /**
  * Make the selected properties of T required.
@@ -19,9 +29,25 @@ import { loadCommands, loadEvents } from "../../utils/index.js";
 export type PickRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 /**
+ * Represents the rewards module.
+ */
+export interface RewardsModule extends Module {
+    /**
+     * Claims the rewards for the given user.
+     *
+     * @param guildID The ID of the guild.
+     * @param userID The ID of the user.
+     * @param level The level of the user.
+     */
+    claimRewards(guildID: string, userID: string, level: number): Promise<void>;
+}
+
+/**
  * Represents the leveling module.
  */
-export default class LevelingModule extends ConfigurableModule<LevelingSettings, LevelingModule> {
+export default class LevelingModule extends ConfigurableModule<LevelingModule> implements ModuleWithSettings<
+    LevelingSettings
+> {
     /**
      * Repository class for managing level up settings.
      */
@@ -48,6 +74,7 @@ export default class LevelingModule extends ConfigurableModule<LevelingSettings,
             name: "Leveling",
             description: "Tracks user activity and assigns experience and levels based on their participation in the server.",
             commands: loadCommands("./commands"),
+            dependencies: loadModules("./dependencies"),
             events: loadEvents("./events")
         });
 
@@ -57,31 +84,31 @@ export default class LevelingModule extends ConfigurableModule<LevelingSettings,
 
         this.defineConfig({
             levelUpSettings: {
-                message: GuildSettingOptionBuilder.string({
+                message: new StringGuildSettingOption({
                     name: "Message",
                     description: "The message to send when a user levels up."
                 }),
-                notificationChannel: GuildSettingOptionBuilder.channel({
+                notificationChannel: new ChannelGuildSettingOption({
                     name: "Notification Channel",
                     description: "The channel to send the notification in.",
                     nullable: true
                 }),
-                notificationType: GuildSettingOptionBuilder.enum({
+                notificationType: new EnumGuildSettingOption({
                     name: "Notification Type",
                     description: "The type of notification to send when a user levels up.",
                     values: Object.values(LevelUpNotificationType)
                 })
             },
             settings: {
-                enabled: GuildSettingOptionBuilder.boolean({
+                enabled: new BooleanGuildSettingOption({
                     name: "Enabled",
                     description: "Whether the leveling module is enabled in the guild."
                 }),
-                ignoredChannels: GuildSettingOptionBuilder.channelArray({
+                ignoredChannels: new ChannelArrayGuildSettingOption({
                     name: "Ignored Channels",
                     description: "Channels that are ignored when tracking user activity."
                 }),
-                ignoredRoles: GuildSettingOptionBuilder.roleArray({
+                ignoredRoles: new RoleArrayGuildSettingOption({
                     name: "Ignored Roles",
                     description: "Roles that are ignored when tracking user activity."
                 })
@@ -128,6 +155,11 @@ export default class LevelingModule extends ConfigurableModule<LevelingSettings,
             await this.memberActivity.upsert(member.guildID, member.userID, {
                 level: newLevel
             });
+
+            const rewards = this.dependencies.get<RewardsModule>("rewards");
+            if (rewards !== undefined) {
+                await rewards.claimRewards(member.guildID, member.userID, newLevel);
+            }
 
             await this.#notifyMember(member, channelID, newLevel);
         }

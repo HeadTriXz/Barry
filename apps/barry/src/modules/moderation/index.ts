@@ -1,5 +1,5 @@
 import type { APIGuild, APIUser } from "@discordjs/core";
-import { type Case, type ModerationSettings, CaseType } from "@prisma/client";
+import { type Case, CaseType } from "@prisma/client";
 import { type CaseLogOptions, getLogContent } from "./functions/getLogContent.js";
 import {
     type ExpiredDWCScheduledBan,
@@ -13,7 +13,12 @@ import type { Application } from "../../Application.js";
 import type { BaseModerationModule } from "../../types/moderation.js";
 import type { FlaggableModule } from "./types.js";
 
-import { ConfigurableModule, GuildSettingOptionBuilder } from "../../ConfigurableModule.js";
+import {
+    BooleanGuildSettingOption,
+    ChannelGuildSettingOption,
+    IntegerGuildSettingOption,
+    RoleGuildSettingOption
+} from "../../config/options/index.js";
 import {
     DWC_BAN_INTERVAL,
     DWC_BAN_REASON,
@@ -21,6 +26,7 @@ import {
     UNBAN_INTERVAL,
     UNKNOWN_UNDWC_REASON
 } from "./constants.js";
+import { ConfigurableModule } from "../../config/module.js";
 import { DiscordAPIError } from "@discordjs/rest";
 import { ModerationActions } from "./functions/actions/actions.js";
 import { loadCommands } from "../../utils/loadFolder.js";
@@ -89,7 +95,7 @@ export interface UnflagOptions {
 /**
  * Represents the moderation module.
  */
-export default class ModerationModule extends ConfigurableModule<ModerationSettings> implements BaseModerationModule {
+export default class ModerationModule extends ConfigurableModule<ModerationModule> implements BaseModerationModule {
     /**
      * Actions that can be performed on a user.
      */
@@ -142,23 +148,23 @@ export default class ModerationModule extends ConfigurableModule<ModerationSetti
 
         this.defineConfig({
             settings: {
-                channelID: GuildSettingOptionBuilder.channel({
+                channelID: new ChannelGuildSettingOption({
                     description: "The channel where moderation logs are posted.",
                     name: "Log Channel",
                     nullable: true
                 }),
-                dwcDays: GuildSettingOptionBuilder.integer({
+                dwcDays: new IntegerGuildSettingOption({
                     description: "The number of days a user must be flagged for before automatically being banned.",
                     name: "DWC Days",
                     maximum: 28,
                     minimum: 1
                 }),
-                dwcRoleID: GuildSettingOptionBuilder.role({
+                dwcRoleID: new RoleGuildSettingOption({
                     description: "The role to assign to flagged users.",
                     name: "DWC Role",
                     nullable: true
                 }),
-                enabled: GuildSettingOptionBuilder.boolean({
+                enabled: new BooleanGuildSettingOption({
                     description: "Whether this module is enabled.",
                     name: "Enabled"
                 })

@@ -57,6 +57,27 @@ model MemberActivity {
   @@map("member_activity")
 }
 
+/// Rewards
+model Reward {
+  id        Int     @id @default(autoincrement())
+  guildID   String  @map("guild_id")
+  roleID    String  @map("role_id")
+  level     Int
+  settings  RewardsSettings @relation(references: [guildID], fields: [guildID], onDelete: Cascade)
+
+  @@index([guildID])
+  @@map("rewards")
+}
+
+model RewardsSettings {
+  guildID     String  @id @map("guild_id")
+  enabled     Boolean @default(false)
+  keepRewards Boolean @default(false) @map("keep_rewards")
+  rewards     Reward[]
+
+  @@map("rewards_settings")
+}
+
 // Marketplace
 /// Profiles
 enum ProfileCreationStatus {

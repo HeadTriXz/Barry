@@ -1,4 +1,5 @@
 import {
+    type APIEmbedFooter,
     type APISelectMenuOption,
     ComponentType,
     MessageFlags,
@@ -11,23 +12,18 @@ import {
     SlashCommand,
     UpdatableInteraction
 } from "@barry/core";
-import { type BaseGuildSettings, ModifyGuildSettingHandlers } from "./handlers.js";
 import {
-    type ParsedGuildSettingConfig,
-    type ParsedGuildSettingOption,
-    ConfigurableModule,
+    type BaseGuildSettingOption,
+    type TypedGuildSettingOption,
     GuildSettingType
-} from "../../../../../ConfigurableModule.js";
-import type { ModuleWithSettings } from "../../../../../types/modules.js";
+} from "../../../../../config/option.js";
+import type { BaseSettings } from "../../../../../types/modules.js";
 import type GeneralModule from "../../../index.js";
 
+import { ConfigurableModule } from "../../../../../config/module.js";
 import { timeoutContent } from "../../../../../common.js";
-import config, { type Emoji } from "../../../../../config.js";
 
-/**
- * Represents the base configurable options for a guild.
- */
-export type BaseGuildSettingsConfig = ParsedGuildSettingConfig<ModuleWithSettings<BaseGuildSettings>>;
+import config, { type Emoji } from "../../../../../config.js";
 
 /**
  * The base options for the select menu.
@@ -74,88 +70,35 @@ export default class extends SlashCommand<GeneralModule> {
     }
 
     /**
-     * Format the value of a setting.
-     *
-     * @param type The type of the setting.
-     * @param settings The settings of the guild.
-     * @param option The option to format.
-     * @returns The formatted value.
-     */
-    formatValue<T extends BaseGuildSettings>(
-        settings: T,
-        option: ParsedGuildSettingOption<ModuleWithSettings<T>, GuildSettingType, T>
-    ): string {
-        const value = settings[option.key];
-        if (option.nullable && value === null) {
-            return "`None`";
-        }
-
-        if (Array.isArray(value) && value.length === 0) {
-            return "`None`";
-        }
-
-        switch (option.type) {
-            case GuildSettingType.Boolean: {
-                return value ? "`True`" : "`False`";
-            }
-            case GuildSettingType.Channel: {
-                return `<#${value}>`;
-            }
-            case GuildSettingType.ChannelArray: {
-                return (value as string[]).map((x) => `<#${x}>`).join(", ");
-            }
-            case GuildSettingType.Custom: {
-                return this.formatValue(settings, { ...option, type: option.base || GuildSettingType.String });
-            }
-            case GuildSettingType.Emoji: {
-                const emojiName = settings[option.emojiKeys.name] as string;
-                const emojiID = settings[option.emojiKeys.id] as string | null;
-
-                return emojiID !== null
-                    ? `<:${emojiName}:${emojiID}>`
-                    : emojiName;
-            }
-            case GuildSettingType.Role: {
-                return `<@&${value}>`;
-            }
-            case GuildSettingType.RoleArray: {
-                return (value as string[]).map((x) => `<@&${x}>`).join(", ");
-            }
-            default: {
-                const escaped = new String(value).replace(/`/g, "`\u200B");
-                return `\`\`${escaped}\`\``;
-            }
-        }
-    }
-
-    /**
      * Returns the emoji for the specified setting.
      *
-     * @param type The type of the setting.
+     * @param option The option to get the emoji for.
      * @param value The value of the setting.
      * @returns The emoji for the setting.
      */
-    getEmoji(type: GuildSettingType, value?: unknown): Emoji {
+    getEmoji(option: BaseGuildSettingOption<any>, value?: unknown): Emoji {
         if (value === null) {
             return config.emotes.unknown;
         }
 
-        if (type === GuildSettingType.Boolean) {
-            return value
-                ? config.emotes.check
-                : config.emotes.unavailable;
-        }
+        if ("type" in option) {
+            if (option.type === GuildSettingType.Boolean) {
+                return value
+                    ? config.emotes.check
+                    : config.emotes.unavailable;
+            }
 
-        if (type === GuildSettingType.Channel || type === GuildSettingType.ChannelArray) {
-            return config.emotes.channel;
-        }
+            if (option.type === GuildSettingType.Channel || option.type === GuildSettingType.ChannelArray) {
+                return config.emotes.channel;
+            }
 
-        if (type === GuildSettingType.Role || type === GuildSettingType.RoleArray) {
-            return config.emotes.role;
-        }
+            if (option.type === GuildSettingType.Role || option.type === GuildSettingType.RoleArray) {
+                return config.emotes.role;
+            }
 
-        if (type === GuildSettingType.Emoji) {
-            return config.emotes.emoji;
+            if (option.type === GuildSettingType.Emoji) {
+                return config.emotes.emoji;
+            }
         }
 
         return config.emotes.add;
@@ -169,11 +112,7 @@ export default class extends SlashCommand<GeneralModule> {
      * @param cache The cache for the settings.
      * @returns The settings of the module.
      */
-    async showModule(
-        interaction: UpdatableInteraction,
-        moduleID: string,
-        cache: Record<string, BaseGuildSettings> = {}
-    ): Promise<void> {
+    async showModule(interaction: UpdatableInteraction, moduleID: string): Promise<void> {
         if (!interaction.isInvokedInGuild()) {
             return;
         }
@@ -201,30 +140,36 @@ export default class extends SlashCommand<GeneralModule> {
         }
 
         if (module instanceof ConfigurableModule) {
-            const moduleConfig = module.getConfig() as BaseGuildSettingsConfig;
+            const options = module.getConfig();
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i] as TypedGuildSettingOption<any, BaseSettings, keyof BaseSettings>;
 
-            for (const setting of moduleConfig) {
-                const key = setting.repository.constructor.name;
-                const settings = cache[key] ??= await setting.repository.getOrCreate(interaction.guildID);
+                const value = await option.get(interaction.guildID);
+                const emoji = this.getEmoji(option, value);
 
-                const emoji = this.getEmoji(setting.type, settings[setting.key]);
                 selectOptions.push({
-                    description: setting.description,
+                    description: option.description,
                     emoji: {
                         animated: emoji.animated,
                         id: emoji.id,
                         name: emoji.name
                     },
-                    label: setting.name,
-                    value: setting.key as string
+                    label: option.name,
+                    value: i.toString()
                 });
 
+                const formatted = await option.onView(option, interaction);
                 embedOptions.push({
-                    emoji: this.getEmoji(setting.type, settings[setting.key]),
-                    name: setting.name,
-                    value: this.formatValue(settings, setting)
+                    emoji: emoji,
+                    name: option.name,
+                    value: formatted
                 });
             }
+        }
+
+        let footer: APIEmbedFooter | undefined;
+        if (dependencies.length > 0) {
+            footer = { text: `You can select from ${dependencies.length} submodules.` };
         }
 
         await interaction.editParent({
@@ -239,9 +184,10 @@ export default class extends SlashCommand<GeneralModule> {
             }],
             content: `### ${config.emotes.add} Select an option to configure.`,
             embeds: [{
-                title: module.name,
                 description: module.description + "\n\n"
-                    + embedOptions.map((o) => `${o.emoji} **${o.name}**: ${o.value}`).join("\n")
+                    + embedOptions.map((o) => `${o.emoji} **${o.name}**: ${o.value}`).join("\n"),
+                footer: footer,
+                title: module.name
             }]
         });
 
@@ -259,24 +205,21 @@ export default class extends SlashCommand<GeneralModule> {
         }
 
         if (dependencies.some((x) => x.id === key)) {
-            return this.showModule(response, `${moduleID}.${key}`, cache);
+            return this.showModule(response, `${moduleID}.${key}`);
         }
 
         if (!(module instanceof ConfigurableModule)) {
             throw new Error(`Module '${moduleID}' is not configurable.`);
         }
 
-        const moduleConfig = module.getConfig() as BaseGuildSettingsConfig;
-        const option = moduleConfig.find((x) => x.key === key);
-        if (option === undefined) {
-            throw new Error(`Option '${key}' not found.`);
+        const options = module.getConfig();
+        const option = options[Number(key)] as TypedGuildSettingOption<any, BaseSettings, keyof BaseSettings>;
+
+        if (response.isInvokedInGuild()) {
+            await option.onEdit(option, response);
         }
 
-        const settings = cache[option.repository.constructor.name];
-        const handler = new ModifyGuildSettingHandlers(module);
-        await handler.handle(response, settings, option);
-
-        await this.showModule(response, moduleID, cache);
+        await this.showModule(response, moduleID);
     }
 
     /**
@@ -333,11 +276,11 @@ export default class extends SlashCommand<GeneralModule> {
      * @param modules The registry to get all configurable modules from.
      * @returns The configurable modules.
      */
-    #getAllModules(modules: ModuleRegistry): Array<ConfigurableModule<BaseGuildSettings>> {
+    #getAllModules(modules: ModuleRegistry): Array<ConfigurableModule<any>> {
         return modules
             .all()
             .filter((module) => {
                 return module instanceof ConfigurableModule || this.#getAllModules(module.dependencies).length > 0;
-            }) as Array<ConfigurableModule<BaseGuildSettings>>;
+            }) as Array<ConfigurableModule<any>>;
     }
 }

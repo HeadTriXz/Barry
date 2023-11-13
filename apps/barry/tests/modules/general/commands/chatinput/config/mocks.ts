@@ -1,7 +1,20 @@
 import type { BaseSettings, SettingsRepository } from "../../../../../../src/types/modules.js";
 import type { Application } from "../../../../../../src/Application.js";
 
-import { ConfigurableModule, GuildSettingOptionBuilder } from "../../../../../../src/ConfigurableModule.js";
+import {
+    BooleanGuildSettingOption,
+    ChannelArrayGuildSettingOption,
+    ChannelGuildSettingOption,
+    EmojiGuildSettingOption,
+    EnumGuildSettingOption,
+    FloatGuildSettingOption,
+    IntegerGuildSettingOption,
+    RoleArrayGuildSettingOption,
+    RoleGuildSettingOption,
+    StringGuildSettingOption
+} from "../../../../../../src/config/options/index.js";
+import { ConfigurableModule } from "../../../../../../src/config/module.js";
+import { CustomGuildSettingOption } from "../../../../../../src/config/option.js";
 import { mockDeep } from "vitest-mock-extended";
 
 export interface MockSettings extends BaseSettings {
@@ -41,17 +54,17 @@ export const mockSettings = {
     type: MockType.Foo
 };
 
-export const mockChannelOption = GuildSettingOptionBuilder.channel({
+export const mockChannelOption = new ChannelGuildSettingOption<MockSettings, "channelID">({
     description: "Hello World!",
     name: "Channel"
 });
 
-export const mockChannelArrayOption = GuildSettingOptionBuilder.channelArray({
+export const mockChannelArrayOption = new ChannelArrayGuildSettingOption<MockSettings, "channels">({
     description: "Hello World!",
     name: "Channels"
 });
 
-export const mockEmojiOption = GuildSettingOptionBuilder.emoji({
+export const mockEmojiOption = new EmojiGuildSettingOption<MockSettings, "emojiID", "emojiName">({
     description: "Hello World!",
     emojiKeys: {
         id: "emojiID",
@@ -60,49 +73,50 @@ export const mockEmojiOption = GuildSettingOptionBuilder.emoji({
     name: "Emoji"
 });
 
-export const mockBooleanOption = GuildSettingOptionBuilder.boolean({
+export const mockBooleanOption = new BooleanGuildSettingOption<MockSettings, "enabled">({
     description: "Hello World!",
     name: "Enabled"
 });
 
-export const mockIntegerOption = GuildSettingOptionBuilder.integer({
+export const mockIntegerOption = new IntegerGuildSettingOption<MockSettings, "min">({
     description: "Hello World!",
     name: "Minimum"
 });
 
-export const mockFloatOption = GuildSettingOptionBuilder.float({
+export const mockFloatOption = new FloatGuildSettingOption<MockSettings, "max">({
     description: "Hello World!",
     name: "Maximum"
 });
 
-export const mockCustomOption = GuildSettingOptionBuilder.custom({
-    callback: vi.fn(),
+export const mockCustomOption = new CustomGuildSettingOption({
     description: "Hello World!",
-    name: "Random"
+    name: "Random",
+    onEdit: vi.fn(),
+    onView: vi.fn().mockResolvedValue("mock")
 });
 
-export const mockRoleOption = GuildSettingOptionBuilder.role({
+export const mockRoleOption = new RoleGuildSettingOption<MockSettings, "roleID">({
     description: "Hello World!",
     name: "Role"
 });
 
-export const mockRoleArrayOption = GuildSettingOptionBuilder.roleArray({
+export const mockRoleArrayOption = new RoleArrayGuildSettingOption<MockSettings, "roles">({
     description: "Hello World!",
     name: "Roles"
 });
 
-export const mockStringOption = GuildSettingOptionBuilder.string({
+export const mockStringOption = new StringGuildSettingOption<MockSettings, "text">({
     description: "Hello World!",
     name: "Text"
 });
 
-export const mockEnumOption = GuildSettingOptionBuilder.enum({
+export const mockEnumOption = new EnumGuildSettingOption<MockSettings, "type">({
     description: "Hello World!",
     name: "Type",
     values: ["Foo", "Bar", "Baz"]
 });
 
-export class MockModule extends ConfigurableModule<MockSettings> {
+export class MockModule extends ConfigurableModule<MockModule> {
     settings: SettingsRepository<MockSettings>;
 
     constructor(client: Application) {
@@ -121,13 +135,14 @@ export class MockModule extends ConfigurableModule<MockSettings> {
                 enabled: mockBooleanOption,
                 min: mockIntegerOption,
                 max: mockFloatOption,
-                random: mockCustomOption,
                 roleID: mockRoleOption,
                 roles: mockRoleArrayOption,
                 text: mockStringOption,
                 type: mockEmojiOption
             }
         });
+
+        this.defineCustom(mockCustomOption);
     }
 
     async isEnabled(guildID: string): Promise<boolean> {

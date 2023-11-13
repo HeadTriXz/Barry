@@ -61,7 +61,7 @@ export class ReplyableInteraction extends Interaction {
     /**
      * The client that received the interaction.
      */
-    #client: Client;
+    client: Client;
 
     /**
      * The ID of the initial interaction response.
@@ -77,7 +77,7 @@ export class ReplyableInteraction extends Interaction {
      */
     constructor(data: APIInteraction, client: Client, respond?: ResponseHandler) {
         super(data, client, respond);
-        this.#client = client;
+        this.client = client;
     }
 
     /**
@@ -98,7 +98,7 @@ export class ReplyableInteraction extends Interaction {
 
         return new Promise((resolve) => {
             const cleanup = (interaction?: MessageComponentInteraction): void => {
-                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
+                this.client.off(GatewayDispatchEvents.InteractionCreate, listener);
 
                 clearTimeout(timeoutID);
                 resolve(interaction);
@@ -124,7 +124,7 @@ export class ReplyableInteraction extends Interaction {
             };
 
             const timeoutID = setTimeout(cleanup, timeout);
-            this.#client.on(GatewayDispatchEvents.InteractionCreate, listener);
+            this.client.on(GatewayDispatchEvents.InteractionCreate, listener);
         });
     }
 
@@ -141,7 +141,7 @@ export class ReplyableInteraction extends Interaction {
     ): Promise<ModalSubmitInteraction | undefined> {
         return new Promise((resolve) => {
             const cleanup = (interaction?: ModalSubmitInteraction): void => {
-                this.#client.off(GatewayDispatchEvents.InteractionCreate, listener);
+                this.client.off(GatewayDispatchEvents.InteractionCreate, listener);
 
                 clearTimeout(timeoutID);
                 resolve(interaction);
@@ -158,7 +158,7 @@ export class ReplyableInteraction extends Interaction {
             };
 
             const timeoutID = setTimeout(cleanup, timeout);
-            this.#client.on(GatewayDispatchEvents.InteractionCreate, listener);
+            this.client.on(GatewayDispatchEvents.InteractionCreate, listener);
         });
     }
 
@@ -169,7 +169,7 @@ export class ReplyableInteraction extends Interaction {
      * @returns The followup message.
      */
     async createFollowupMessage(options: APIInteractionResponseCallbackDataWithFiles): Promise<APIMessage> {
-        return this.#client.api.webhooks.execute(this.applicationID, this.token, { ...options, wait: true });
+        return this.client.api.webhooks.execute(this.applicationID, this.token, { ...options, wait: true });
     }
 
     /**
@@ -240,7 +240,7 @@ export class ReplyableInteraction extends Interaction {
      * @param messageID The ID of the message.
      */
     async deleteFollowupMessage(messageID: string): Promise<void> {
-        return this.#client.api.webhooks.deleteMessage(this.applicationID, this.token, messageID);
+        return this.client.api.webhooks.deleteMessage(this.applicationID, this.token, messageID);
     }
 
     /**
@@ -261,7 +261,7 @@ export class ReplyableInteraction extends Interaction {
         messageID: string,
         options: APIInteractionResponseCallbackDataWithFiles
     ): Promise<APIMessage> {
-        return this.#client.api.webhooks.editMessage(this.applicationID, this.token, messageID, options);
+        return this.client.api.webhooks.editMessage(this.applicationID, this.token, messageID, options);
     }
 
     /**
@@ -284,7 +284,7 @@ export class ReplyableInteraction extends Interaction {
      * @returns The found message.
      */
     async getFollowupMessage(messageID: string): Promise<APIMessage> {
-        return this.#client.api.webhooks.getMessage(this.applicationID, this.token, messageID);
+        return this.client.api.webhooks.getMessage(this.applicationID, this.token, messageID);
     }
 
     /**
