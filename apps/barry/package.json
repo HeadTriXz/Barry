@@ -28,9 +28,9 @@
   },
   "dependencies": {
     "@barry/core": "*",
-    "@discordjs/core": "^1.0.1",
-    "@discordjs/rest": "^2.0.1",
-    "@discordjs/ws": "^1.0.1",
+    "@discordjs/core": "^1.1.0",
+    "@discordjs/rest": "^2.1.0",
+    "@discordjs/ws": "^1.0.2",
     "@napi-rs/canvas": "^0.1.41",
     "@prisma/client": "^5.0.0",
     "canvas-constructor": "^7.0.1",

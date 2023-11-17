@@ -21,6 +21,7 @@ import { mockMessageButton } from "./components.js";
 const baseInteraction = {
     application_id: "49072635294295155",
     app_permissions: "8",
+    entitlements: [],
     guild_id: "68239102456844360",
     guild_locale: "en-US",
     id: "82634092357100295",

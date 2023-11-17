@@ -5,7 +5,7 @@ import {
     GuildSettingType,
     TypedGuildSettingOption
 } from "../option.js";
-import { type GuildChannelType, ComponentType } from "@discordjs/core";
+import { type GuildChannelType, ComponentType, SelectMenuDefaultValueType } from "@discordjs/core";
 import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
 import type { BaseSettings } from "../../types/modules.js";
 import { timeoutContent } from "../../common.js";
@@ -70,7 +70,7 @@ export class ChannelGuildSettingOption<
      * @param interaction The interaction that triggered the setting.
      */
     async handle(interaction: GuildInteraction<UpdatableInteraction>): Promise<void> {
-        const value = await this.get(interaction.guildID);
+        const value = await this.get(interaction.guildID) as string | null;
 
         if (typeof value !== "string" && !(this.nullable && value === null)) {
             throw new Error(`The setting '${this.key}' is not of type 'string'.`);
@@ -81,9 +81,8 @@ export class ChannelGuildSettingOption<
                 components: [{
                     channel_types: this.channelTypes ?? DEFAULT_CHANNEL_TYPES,
                     custom_id: "config-channel",
-                    // @ts-expect-error discord.js is lazy
                     default_values: value !== null
-                        ? [{ id: value, type: "channel" }]
+                        ? [{ id: value, type: SelectMenuDefaultValueType.Channel }]
                         : undefined,
                     min_values: this.nullable ? 0 : 1,
                     placeholder: this.description,

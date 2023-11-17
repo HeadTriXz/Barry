@@ -87,6 +87,7 @@ export class Application extends Client {
         const rest = new REST().setToken(options.discord.token);
 
         super({
+            // @ts-expect-error The types are wrong.
             api: new API(rest),
             applicationID: options.discord.applicationID,
             gateway: new WebSocketManager({

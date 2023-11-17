@@ -344,7 +344,6 @@ export default class extends Event<ReportsModule> {
         }
 
         await this.client.api.channels.edit(report.threadID, {
-            // @ts-expect-error - The typings are incorrect. Update @discordjs/core.
             applied_tags: tags,
             archived: true
         });

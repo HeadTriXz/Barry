@@ -5,7 +5,7 @@ import {
     GuildSettingType,
     TypedGuildSettingOption
 } from "../option.js";
-import { type GuildChannelType, ComponentType } from "@discordjs/core";
+import { type GuildChannelType, ComponentType, SelectMenuDefaultValueType } from "@discordjs/core";
 import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
 import type { BaseSettings } from "../../types/modules.js";
 
@@ -94,10 +94,9 @@ export class ChannelArrayGuildSettingOption<
                 components: [{
                     channel_types: this.channelTypes ?? DEFAULT_CHANNEL_TYPES,
                     custom_id: "config-channels",
-                    // @ts-expect-error discord.js is lazy
                     default_values: value?.map((value: string) => ({
                         id: value,
-                        type: "channel"
+                        type: SelectMenuDefaultValueType.Channel
                     })),
                     max_values: this.maximum ?? 25,
                     min_values: this.minimum ?? 0,
