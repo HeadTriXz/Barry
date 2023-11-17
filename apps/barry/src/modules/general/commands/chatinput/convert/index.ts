@@ -2,6 +2,7 @@ import type GeneralModule from "../../../index.js";
 
 import { SlashCommand } from "@barry/core";
 import ConvertCurrencyCommand from "./currency/index.js";
+import ConvertUnitCommand from "./unit/index.js";
 
 /**
  * Represents a slash command for converting one unit to another.
@@ -16,7 +17,10 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "convert",
             description: "Converts one unit to another.",
-            children: [ConvertCurrencyCommand]
+            children: [
+                ConvertCurrencyCommand,
+                ConvertUnitCommand
+            ]
         });
     }
 
