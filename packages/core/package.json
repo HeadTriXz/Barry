@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@barry/logger": "*",
-    "@discordjs/core": "^1.1.0",
-    "@discordjs/rest": "^2.1.0",
+    "@discordjs/core": "^1.1.1",
+    "@discordjs/rest": "^2.2.0",
     "@discordjs/ws": "^1.0.2",
     "fastify": "^4.15.0",
     "tweetnacl": "^1.0.3"

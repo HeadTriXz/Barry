@@ -28,8 +28,8 @@
   },
   "dependencies": {
     "@barry/core": "*",
-    "@discordjs/core": "^1.1.0",
-    "@discordjs/rest": "^2.1.0",
+    "@discordjs/core": "^1.1.1",
+    "@discordjs/rest": "^2.2.0",
     "@discordjs/ws": "^1.0.2",
     "@napi-rs/canvas": "^0.1.41",
     "@prisma/client": "^5.0.0",
