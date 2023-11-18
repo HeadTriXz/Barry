@@ -7,7 +7,7 @@ import {
 import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
 import type { BaseSettings } from "../../types/modules.js";
 
-import { ComponentType } from "@discordjs/core";
+import { ComponentType, SelectMenuDefaultValueType } from "@discordjs/core";
 import { timeoutContent } from "../../common.js";
 
 /**
@@ -73,10 +73,9 @@ export class RoleArrayGuildSettingOption<
             components: [{
                 components: [{
                     custom_id: "config-roles",
-                    // @ts-expect-error discord.js is lazy
                     default_values: value?.map((value: string) => ({
                         id: value,
-                        type: "role"
+                        type: SelectMenuDefaultValueType.Role
                     })),
                     max_values: this.maximum ?? 25,
                     min_values: this.minimum ?? 0,
