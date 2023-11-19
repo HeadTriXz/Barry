@@ -54,37 +54,37 @@ export interface ColorValues {
 /**
  * The regular expression for a color in the RGB format.
  */
-const RGB_REGEX = /rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const RGB_REGEX = /^rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
 
 /**
  * The regular expression for a color in the HEX format.
  */
-const HEX_REGEX = /(#|0x)?[0-9a-fA-F]{3,8}/;
+const HEX_REGEX = /^(#|0x)?[0-9a-fA-F]{3,8}/;
 
 /**
  * The regular expression for a color in the HSL format.
  */
-const HSL_REGEX = /hsl\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const HSL_REGEX = /^hsl\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
 
 /**
  * The regular expression for a color in the HSV format.
  */
-const HSV_REGEX = /hsv\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const HSV_REGEX = /^hsv\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
 
 /**
  * The regular expression for a color in the HSB format.
  */
-const HSB_REGEX = /hsb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const HSB_REGEX = /^hsb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
 
 /**
  * The regular expression for a color in the LAB format.
  */
-const LAB_REGEX = /lab\((\d{1,3})(\.\d+)?, ?(\d{1,3})(\.\d+)?, ?(\d{1,3})(\.\d+)?\)/;
+const LAB_REGEX = /^lab\((\d{1,3})(\.\d+)?, ?(\d{1,3})(\.\d+)?, ?(\d{1,3})(\.\d+)?\)/;
 
 /**
  * The regular expression for a color in the CMYK format.
  */
-const CMYK_REGEX = /cmyk\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?/;
+const CMYK_REGEX = /^cmyk\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?/;
 
 /**
  * The supported color formats.
