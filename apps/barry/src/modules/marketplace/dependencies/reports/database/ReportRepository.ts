@@ -75,10 +75,18 @@ export class ReportRepository {
                 category: options.category,
                 creatorID: options.creatorID,
                 guildID: options.guildID,
+                profile: {
+                    connect: {
+                        userID: options.userID
+                    }
+                },
                 reason: options.reason,
-                requestID: options.requestID,
-                type: options.type,
-                userID: options.userID
+                request: {
+                    connect: {
+                        id: options.requestID
+                    }
+                },
+                type: options.type
             }
         });
     }
