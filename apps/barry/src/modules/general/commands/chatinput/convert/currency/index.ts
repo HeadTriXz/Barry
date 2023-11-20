@@ -185,7 +185,7 @@ export default class extends SlashCommand<GeneralModule> {
             });
         }
 
-        const rate = await this.fetchRate(options.amount, options.from, options.to);
+        const rate = await this.fetchRate(options.amount, options.from.toUpperCase(), options.to.toUpperCase());
         await interaction.createMessage({
             content: `${config.emotes.add} \`${options.amount} ${options.from}\` is \`${rate} ${options.to}\`.`
         });
