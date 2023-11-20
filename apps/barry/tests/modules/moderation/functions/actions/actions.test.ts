@@ -22,7 +22,11 @@ describe("respond", () => {
 
         await respond(interaction, "content");
 
-        expect(editParentSpy).toHaveBeenCalledWith({ content: "content" });
+        expect(editParentSpy).toHaveBeenCalledWith({
+            components: [],
+            content: "content",
+            embeds: []
+        });
     });
 
     it("should create a message if the interaction is not updatable", async () => {

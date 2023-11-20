@@ -1,8 +1,8 @@
-import type {
-    ReportCategory,
-    ReportType,
-    PrismaClient,
-    Report
+import {
+    type PrismaClient,
+    type Report,
+    type ReportCategory,
+    ReportType
 } from "@prisma/client";
 
 /**
@@ -75,6 +75,9 @@ export class ReportRepository {
                 category: options.category,
                 creatorID: options.creatorID,
                 guildID: options.guildID,
+                profileID: options.type === ReportType.Profile
+                    ? options.userID
+                    : undefined,
                 reason: options.reason,
                 requestID: options.requestID,
                 type: options.type,
