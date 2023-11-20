@@ -1,9 +1,8 @@
-import type {
-    ReportCategory,
-    ReportType,
-    PrismaClient,
-    Report,
-    Prisma
+import {
+    type PrismaClient,
+    type Report,
+    type ReportCategory,
+    ReportType
 } from "@prisma/client";
 
 /**
@@ -71,24 +70,20 @@ export class ReportRepository {
      * @returns The created report.
      */
     async create(options: ReportOptions): Promise<Report> {
-        const data = {
-            category: options.category,
-            creatorID: options.creatorID,
-            guildID: options.guildID,
-            reason: options.reason,
-            type: options.type,
-            userID: options.userID
-        } as Prisma.ReportCreateInput;
-
-        if (options.requestID !== undefined) {
-            data.request = {
-                connect: {
-                    id: options.requestID
-                }
-            };
-        }
-
-        return this.#prisma.report.create({ data });
+        return this.#prisma.report.create({
+            data: {
+                category: options.category,
+                creatorID: options.creatorID,
+                guildID: options.guildID,
+                profileID: options.type === ReportType.Profile
+                    ? options.userID
+                    : undefined,
+                reason: options.reason,
+                requestID: options.requestID,
+                type: options.type,
+                userID: options.userID
+            }
+        });
     }
 
     /**

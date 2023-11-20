@@ -216,6 +216,7 @@ model Report {
   category  ReportCategory
   creatorID String         @map("creator_id")
   guildID   String         @map("guild_id")
+  profileID String?        @map("profile_id")
   reason    String
   requestID Int?           @map("request_id")
   type      ReportType
@@ -223,7 +224,7 @@ model Report {
   createdAt DateTime       @default(now()) @map("created_at")
 
   local     LocalReport[]
-  profile   Profile?       @relation(references: [userID], fields: [userID])
+  profile   Profile?       @relation(references: [userID], fields: [profileID])
   request   Request?       @relation(references: [id], fields: [requestID])
 
   @@map("reports")

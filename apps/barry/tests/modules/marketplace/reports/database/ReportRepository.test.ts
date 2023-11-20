@@ -19,6 +19,7 @@ describe("ReportRepository", () => {
             creatorID: creatorID,
             guildID: guildID,
             id: 42,
+            profileID: null,
             reason: "They scammed me.",
             requestID: 1,
             type: ReportType.Request,
@@ -43,6 +44,7 @@ describe("ReportRepository", () => {
                     category: ReportCategory.ScamsFraud,
                     creatorID: creatorID,
                     guildID: guildID,
+                    profileID: userID,
                     reason: "They scammed me.",
                     type: ReportType.Profile,
                     userID: userID
