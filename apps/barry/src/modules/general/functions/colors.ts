@@ -52,9 +52,29 @@ export interface ColorValues {
 }
 
 /**
+ * The regular expression for a digit between 0 and 100.
+ */
+const DIGIT_100_REGEX = "\\s*(\\d|[1-9]\\d|100)\\s*";
+
+/**
+ * The regular expression for a digit between 0 and 255.
+ */
+const DIGIT_255_REGEX = "\\s*(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\s*";
+
+/**
+ * The regular expression for a digit between 0 and 360.
+ */
+const DIGIT_360_REGEX = "\\s*(\\d|[1-9]\\d|[12]\\d{2}|3[0-5]\\d|360)\\s*";
+
+/**
+ * The regular expression for a digit between -128 and 128.
+ */
+const DIGIT_128_REGEX = "\\s*(-[1-9]|-?[1-9]\\d|-?1[01]\\d|-?12[0-8]|\\d)\\s*";
+
+/**
  * The regular expression for a color in the RGB format.
  */
-const RGB_REGEX = /^rgb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const RGB_REGEX = new RegExp(`^rgb\\(${DIGIT_255_REGEX},${DIGIT_255_REGEX},${DIGIT_255_REGEX}\\)`, "i");
 
 /**
  * The regular expression for a color in the HEX format.
@@ -64,27 +84,27 @@ const HEX_REGEX = /^(#|0x)?[0-9a-fA-F]{3,8}/;
 /**
  * The regular expression for a color in the HSL format.
  */
-const HSL_REGEX = /^hsl\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const HSL_REGEX = new RegExp(`^hsl\\(${DIGIT_360_REGEX},${DIGIT_100_REGEX},${DIGIT_100_REGEX}\\)`, "i");
 
 /**
  * The regular expression for a color in the HSV format.
  */
-const HSV_REGEX = /^hsv\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const HSV_REGEX = new RegExp(`^hsv\\(${DIGIT_360_REGEX},${DIGIT_100_REGEX},${DIGIT_100_REGEX}\\)`, "i");
 
 /**
  * The regular expression for a color in the HSB format.
  */
-const HSB_REGEX = /^hsb\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)/;
+const HSB_REGEX = new RegExp(`^hsb\\(${DIGIT_360_REGEX},${DIGIT_100_REGEX},${DIGIT_100_REGEX}\\)`, "i");
 
 /**
  * The regular expression for a color in the LAB format.
  */
-const LAB_REGEX = /^lab\((\d{1,3})(\.\d+)?, ?(\d{1,3})(\.\d+)?, ?(\d{1,3})(\.\d+)?\)/;
+const LAB_REGEX = new RegExp(`^lab\\(${DIGIT_100_REGEX},${DIGIT_128_REGEX},${DIGIT_128_REGEX}\\)`, "i");
 
 /**
  * The regular expression for a color in the CMYK format.
  */
-const CMYK_REGEX = /^cmyk\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?/;
+const CMYK_REGEX = new RegExp(`^cmyk\\(${DIGIT_100_REGEX},${DIGIT_100_REGEX},${DIGIT_100_REGEX},${DIGIT_100_REGEX}\\)`, "i");
 
 /**
  * The supported color formats.

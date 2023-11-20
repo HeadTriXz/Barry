@@ -25,7 +25,7 @@ vi.mock("canvas-constructor/napi-rs", () => {
     };
 });
 
-describe("ContrastCommand", () => {
+describe("/contrast", () => {
     let command: ContrastCommand;
     let interaction: ApplicationCommandInteraction;
 
