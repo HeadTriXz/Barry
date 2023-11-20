@@ -24,7 +24,11 @@ import { warn } from "./warn.js";
  */
 export async function respond(interaction: ReplyableInteraction, content: string): Promise<void> {
     if (interaction instanceof UpdatableInteraction) {
-        return interaction.editParent({ content });
+        return interaction.editParent({
+            components: [],
+            content: content,
+            embeds: []
+        });
     }
 
     await interaction.createMessage({
