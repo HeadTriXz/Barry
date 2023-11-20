@@ -49,6 +49,13 @@ export default class extends SlashCommand<ModerationModule> {
      * @param options The options for the command.
      */
     async execute(interaction: ApplicationCommandInteraction, options: DWCOptions): Promise<void> {
+        if ("members" in interaction.data.resolved) {
+            const member = interaction.data.resolved.members.get(options.user.id);
+            if (member !== undefined) {
+                options.member = member;
+            }
+        }
+
         return this.module.actions.dwc(interaction, options);
     }
 }
