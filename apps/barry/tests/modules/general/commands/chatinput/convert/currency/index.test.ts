@@ -50,7 +50,7 @@ describe("/convert currency", () => {
 
             expect(interaction.createMessage).toHaveBeenCalledOnce();
             expect(interaction.createMessage).toHaveBeenCalledWith({
-                content: expect.stringContaining("`invalid` is not a valid currency."),
+                content: expect.stringContaining("`INVALID` is not a valid currency."),
                 flags: MessageFlags.Ephemeral
             });
         });
@@ -68,7 +68,7 @@ describe("/convert currency", () => {
 
             expect(interaction.createMessage).toHaveBeenCalledOnce();
             expect(interaction.createMessage).toHaveBeenCalledWith({
-                content: expect.stringContaining("`invalid` is not a valid currency."),
+                content: expect.stringContaining("`INVALID` is not a valid currency."),
                 flags: MessageFlags.Ephemeral
             });
         });

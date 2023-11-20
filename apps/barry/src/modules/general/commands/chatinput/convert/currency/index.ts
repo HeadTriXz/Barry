@@ -164,6 +164,9 @@ export default class extends SlashCommand<GeneralModule> {
      * @param options The options for this command.
      */
     async execute(interaction: ApplicationCommandInteraction, options: CurrencyOptions): Promise<void> {
+        options.from = options.from.toUpperCase();
+        options.to = options.to.toUpperCase();
+
         if (!this.isValidCurrency(options.from)) {
             return interaction.createMessage({
                 content: `${config.emotes.error} \`${options.from}\` is not a valid currency.`,
@@ -185,7 +188,7 @@ export default class extends SlashCommand<GeneralModule> {
             });
         }
 
-        const rate = await this.fetchRate(options.amount, options.from.toUpperCase(), options.to.toUpperCase());
+        const rate = await this.fetchRate(options.amount, options.from, options.to);
         await interaction.createMessage({
             content: `${config.emotes.add} \`${options.amount} ${options.from}\` is \`${rate} ${options.to}\`.`
         });
@@ -217,7 +220,7 @@ export default class extends SlashCommand<GeneralModule> {
      * @returns Whether the given currency is valid.
      */
     isValidCurrency(currency: string): boolean {
-        return currency.toUpperCase() in currencyNames;
+        return currency in currencyNames;
     }
 
     /**
