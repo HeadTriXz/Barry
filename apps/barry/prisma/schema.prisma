@@ -223,8 +223,8 @@ model Report {
   createdAt DateTime       @default(now()) @map("created_at")
 
   local     LocalReport[]
-  profile   Profile?       @relation(references: [userID], fields: [userID], onDelete: Cascade)
-  request   Request?       @relation(references: [id], fields: [requestID], onDelete: Cascade)
+  profile   Profile?       @relation(references: [userID], fields: [userID])
+  request   Request?       @relation(references: [id], fields: [requestID])
 
   @@map("reports")
 }
