@@ -91,7 +91,7 @@ describe("DWCScheduledBanRepository", () => {
             expect(entities).toEqual([expiredBan]);
             expect(prisma.$queryRaw).toHaveBeenCalledOnce();
             expect(prisma.$queryRaw).toHaveBeenCalledWith([
-                expect.stringContaining("WHERE d.created_at <= NOW() + (s.dwc_days * INTERVAL '1 day')")
+                expect.stringContaining("WHERE d.created_at + (s.dwc_days * INTERVAL '1 day') <= NOW()")
             ]);
         });
 
