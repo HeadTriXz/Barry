@@ -5,9 +5,9 @@ import {
 } from "../../../src/modules/marketplace/utils.js";
 
 import { MessageFlags } from "@discordjs/core";
-import { UpdatableInteraction } from "@barry/core";
+import { UpdatableInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../mocks/application.js";
-import { createMockModalSubmitInteraction } from "@barry/testing";
+import { createMockModalSubmitInteraction } from "@barry-bot/testing";
 import { mockProfile } from "./profiles/mocks/profile.js";
 
 describe("Utils", () => {

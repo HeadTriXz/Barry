@@ -3,10 +3,10 @@ import {
     createMockApplicationCommandInteraction,
     mockGuild,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { mockCase, mockCaseNote } from "../../../../mocks/case.js";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { CaseType } from "@prisma/client";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../../mocks/application.js";

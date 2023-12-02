@@ -4,7 +4,7 @@ import type {
     RequestsSettings
 } from "@prisma/client";
 
-import { mockChannel, mockGuild, mockRole } from "@barry/testing";
+import { mockChannel, mockGuild, mockRole } from "@barry-bot/testing";
 import { OverwriteType } from "@discordjs/core";
 import { createMockApplication } from "../../../mocks/index.js";
 import { getDWCRole } from "../../../../src/modules/moderation/functions/getDWCRole.js";

@@ -4,7 +4,7 @@ import {
     GuildSettingType,
     TypedGuildSettingOption
 } from "../option.js";
-import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
+import type { GuildInteraction, UpdatableInteraction } from "@barry-bot/core";
 import type { BaseSettings } from "../../types/modules.js";
 
 import { ComponentType, MessageFlags, TextInputStyle } from "@discordjs/core";

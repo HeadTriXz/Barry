@@ -6,8 +6,8 @@ import {
 import {
     createMockApplicationCommandInteraction,
     mockUser
-} from "@barry/testing";
-import { ApplicationCommandInteraction } from "@barry/core";
+} from "@barry-bot/testing";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
 import { mockCase } from "../../../mocks/case.js";

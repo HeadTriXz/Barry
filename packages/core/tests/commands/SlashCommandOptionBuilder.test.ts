@@ -5,7 +5,7 @@ import {
 } from "../../src/index.js";
 
 import { ApplicationCommandOptionType, ChannelType } from "@discordjs/core";
-import { createMockAutocompleteInteraction } from "@barry/testing";
+import { createMockAutocompleteInteraction } from "@barry-bot/testing";
 
 describe("SlashCommandOptionBuilder", () => {
     describe("attachments", () => {

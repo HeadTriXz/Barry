@@ -3,6 +3,7 @@
 
 [![Banner Barry][banner]][link-repo]
 
+[![NPM][badge-npm]][link-npm]
 [![Build][badge-build]][link-build]
 [![Coverage][badge-coverage]][link-coverage]
 [![Contribute][badge-contribute]][link-contributing]
@@ -12,27 +13,27 @@
 
 <!-- Main Content -->
 ## About
-`@barry/core` serves as the beating heart of [Barry](/apps/barry/), a versatile and user-friendly Discord bot designed to assist and enhance the workflow of creatives. With a focus on 
+`@barry-bot/core` serves as the beating heart of [Barry](/apps/barry/), a versatile and user-friendly Discord bot designed to assist and enhance the workflow of creatives. With a focus on 
 flexibility and extensibility, it offers a powerful foundation for building feature-rich bots with ease.
 
 ## Features
 - **Command Handling**: Simplify the management of commands with built-in support for slash, message, and user commands. Easily define and handle commands, with automatic argument parsing for seamless user input processing.
 - **Modular System**: Organize your bot's functionality into modules, each can have its own set of commands and event listeners, providing the flexibility to swap in and out functionality as needed.
 - **Support for Gateway & HTTP**: Enjoy the best of both worlds with support for both **Gateway** events and **HTTP** interactions. Choose whatever suits your needs, whether you prefer the real-time nature of Gateway events or the scalability of HTTP interactions.
-- **Stability and Compatibility**: `@barry/core` strives to stay close to the Discord API, minimizing breaking changes and ensuring compatibility with the latest Discord features and updates. This allows you to build your bot with confidence, knowing that it will continue to function reliably.
+- **Stability and Compatibility**: `@barry-bot/core` strives to stay close to the Discord API, minimizing breaking changes and ensuring compatibility with the latest Discord features and updates. This allows you to build your bot with confidence, knowing that it will continue to function reliably.
 
 
 ## Installation
 [Node.js](https://nodejs.org/en/download) version 20 or later is required.
 ```sh
-npm install @barry/core
+npm install @barry-bot/core
 # or
-yarn add @barry/core
+yarn add @barry-bot/core
 ```
 
 ## Example Usage
 ```ts
-import { Client, FastifyServer, Module, SlashCommand } from "@barry/core";
+import { Client, FastifyServer, Module, SlashCommand } from "@barry-bot/core";
 import { API } from "@discordjs/core";
 import { REST } from "@discordjs/rest";
 
@@ -104,6 +105,7 @@ Please note that the licenses may differ between different parts of the project.
 [badge-coverage]:https://img.shields.io/codecov/c/github/HeadTriXz/Barry?style=for-the-badge&flag=core
 [badge-contribute]:https://img.shields.io/badge/contributions-welcome-orange.svg?style=for-the-badge
 [badge-kofi]:https://ko-fi.com/img/githubbutton_sm.svg
+[badge-npm]:https://img.shields.io/npm/v/@barry-bot/core.svg?maxAge=3600&style=for-the-badge
 [badge-license]:https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge
 [banner]:https://github.com/HeadTriXz/Barry/assets/32986761/72d2c27d-925c-465f-a6a3-fe836e86fad6
 
@@ -115,4 +117,5 @@ Please note that the licenses may differ between different parts of the project.
 [link-contributing]:https://github.com/HeadTriXz/Barry/blob/main/.github/CONTRIBUTING.md
 [link-kofi]:https://ko-fi.com/headtrixz
 [link-license]:https://github.com/HeadTriXz/Barry/blob/main/LICENSE
+[link-npm]:https://www.npmjs.com/package/@barry-bot/core
 [link-repo]: https://github.com/HeadTriXz/Barry

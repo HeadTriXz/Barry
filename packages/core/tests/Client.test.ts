@@ -19,8 +19,8 @@ import {
     MockServer,
     createMockModule
 } from "./mocks/index.js";
-import { mockPingInteraction } from "@barry/testing";
-import { Logger } from "@barry/logger";
+import { mockPingInteraction } from "@barry-bot/testing";
+import { Logger } from "@barry-bot/logger";
 
 describe("Client", () => {
     let client: Client;

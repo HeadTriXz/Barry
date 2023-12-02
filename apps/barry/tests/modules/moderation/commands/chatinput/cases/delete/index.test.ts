@@ -3,7 +3,7 @@ import type { CaseWithNotes } from "../../../../../../../src/modules/moderation/
 import {
     ApplicationCommandInteraction,
     MessageComponentInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     ButtonStyle,
     ComponentType,
@@ -13,7 +13,7 @@ import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { mockCase, mockCaseNote } from "../../../../mocks/case.js";
 import { createMockApplication } from "../../../../../../mocks/application.js";

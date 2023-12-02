@@ -1,7 +1,7 @@
 import type { BanOptions } from "../../../../../../src/types/moderation.js";
 
-import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
-import { createMockApplicationCommandInteraction, createMockAutocompleteInteraction } from "@barry/testing";
+import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry-bot/core";
+import { createMockApplicationCommandInteraction, createMockAutocompleteInteraction } from "@barry-bot/testing";
 
 import { ApplicationCommandType } from "@discordjs/core";
 import { COMMON_SEVERE_REASONS } from "../../../../../../src/modules/moderation/constants.js";

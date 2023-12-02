@@ -1,11 +1,11 @@
 import type { ProfilesSettings } from "@prisma/client";
 
-import { MessageComponentInteraction, PingInteraction } from "@barry/core";
+import { MessageComponentInteraction, PingInteraction } from "@barry-bot/core";
 import {
     createMockMessageComponentInteraction,
     mockChannel,
     mockPingInteraction
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { ComponentType } from "@discordjs/core";
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";

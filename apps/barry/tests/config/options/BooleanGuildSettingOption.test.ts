@@ -1,9 +1,9 @@
-import { type GuildInteraction, UpdatableInteraction } from "@barry/core";
+import { type GuildInteraction, UpdatableInteraction } from "@barry-bot/core";
 import { BooleanGuildSettingOption } from "../../../src/config/options/BooleanGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
 import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
-import { createMockMessageComponentInteraction } from "@barry/testing";
+import { createMockMessageComponentInteraction } from "@barry-bot/testing";
 
 describe("BooleanGuildSettingOption", () => {
     let interaction: GuildInteraction<UpdatableInteraction>;

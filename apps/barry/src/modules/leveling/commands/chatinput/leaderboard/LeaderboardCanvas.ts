@@ -14,7 +14,7 @@ import {
 import { Canvas, loadImage } from "canvas-constructor/napi-rs";
 import { LeaderboardPodium } from "./LeaderboardPodium.js";
 import { MemberActivitySortBy } from "../../../database/index.js";
-import { getAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry-bot/core";
 
 /**
  * Represents the dimensions of a piece of text in a canvas.

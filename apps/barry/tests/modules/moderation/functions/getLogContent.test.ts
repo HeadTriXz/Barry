@@ -1,8 +1,8 @@
 import { type CaseLogOptions, getLogContent } from "../../../../src/modules/moderation/functions/getLogContent.js";
 
-import { mockGuild, mockUser } from "@barry/testing";
+import { mockGuild, mockUser } from "@barry-bot/testing";
 import { CaseType } from "@prisma/client";
-import { getAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry-bot/core";
 
 describe("getLogContent", () => {
     let options: CaseLogOptions;

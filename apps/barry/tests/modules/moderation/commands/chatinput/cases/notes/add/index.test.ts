@@ -1,8 +1,8 @@
 import { mockCase, mockCaseNote } from "../../../../../mocks/case.js";
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../../../mocks/application.js";
-import { createMockApplicationCommandInteraction } from "@barry/testing";
+import { createMockApplicationCommandInteraction } from "@barry-bot/testing";
 
 import AddNoteCommand, { type AddNoteOptions } from "../../../../../../../../src/modules/moderation/commands/chatinput/cases/notes/add/index.js";
 import ModerationModule from "../../../../../../../../src/modules/moderation/index.js";

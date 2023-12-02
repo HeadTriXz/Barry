@@ -4,7 +4,7 @@ import {
     ApplicationCommandInteraction,
     MessageComponentInteraction,
     ModalSubmitInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import { MemberActivitySortBy, MemberActivitySortOrder } from "../../../../../../src/modules/leveling/database/index.js";
 import {
@@ -13,7 +13,7 @@ import {
     createMockModalSubmitInteraction,
     mockMessage,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { LeaderboardCanvas } from "../../../../../../src/modules/leveling/commands/chatinput/leaderboard/LeaderboardCanvas.js";
 import { PaginationMessage } from "../../../../../../src/utils/pagination.js";

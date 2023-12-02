@@ -5,14 +5,14 @@ import {
     MessageComponentInteraction,
     ModalSubmitInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,
     mockChannel,
     mockMessage,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { ProfileEditor } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/ProfileEditor.js";

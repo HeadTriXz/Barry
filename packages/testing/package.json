@@ -1,5 +1,5 @@
 {
-  "name": "@barry/testing",
+  "name": "@barry-bot/testing",
   "version": "1.0.0",
   "description": "A collection of mock data for testing Discord bots.",
   "repository": "HeadTriXz/Barry",

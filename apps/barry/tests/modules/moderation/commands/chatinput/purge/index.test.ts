@@ -4,13 +4,13 @@ import {
     createMockApplicationCommandInteraction,
     mockMessage,
     mockUser
-} from "@barry/testing";
-import { ApplicationCommandInteraction } from "@barry/core";
+} from "@barry-bot/testing";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
 
 import PurgeCommand, { type PurgeOptions } from "../../../../../../src/modules/moderation/commands/chatinput/purge/index.js";
 import ModerationModule from "../../../../../../src/modules/moderation/index.js";
-import * as core from "@barry/core";
+import * as core from "@barry-bot/core";
 
 describe("/purge", () => {
     let command: PurgeCommand;

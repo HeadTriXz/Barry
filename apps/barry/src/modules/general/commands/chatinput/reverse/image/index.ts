@@ -2,7 +2,7 @@ import {
     type ApplicationCommandInteraction,
     SlashCommand,
     SlashCommandOptionBuilder
-} from "@barry/core";
+} from "@barry-bot/core";
 import { type APIAttachment, MessageFlags } from "@discordjs/core";
 import type GeneralModule from "../../../../index.js";
 

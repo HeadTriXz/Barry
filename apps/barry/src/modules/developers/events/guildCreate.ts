@@ -1,7 +1,7 @@
 import { type APIGuild, GatewayDispatchEvents } from "@discordjs/core";
 import type DevelopersModule from "../index.js";
 
-import { Event } from "@barry/core";
+import { Event } from "@barry-bot/core";
 
 /**
  * Represents the guild create event to leave blacklisted guilds.

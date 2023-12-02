@@ -30,7 +30,7 @@ import {
     mockRole,
     mockUser,
     mockUserCommand
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 describe("ApplicationCommandInteractionHandler", () => {
     let client: Client;

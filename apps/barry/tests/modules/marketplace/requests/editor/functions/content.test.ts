@@ -7,7 +7,7 @@ import {
     getRequestContent
 } from "../../../../../../src/modules/marketplace/dependencies/requests/editor/functions/content.js";
 import { mockRequest } from "../../mocks/request.js";
-import { mockUser } from "@barry/testing";
+import { mockUser } from "@barry-bot/testing";
 
 describe("Content", () => {
     describe("getEditContactContent", () => {

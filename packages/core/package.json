@@ -1,11 +1,10 @@
 {
-  "name": "@barry/core",
+  "name": "@barry-bot/core",
   "version": "1.0.0",
   "description": "A toolkit for building advanced Discord bots.",
   "repository": "HeadTriXz/Barry",
   "author": "HeadTriXz",
   "license": "MIT",
-  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
@@ -24,7 +23,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@barry/logger": "*",
+    "@barry-bot/logger": "*",
     "@discordjs/core": "^1.1.1",
     "@discordjs/rest": "^2.2.0",
     "@discordjs/ws": "^1.0.2",
@@ -32,6 +31,6 @@
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
-    "@barry/testing": "*"
+    "@barry-bot/testing": "*"
   }
 }

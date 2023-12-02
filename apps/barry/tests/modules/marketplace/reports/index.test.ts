@@ -1,13 +1,13 @@
 import { type ReportsSettings, ReportCategory } from "@prisma/client";
 
 import { ChannelType, OverwriteType, PermissionFlagsBits } from "@discordjs/core";
-import { MessageComponentInteraction, UpdatableInteraction } from "@barry/core";
+import { MessageComponentInteraction, UpdatableInteraction } from "@barry-bot/core";
 import {
     REPORT_CHANNEL_TAGS,
     REPORT_DEFAULT_PROFILE_REASONS,
     REPORT_DEFAULT_REQUEST_REASONS
 } from "../../../../src/modules/marketplace/dependencies/reports/constants.js";
-import { createMockMessageComponentInteraction, mockChannel } from "@barry/testing";
+import { createMockMessageComponentInteraction, mockChannel } from "@barry-bot/testing";
 
 import { LocalReportRepository } from "../../../../src/modules/marketplace/dependencies/reports/database/LocalReportRepository.js";
 import { REPORT_CHANNEL_GUIDELINES } from "../../../../src/modules/marketplace/dependencies/reports/content.js";

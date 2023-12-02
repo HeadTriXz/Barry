@@ -1,7 +1,7 @@
 import type { RequestsSettings } from "@prisma/client";
 
 import { RequestsSettingsRepository } from "../../../../../src/modules/marketplace/dependencies/requests/database/index.js";
-import { mockChannel } from "@barry/testing";
+import { mockChannel } from "@barry-bot/testing";
 import { prisma } from "../../../../mocks/index.js";
 
 describe("RequestsSettingsRepository", () => {

@@ -2,7 +2,7 @@ import {
     type ApplicationCommandInteraction,
     SlashCommand,
     getCreatedAt
-} from "@barry/core";
+} from "@barry-bot/core";
 
 import type GeneralModule from "../../../index.js";
 import config from "../../../../../config.js";

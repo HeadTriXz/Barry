@@ -1,7 +1,7 @@
 import { type API, InteractionResponseType, InteractionType } from "@discordjs/core";
 
 import { Client, PingInteraction } from "../../src/index.js";
-import { mockPingInteraction } from "@barry/testing";
+import { mockPingInteraction } from "@barry-bot/testing";
 
 describe("PingInteraction", () => {
     let client: Client;

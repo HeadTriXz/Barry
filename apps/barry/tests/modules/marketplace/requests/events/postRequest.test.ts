@@ -1,8 +1,8 @@
 import type { RequestsSettings } from "@prisma/client";
 
 import { ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core";
-import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry/testing";
+import { MessageComponentInteraction, PingInteraction } from "@barry-bot/core";
+import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry-bot/testing";
 import { createMockApplication } from "../../../../mocks/application.js";
 import { mockRequest } from "../mocks/request.js";
 import { timeoutContent } from "../../../../../src/common.js";

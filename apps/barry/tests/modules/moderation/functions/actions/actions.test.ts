@@ -2,9 +2,9 @@ import { type APIMessageComponentInteraction, MessageFlags } from "@discordjs/co
 import type { Application } from "../../../../../src/Application.js";
 
 import { ModerationActions, respond } from "../../../../../src/modules/moderation/functions/actions/actions.js";
-import { UpdatableInteraction, ReplyableInteraction } from "@barry/core";
+import { UpdatableInteraction, ReplyableInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../mocks/application.js";
-import { createMockMessageComponentInteraction } from "@barry/testing";
+import { createMockMessageComponentInteraction } from "@barry-bot/testing";
 import ModerationModule from "../../../../../src/modules/moderation/index.js";
 
 describe("respond", () => {

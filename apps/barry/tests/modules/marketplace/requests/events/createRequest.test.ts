@@ -1,8 +1,8 @@
 import type { RequestsSettings } from "@prisma/client";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry/testing";
+import { MessageComponentInteraction, PingInteraction } from "@barry-bot/core";
+import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry-bot/testing";
 
 import { RequestEditor } from "../../../../../src/modules/marketplace/dependencies/requests/editor/RequestEditor.js";
 import { createMockApplication } from "../../../../mocks/index.js";

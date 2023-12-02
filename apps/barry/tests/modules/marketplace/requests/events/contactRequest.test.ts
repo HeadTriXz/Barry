@@ -1,6 +1,6 @@
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { MessageComponentInteraction, PingInteraction } from "@barry/core";
-import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry/testing";
+import { MessageComponentInteraction, PingInteraction } from "@barry-bot/core";
+import { createMockMessageComponentInteraction, mockPingInteraction } from "@barry-bot/testing";
 
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockRequest } from "../mocks/request.js";

@@ -1,5 +1,5 @@
-import { ApplicationCommandInteraction } from "@barry/core";
-import { createMockApplicationCommandInteraction } from "@barry/testing";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
+import { createMockApplicationCommandInteraction } from "@barry-bot/testing";
 import { createMockApplication } from "../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../src/modules/general/index.js";

@@ -18,7 +18,7 @@ import {
     MessageComponentInteraction,
     ModalSubmitInteraction,
     Module
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,
@@ -26,7 +26,7 @@ import {
     mockGuild,
     mockMember,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { REPORT_BASE_ACTIONS, REPORT_GLOBAL_ACTIONS, REPORT_LOCAL_ACTIONS, ReportAction } from "../../../../../src/modules/marketplace/dependencies/reports/constants.js";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { timeoutContent } from "../../../../../src/common.js";

@@ -6,7 +6,7 @@ import {
     TypedGuildSettingOption
 } from "../option.js";
 import { type GuildChannelType, ComponentType, SelectMenuDefaultValueType } from "@discordjs/core";
-import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
+import type { GuildInteraction, UpdatableInteraction } from "@barry-bot/core";
 import type { BaseSettings } from "../../types/modules.js";
 
 import { timeoutContent } from "../../common.js";

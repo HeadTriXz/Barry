@@ -7,7 +7,7 @@ import {
     type ReplyableInteraction,
     ApplicationCommandInteraction,
     MessageComponentInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import {
@@ -15,7 +15,7 @@ import {
     createMockMessageComponentInteraction,
     mockMessage,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { Application } from "../../src/Application.js";
 import { createMockApplication } from "../mocks/index.js";

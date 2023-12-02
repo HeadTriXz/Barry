@@ -1,7 +1,7 @@
 import { GatewayDispatchEvents, GatewayIntentBits } from "@discordjs/core";
 
 import { Application } from "./Application.js";
-import { Logger } from "@barry/logger";
+import { Logger } from "@barry-bot/logger";
 import { loadModules } from "./utils/index.js";
 
 // Check environment variables.

@@ -8,9 +8,9 @@ import {
     mockGuild,
     mockMember,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
 import { mockCase } from "../../../mocks/case.js";

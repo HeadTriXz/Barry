@@ -5,7 +5,7 @@ import {
     getDefaultAvatarURL,
     getDiscordEpoch
 } from "../../src/index.js";
-import { mockUser } from "@barry/testing";
+import { mockUser } from "@barry-bot/testing";
 
 describe("getAvatarURL", () => {
     it("should return the url of the avatar of the user", () => {

@@ -5,9 +5,9 @@ import {
     createMockApplicationCommandInteraction,
     mockMember,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { mockCase, mockCaseNote } from "../../../../../mocks/case.js";
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../../../../mocks/application.js";
 
 import DeleteNoteCommand, { type DeleteNoteOptions } from "../../../../../../../../src/modules/moderation/commands/chatinput/cases/notes/delete/index.js";

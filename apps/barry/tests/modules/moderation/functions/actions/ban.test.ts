@@ -14,9 +14,9 @@ import {
     mockMember,
     mockMessage,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { ban } from "../../../../../src/modules/moderation/functions/actions/ban.js";
 import { createMockApplication } from "../../../../mocks/application.js";
 import { mockCase } from "../../mocks/case.js";

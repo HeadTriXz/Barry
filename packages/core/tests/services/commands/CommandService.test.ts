@@ -25,7 +25,7 @@ import {
     mockChatInputCommand,
     mockMessageCommand,
     mockUserCommand
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 describe("CommandService", () => {
     let client: Client;

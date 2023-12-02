@@ -1,6 +1,6 @@
-import { createMockApplicationCommandInteraction, mockAttachment } from "@barry/testing";
+import { createMockApplicationCommandInteraction, mockAttachment } from "@barry-bot/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../../mocks/index.js";
 

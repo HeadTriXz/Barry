@@ -9,7 +9,7 @@ import {
     SlashCommand,
     SlashCommandOptionBuilder,
     getCreatedAt
-} from "@barry/core";
+} from "@barry-bot/core";
 import type ModerationModule from "../../../index.js";
 
 import config from "../../../../../config.js";

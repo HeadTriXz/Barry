@@ -2,8 +2,8 @@ import { createMockApplication, mockAppOptions } from "./mocks/application.js";
 
 import { API, GatewayDispatchEvents } from "@discordjs/core";
 import { Application } from "../src/Application.js";
-import { Client } from "@barry/core";
-import { mockMessage, mockUser } from "@barry/testing";
+import { Client } from "@barry-bot/core";
+import { mockMessage, mockUser } from "@barry-bot/testing";
 
 describe("Application", () => {
     let app: Application;

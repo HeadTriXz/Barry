@@ -1,6 +1,6 @@
 import type { BaseSettings, ModuleWithSettings } from "../../types/modules.js";
 import type { APIUser } from "@discordjs/core";
-import type { Module } from "@barry/core";
+import type { Module } from "@barry-bot/core";
 
 /**
  * Represents a module that allows flagging users.

@@ -24,9 +24,9 @@
 <!-- Main Content -->
 ## Packages
 - **[barry](/apps/barry)** - A versatile and user-friendly Discord bot designed to assist and enhance the workflow of creatives.
-- **[@barry/core](/packages/core)** - A toolkit for building advanced Discord bots.
-- **[@barry/logger](/packages/logger)** - An easy-to-use Node.js logger.
-- **[@barry/testing](/packages/testing)** - A collection of mock data for testing Discord bots.
+- **[@barry-bot/core](/packages/core)** - A toolkit for building advanced Discord bots.
+- **[@barry-bot/logger](/packages/logger)** - An easy-to-use Node.js logger.
+- **[@barry-bot/testing](/packages/testing)** - A collection of mock data for testing Discord bots.
 
 ## Contributing
 Contributions, bug reports, and feature requests are welcome! Please refer to the [contribution guidelines][link-contributing] for detailed information on how to contribute to the project.

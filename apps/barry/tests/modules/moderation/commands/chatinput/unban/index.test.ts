@@ -7,9 +7,9 @@ import {
     createMockApplicationCommandInteraction,
     mockGuild,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { DiscordAPIError } from "@discordjs/rest";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/index.js";

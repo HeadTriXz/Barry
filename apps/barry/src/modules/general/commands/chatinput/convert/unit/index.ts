@@ -4,7 +4,7 @@ import {
     type AutocompleteInteraction,
     SlashCommand,
     SlashCommandOptionBuilder
-} from "@barry/core";
+} from "@barry-bot/core";
 import type GeneralModule from "../../../../index.js";
 
 import convert, { type Unit } from "convert-units";

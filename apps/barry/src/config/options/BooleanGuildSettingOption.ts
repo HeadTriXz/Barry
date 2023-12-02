@@ -1,4 +1,4 @@
-import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
+import type { GuildInteraction, UpdatableInteraction } from "@barry-bot/core";
 import {
     type BaseGuildSettingOptionData,
     type OptionalCallback,

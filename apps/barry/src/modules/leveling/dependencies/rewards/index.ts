@@ -1,7 +1,7 @@
 import type { Reward, RewardsSettings } from "@prisma/client";
 import type { Application } from "../../../../Application.js";
 import type { ModuleWithSettings } from "../../../../types/modules.js";
-import type { UpdatableInteraction } from "@barry/core";
+import type { UpdatableInteraction } from "@barry-bot/core";
 
 import { ButtonStyle, ComponentType, TextInputStyle } from "@discordjs/core";
 import { RewardRepository, RewardsSettingsRepository } from "./database/index.js";

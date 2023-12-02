@@ -24,7 +24,7 @@ import {
     mockMessageUserSelect,
     mockRole,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 describe("MessageComponentInteraction", () => {
     let client: Client;

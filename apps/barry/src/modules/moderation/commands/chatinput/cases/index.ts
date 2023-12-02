@@ -1,6 +1,6 @@
 import type ModerationModule from "../../../index.js";
 
-import { SlashCommand } from "@barry/core";
+import { SlashCommand } from "@barry-bot/core";
 import DeleteCommand from "./delete/index.js";
 import NoteCommand from "./notes/index.js";
 import ViewCommand from "./view/index.js";

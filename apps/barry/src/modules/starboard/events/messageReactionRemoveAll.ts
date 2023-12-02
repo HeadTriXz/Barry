@@ -1,7 +1,7 @@
 import { type GatewayMessageReactionRemoveAllDispatchData, GatewayDispatchEvents } from "@discordjs/core";
 import type StarboardModule from "../index.js";
 
-import { Event } from "@barry/core";
+import { Event } from "@barry-bot/core";
 
 /**
  * Represents an event handler for updating a starboard message.

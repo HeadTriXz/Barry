@@ -1,4 +1,4 @@
-import { type AnyInteraction, type UpdatableInteraction, Event } from "@barry/core";
+import { type AnyInteraction, type UpdatableInteraction, Event } from "@barry-bot/core";
 import type RequestsModule from "../index.js";
 
 import {

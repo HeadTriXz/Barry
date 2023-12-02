@@ -2,9 +2,9 @@ import {
     type GuildInteraction,
     ModalSubmitInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { createMockMessageComponentInteraction, createMockModalSubmitInteraction } from "@barry/testing";
+import { createMockMessageComponentInteraction, createMockModalSubmitInteraction } from "@barry-bot/testing";
 import { EmojiGuildSettingOption } from "../../../src/config/options/EmojiGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
 import { GuildSettingsStore } from "../../../src/config/store.js";

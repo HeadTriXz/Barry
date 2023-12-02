@@ -12,7 +12,7 @@ import {
 } from "@prisma/client";
 import type { Application } from "../../../../Application.js";
 import type { ModuleWithSettings } from "../../../../types/modules.js";
-import type { UpdatableInteraction } from "@barry/core";
+import type { UpdatableInteraction } from "@barry-bot/core";
 
 import {
     LocalReportRepository,

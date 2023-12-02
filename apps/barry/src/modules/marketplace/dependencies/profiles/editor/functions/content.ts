@@ -14,7 +14,7 @@ import {
     combinations,
     getEmoji
 } from "../availability.js";
-import { getAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry-bot/core";
 import { parseLink } from "./parseLink.js";
 import config from "../../../../../../config.js";
 

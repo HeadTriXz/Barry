@@ -1,5 +1,5 @@
-import { ApplicationCommandInteraction, AutocompleteInteraction, Module, ValidationError } from "@barry/core";
-import { createMockApplicationCommandInteraction, createMockAutocompleteInteraction, mockUserCommand } from "@barry/testing";
+import { ApplicationCommandInteraction, AutocompleteInteraction, Module, ValidationError } from "@barry-bot/core";
+import { createMockApplicationCommandInteraction, createMockAutocompleteInteraction, mockUserCommand } from "@barry-bot/testing";
 
 import { BlacklistedGuildRepository } from "../../../src/modules/developers/database/BlacklistedGuildRepository.js";
 import { BlacklistedUserRepository } from "../../../src/modules/developers/database/BlacklistedUserRepository.js";

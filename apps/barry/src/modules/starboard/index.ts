@@ -24,7 +24,7 @@ import {
     StarboardSettingsRepository
 } from "./database/index.js";
 import { ConfigurableModule } from "../../config/module.js";
-import { getAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry-bot/core";
 import { loadEvents } from "../../utils/loadFolder.js";
 
 import config from "../../config.js";

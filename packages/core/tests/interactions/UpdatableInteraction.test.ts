@@ -1,7 +1,7 @@
 import { type API, InteractionResponseType } from "@discordjs/core";
 
 import { Client, UpdatableInteraction } from "../../src/index.js";
-import { createMockModalSubmitInteraction } from "@barry/testing";
+import { createMockModalSubmitInteraction } from "@barry-bot/testing";
 
 describe("UpdatableInteraction", () => {
     let client: Client;

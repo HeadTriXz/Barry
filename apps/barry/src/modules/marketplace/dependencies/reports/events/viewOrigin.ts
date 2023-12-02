@@ -7,7 +7,7 @@ import {
     type AnyInteraction,
     type Module,
     Event
-} from "@barry/core";
+} from "@barry-bot/core";
 import type ReportsModule from "../index.js";
 
 import { ReportActionButton } from "../index.js";

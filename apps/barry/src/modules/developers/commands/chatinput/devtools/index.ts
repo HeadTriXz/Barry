@@ -1,4 +1,4 @@
-import { type ApplicationCommandInteraction, SlashCommand } from "@barry/core";
+import { type ApplicationCommandInteraction, SlashCommand } from "@barry-bot/core";
 import type DevelopersModule from "../../../index.js";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";

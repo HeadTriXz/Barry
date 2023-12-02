@@ -6,7 +6,7 @@ import {
     getEditProfileContent,
     getProfileContent
 } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/content.js";
-import { mockUser } from "@barry/testing";
+import { mockUser } from "@barry-bot/testing";
 import { mockProfile } from "../../mocks/profile.js";
 
 describe("Content", () => {

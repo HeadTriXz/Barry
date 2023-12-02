@@ -2,14 +2,14 @@ import {
     MessageComponentInteraction,
     ModalSubmitInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import { blacklistGuild, blacklistUser } from "../../../../../../../src/modules/developers/commands/chatinput/devtools/tools/blacklist.js";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,
     mockGuild,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { ComponentType } from "@discordjs/core";
 import { DiscordAPIError } from "@discordjs/rest";

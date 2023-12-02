@@ -2,9 +2,9 @@ import { type APIModalSubmitInteraction, ComponentType } from "@discordjs/core";
 
 import { URL_REGEX, parseProfileData } from "../../../../../../src/modules/marketplace/dependencies/profiles/editor/functions/utils.js";
 import { Application } from "../../../../../../src/Application.js";
-import { ModalSubmitInteraction } from "@barry/core";
+import { ModalSubmitInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
-import { createMockModalSubmitInteraction } from "@barry/testing";
+import { createMockModalSubmitInteraction } from "@barry-bot/testing";
 
 describe("Utils", () => {
     describe("URL_REGEX", () => {

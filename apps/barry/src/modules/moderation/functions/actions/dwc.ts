@@ -1,7 +1,7 @@
 import { type PartialGuildMember, isAboveMember } from "../permissions.js";
 import type { DWCOptions } from "../../../../types/moderation.js";
 import type { FlaggableModule } from "../../types.js";
-import type { ReplyableInteraction } from "@barry/core";
+import type { ReplyableInteraction } from "@barry-bot/core";
 import type ModerationModule from "../../index.js";
 
 import { CaseType } from "@prisma/client";

@@ -17,7 +17,7 @@ import {
     MessageComponentInteraction,
     MessageStringSelectInteractionData,
     ModalSubmitInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     REPORT_CATEGORY_TITLE,
     REPORT_DEFAULT_PROFILE_REASONS,
@@ -29,7 +29,7 @@ import {
     mockChannel,
     mockGuild,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { ProfileActionButton } from "../../../../../src/modules/marketplace/dependencies/profiles/index.js";

@@ -2,13 +2,13 @@ import {
     type GuildInteraction,
     ModalSubmitInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { IntegerGuildSettingOption } from "../../../src/config/options/IntegerGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
 import { GuildSettingsStore } from "../../../src/config/store.js";

@@ -5,7 +5,7 @@ import {
 import type WelcomerModule from "../index.js";
 
 import { DiscordAPIError } from "@discordjs/rest";
-import { Event } from "@barry/core";
+import { Event } from "@barry-bot/core";
 
 /**
  * Represents an event handler for welcoming new members.

@@ -3,7 +3,7 @@ import type { PickRequired } from "../index.js";
 import type LevelingModule from "../index.js";
 
 import { DiscordAPIError } from "@discordjs/rest";
-import { Event } from "@barry/core";
+import { Event } from "@barry-bot/core";
 
 /**
  * Represents dispatch data of the 'MESSAGE_CREATE' event in a guild.

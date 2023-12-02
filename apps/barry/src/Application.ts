@@ -9,9 +9,9 @@ import {
     type Gateway,
     type Module,
     Client
-} from "@barry/core";
+} from "@barry-bot/core";
 import { type RedisOptions, Redis } from "ioredis";
-import type { BaseLogger } from "@barry/logger";
+import type { BaseLogger } from "@barry-bot/logger";
 
 import { PrismaClient } from "@prisma/client";
 import { REST } from "@discordjs/rest";

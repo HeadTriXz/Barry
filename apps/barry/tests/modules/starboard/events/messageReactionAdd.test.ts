@@ -1,7 +1,7 @@
 import type { GatewayMessageReactionAddDispatchData } from "@discordjs/core";
 
 import { createMockApplication } from "../../../mocks/application.js";
-import { mockMember } from "@barry/testing";
+import { mockMember } from "@barry-bot/testing";
 
 import MessageReactionAddEvent from "../../../../src/modules/starboard/events/messageReactionAdd.js";
 import StarboardModule from "../../../../src/modules/starboard/index.js";
