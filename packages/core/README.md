@@ -3,6 +3,7 @@
 
 [![Banner Barry][banner]][link-repo]
 
+[![NPM][badge-npm]][link-npm]
 [![Build][badge-build]][link-build]
 [![Coverage][badge-coverage]][link-coverage]
 [![Contribute][badge-contribute]][link-contributing]
@@ -104,6 +105,7 @@ Please note that the licenses may differ between different parts of the project.
 [badge-coverage]:https://img.shields.io/codecov/c/github/HeadTriXz/Barry?style=for-the-badge&flag=core
 [badge-contribute]:https://img.shields.io/badge/contributions-welcome-orange.svg?style=for-the-badge
 [badge-kofi]:https://ko-fi.com/img/githubbutton_sm.svg
+[badge-npm]:https://img.shields.io/npm/v/@barry-bot/core.svg?maxAge=3600&style=for-the-badge
 [badge-license]:https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge
 [banner]:https://github.com/HeadTriXz/Barry/assets/32986761/72d2c27d-925c-465f-a6a3-fe836e86fad6
 
@@ -115,4 +117,5 @@ Please note that the licenses may differ between different parts of the project.
 [link-contributing]:https://github.com/HeadTriXz/Barry/blob/main/.github/CONTRIBUTING.md
 [link-kofi]:https://ko-fi.com/headtrixz
 [link-license]:https://github.com/HeadTriXz/Barry/blob/main/LICENSE
+[link-npm]:https://www.npmjs.com/package/@barry-bot/core
 [link-repo]: https://github.com/HeadTriXz/Barry
