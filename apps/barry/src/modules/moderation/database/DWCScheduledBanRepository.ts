@@ -102,7 +102,7 @@ export class DWCScheduledBanRepository {
             FROM dwc_scheduled_bans AS d
                 INNER JOIN moderation_settings AS s
                 ON s.guild_id = d.guild_id
-            WHERE d.created_at <= NOW() + (s.dwc_days * INTERVAL '1 day');
+            WHERE d.created_at + (s.dwc_days * INTERVAL '1 day') <= NOW();
         `;
     }
 }
