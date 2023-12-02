@@ -1,6 +1,6 @@
 import { type RequestsSettings, RequestStatus } from "@prisma/client";
 import type { RequestWithAttachments } from "../database/index.js";
-import type { UpdatableInteraction } from "@barry/core";
+import type { UpdatableInteraction } from "@barry-bot/core";
 import type RequestsModule from "../index.js";
 
 import { ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core";

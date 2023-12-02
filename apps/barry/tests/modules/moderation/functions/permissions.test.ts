@@ -1,6 +1,6 @@
 import type { APIGuild, APIRole } from "@discordjs/core";
 import { getHighestRole, isAboveMember } from "../../../../src/modules/moderation/functions/permissions.js";
-import { mockGuild, mockMember } from "@barry/testing";
+import { mockGuild, mockMember } from "@barry-bot/testing";
 
 describe("Permissions", () => {
     let guild: APIGuild;

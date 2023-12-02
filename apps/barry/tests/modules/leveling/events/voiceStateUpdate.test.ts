@@ -2,7 +2,7 @@ import type { GatewayVoiceState } from "@discordjs/core";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
-import { mockMember } from "@barry/testing";
+import { mockMember } from "@barry-bot/testing";
 import { redis } from "../../../mocks/index.js";
 
 import LevelingModule from "../../../../src/modules/leveling/index.js";

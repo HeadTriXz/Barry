@@ -2,14 +2,14 @@ import {
     type GuildInteraction,
     MessageComponentInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 
 import { ChannelType, ComponentType } from "@discordjs/core";
 import { ChannelArrayGuildSettingOption } from "../../../src/config/options/ChannelArrayGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
 import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
-import { createMockMessageComponentInteraction } from "@barry/testing";
+import { createMockMessageComponentInteraction } from "@barry-bot/testing";
 import { timeoutContent } from "../../../src/common.js";
 
 describe("ChannelArrayGuildSettingOption", () => {

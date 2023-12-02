@@ -6,7 +6,7 @@ import type {
 import type { Case } from "@prisma/client";
 
 import { CASE_EMOJIS, CASE_TITLES } from "../constants.js";
-import { getAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry-bot/core";
 import config from "../../../config.js";
 
 /**

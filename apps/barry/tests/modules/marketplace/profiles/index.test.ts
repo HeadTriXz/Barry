@@ -1,4 +1,4 @@
-import { type GuildInteraction, UpdatableInteraction } from "@barry/core";
+import { type GuildInteraction, UpdatableInteraction } from "@barry-bot/core";
 import type { ProfilesSettings } from "@prisma/client";
 
 import { ButtonStyle, ComponentType } from "@discordjs/core";
@@ -11,7 +11,7 @@ import {
     createMockMessageComponentInteraction,
     mockMessage,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { ChannelGuildSettingOption } from "../../../../src/config/options/index.js";
 import { DiscordAPIError } from "@discordjs/rest";

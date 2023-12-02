@@ -1,7 +1,7 @@
 import { type API, InteractionType, ComponentType } from "@discordjs/core";
 
 import { Client, ModalSubmitInteraction } from "../../src/index.js";
-import { createMockModalSubmitInteraction } from "@barry/testing";
+import { createMockModalSubmitInteraction } from "@barry-bot/testing";
 
 describe("ModalSubmitInteraction", () => {
     let client: Client;

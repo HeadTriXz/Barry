@@ -1,11 +1,10 @@
 {
-  "name": "@barry/logger",
+  "name": "@barry-bot/logger",
   "version": "1.0.0",
   "description": "An easy-to-use Node.js logger.",
   "repository": "HeadTriXz/Barry",
   "author": "HeadTriXz",
   "license": "MIT",
-  "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",

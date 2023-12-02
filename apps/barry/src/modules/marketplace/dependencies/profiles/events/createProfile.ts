@@ -1,4 +1,4 @@
-import { type AnyInteraction, Event } from "@barry/core";
+import { type AnyInteraction, Event } from "@barry-bot/core";
 import type ProfilesModule from "../index.js";
 
 import { GatewayDispatchEvents } from "@discordjs/core";

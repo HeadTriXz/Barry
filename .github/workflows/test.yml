@@ -51,14 +51,14 @@ jobs:
           flags: barry
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Upload coverage for '@barry/core'
+      - name: Upload coverage for '@barry-bot/core'
         uses: codecov/codecov-action@v3
         with:
           files: ./packages/core/coverage/cobertura-coverage.xml
           flags: core
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Upload coverage for '@barry/logger'
+      - name: Upload coverage for '@barry-bot/logger'
         uses: codecov/codecov-action@v3
         with:
           files: ./packages/logger/coverage/cobertura-coverage.xml

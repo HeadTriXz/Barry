@@ -2,7 +2,7 @@ import {
     type ApplicationCommandInteraction,
     SlashCommand,
     SlashCommandOptionBuilder
-} from "@barry/core";
+} from "@barry-bot/core";
 import type { PartialGuildMember } from "../../../functions/permissions.js";
 import type ModerationModule from "../../../index.js";
 

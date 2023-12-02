@@ -1,6 +1,6 @@
 import { MessageFlags } from "@discordjs/core";
 import { getReverseContent } from "../../../../../src/modules/general/functions/reverse/getReverseContent.js";
-import { mockAttachment } from "@barry/testing";
+import { mockAttachment } from "@barry-bot/testing";
 
 import config from "../../../../../src/config.js";
 

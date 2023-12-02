@@ -4,12 +4,12 @@ import {
     ModalSubmitInteraction,
     UpdatableInteraction,
     getAvatarURL
-} from "@barry/core";
+} from "@barry-bot/core";
 import type { IntegerGuildSettingOption } from "../../../src/config/options/index.js";
 import type { WelcomerSettings } from "@prisma/client";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { createMockModalSubmitInteraction, mockGuild, mockUser } from "@barry/testing";
+import { createMockModalSubmitInteraction, mockGuild, mockUser } from "@barry-bot/testing";
 
 import { WelcomerSettingsRepository } from "../../../src/modules/welcomer/database/index.js";
 import { createMockApplication } from "../../mocks/application.js";

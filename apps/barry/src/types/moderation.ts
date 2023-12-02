@@ -1,4 +1,4 @@
-import type { Module, ReplyableInteraction } from "@barry/core";
+import type { Module, ReplyableInteraction } from "@barry-bot/core";
 import type { APIUser } from "@discordjs/core";
 import type { ModuleWithSettings } from "./modules.js";
 import type { ModerationSettings } from "@prisma/client";

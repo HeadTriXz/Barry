@@ -9,7 +9,7 @@ import type {
     APIInteractionResponseCallbackDataWithFiles,
     Awaitable,
     ReplyableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 
 import config from "../config.js";
 

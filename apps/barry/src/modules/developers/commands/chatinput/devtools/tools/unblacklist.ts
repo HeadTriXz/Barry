@@ -1,4 +1,4 @@
-import type { UpdatableInteraction } from "@barry/core";
+import type { UpdatableInteraction } from "@barry-bot/core";
 import type DevelopersModule from "../../../../index.js";
 
 import { ComponentType, TextInputStyle } from "@discordjs/core";

@@ -1,7 +1,7 @@
 import type { Application } from "../../Application.js";
 import type { BlacklistableModule } from "../../types/blacklist.js";
 
-import { Module, ValidationError } from "@barry/core";
+import { Module, ValidationError } from "@barry-bot/core";
 import { loadCommands, loadEvents } from "../../utils/index.js";
 import { BlacklistedGuildRepository } from "./database/BlacklistedGuildRepository.js";
 import { BlacklistedUserRepository } from "./database/BlacklistedUserRepository.js";

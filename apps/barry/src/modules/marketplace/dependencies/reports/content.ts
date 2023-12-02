@@ -10,7 +10,7 @@ import type { LocalReportWithReport } from "./database/index.js";
 
 import { REPORT_CATEGORY_TITLE } from "./constants.js";
 import { ReportActionButton } from "./index.js";
-import { getAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry-bot/core";
 import config from "../../../../config.js";
 
 /**

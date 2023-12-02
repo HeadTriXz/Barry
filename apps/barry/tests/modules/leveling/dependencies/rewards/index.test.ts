@@ -1,12 +1,12 @@
 import type { Reward, RewardsSettings } from "@prisma/client";
 
-import { MessageComponentInteraction, ModalSubmitInteraction } from "@barry/core";
+import { MessageComponentInteraction, ModalSubmitInteraction } from "@barry-bot/core";
 import { RewardRepository, RewardsSettingsRepository } from "../../../../../src/modules/leveling/dependencies/rewards/database/index.js";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,
     mockMember
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { ComponentType } from "@discordjs/core";
 import { DiscordAPIError } from "@discordjs/rest";

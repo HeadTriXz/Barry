@@ -11,7 +11,7 @@
 
 <!-- Main Content -->
 ## About
-`@barry/testing` is a collection of mock data specifically designed for testing Discord bots. It provides a wide range of pre-generated data that can be used to simulate various scenarios and interactions. By utilizing this mock data, developers can thoroughly test the functionalities and behaviors of their Discord bots, ensuring their reliability and robustness before deploying them to production environments.
+`@barry-bot/testing` is a collection of mock data specifically designed for testing Discord bots. It provides a wide range of pre-generated data that can be used to simulate various scenarios and interactions. By utilizing this mock data, developers can thoroughly test the functionalities and behaviors of their Discord bots, ensuring their reliability and robustness before deploying them to production environments.
 
 ## Contributing
 Contributions, bug reports, and feature requests are welcome! Please refer to the [contribution guidelines][link-contributing] for detailed information on how to contribute to the project.

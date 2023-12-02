@@ -5,7 +5,7 @@ import {
 } from "@discordjs/core";
 
 import { AutocompleteInteraction, Client } from "../../src/index.js";
-import { createMockAutocompleteInteraction } from "@barry/testing";
+import { createMockAutocompleteInteraction } from "@barry-bot/testing";
 
 describe("AutocompleteInteraction", () => {
     let client: Client;

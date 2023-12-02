@@ -1,6 +1,6 @@
-import { createMockApplicationCommandInteraction, mockUser } from "@barry/testing";
+import { createMockApplicationCommandInteraction, mockUser } from "@barry-bot/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
 
 import AvatarCommand from "../../../../../../src/modules/general/commands/user/avatar/index.js";

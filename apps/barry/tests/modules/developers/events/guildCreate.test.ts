@@ -1,5 +1,5 @@
 import { createMockApplication } from "../../../mocks/application.js";
-import { mockGuild } from "@barry/testing";
+import { mockGuild } from "@barry-bot/testing";
 import DevelopersModule from "../../../../src/modules/developers/index.js";
 import GuildCreateEvent from "../../../../src/modules/developers/events/guildCreate.js";
 

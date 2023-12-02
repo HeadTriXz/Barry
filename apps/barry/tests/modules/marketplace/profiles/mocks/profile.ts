@@ -1,6 +1,6 @@
 import type { Profile } from "@prisma/client";
 import { ProfileAvailability } from "../../../../../src/modules/marketplace/dependencies/profiles/editor/availability.js";
-import { mockUser } from "@barry/testing";
+import { mockUser } from "@barry-bot/testing";
 
 export const mockProfile: Profile = {
     about: "Hello world!",

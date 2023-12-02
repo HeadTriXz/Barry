@@ -1,7 +1,7 @@
 import type ModerationModule from "../../../../index.js";
 
 import { PermissionFlagsBits } from "@discordjs/core";
-import { SlashCommand } from "@barry/core";
+import { SlashCommand } from "@barry-bot/core";
 import AddNoteCommand from "./add/index.js";
 import DeleteNoteCommand from "./delete/index.js";
 import EditNoteCommand from "./edit/index.js";

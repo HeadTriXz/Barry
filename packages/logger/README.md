@@ -12,7 +12,7 @@
 
 <!-- Main Content -->
 ## About
-`@barry/logger` is a powerful logger package that provides a flexible and customizable logging solution for Node.js applications. It offers various features such as log severity levels, error handling, log formatting, and integration with Sentry for error reporting.
+`@barry-bot/logger` is a powerful logger package that provides a flexible and customizable logging solution for Node.js applications. It offers various features such as log severity levels, error handling, log formatting, and integration with Sentry for error reporting.
 
 ## Features
 - **Log Severity Levels**: Log messages with different severity levels such as `DEBUG`, `ERROR`, `FATAL`, `INFO`, `TRACE`, and `WARN`.
@@ -24,14 +24,14 @@
 ## Installation
 [Node.js](https://nodejs.org/en/download) version 20 or later is required.
 ```sh
-npm install @barry/logger
+npm install @barry-bot/logger
 # or
-yarn add @barry/logger
+yarn add @barry-bot/logger
 ```
 
 ## Example Usage
 ```ts
-import { Logger, LogSeverity } from "@barry/logger";
+import { Logger, LogSeverity } from "@barry-bot/logger";
 
 // Create a new logger instance.
 const logger = new Logger({

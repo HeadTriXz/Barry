@@ -4,7 +4,7 @@ import {
     LevelUpNotificationType
 } from "@prisma/client";
 import type { Application } from "../../Application.js";
-import type { Module } from "@barry/core";
+import type { Module } from "@barry-bot/core";
 import type { ModuleWithSettings } from "../../types/modules.js";
 
 import {

@@ -3,7 +3,7 @@ import {
     type ProfilesSettings,
     ProfileCreationStatus
 } from "@prisma/client";
-import type { UpdatableInteraction } from "@barry/core";
+import type { UpdatableInteraction } from "@barry-bot/core";
 import type ProfilesModule from "../index.js";
 
 import { ButtonStyle, ComponentType, MessageFlags } from "@discordjs/core";

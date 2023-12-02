@@ -1,12 +1,12 @@
 import type { KickOptions } from "../../../../../../src/types/moderation.js";
 
-import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
+import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry-bot/core";
 import {
     createMockApplicationCommandInteraction,
     createMockAutocompleteInteraction,
     mockMember,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { ApplicationCommandType } from "@discordjs/core";
 import { COMMON_SEVERE_REASONS } from "../../../../../../src/modules/moderation/constants.js";

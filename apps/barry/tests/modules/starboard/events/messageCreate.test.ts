@@ -3,7 +3,7 @@ import type { StarboardSettings } from "@prisma/client";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
-import { mockMessage } from "@barry/testing";
+import { mockMessage } from "@barry-bot/testing";
 
 import MessageCreateEvent from "../../../../src/modules/starboard/events/messageCreate.js";
 import StarboardModule from "../../../../src/modules/starboard/index.js";

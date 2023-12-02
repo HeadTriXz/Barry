@@ -5,14 +5,14 @@ import {
     MessageComponentInteraction,
     ModalSubmitInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,
     mockChannel,
     mockMessage,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { RequestEditor } from "../../../../../src/modules/marketplace/dependencies/requests/editor/RequestEditor.js";

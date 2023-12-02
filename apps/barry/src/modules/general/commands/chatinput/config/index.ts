@@ -11,7 +11,7 @@ import {
     type ReplyableInteraction,
     SlashCommand,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     type BaseGuildSettingOption,
     type TypedGuildSettingOption,

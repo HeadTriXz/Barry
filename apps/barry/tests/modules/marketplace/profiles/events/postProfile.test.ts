@@ -2,13 +2,13 @@ import { type ProfilesSettings, ProfileCreationStatus } from "@prisma/client";
 import type { ProfileWithMessages } from "../../../../../src/modules/marketplace/dependencies/profiles/database/index.js";
 
 import { ComponentType, MessageFlags } from "@discordjs/core";
-import { MessageComponentInteraction, PingInteraction } from "@barry/core";
+import { MessageComponentInteraction, PingInteraction } from "@barry-bot/core";
 import {
     createMockMessageComponentInteraction,
     mockChannel,
     mockPingInteraction,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { createMockApplication } from "../../../../mocks/index.js";
 import { mockProfile } from "../mocks/profile.js";
 

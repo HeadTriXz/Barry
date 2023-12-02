@@ -2,7 +2,7 @@ import {
     type AnyInteraction,
     type UpdatableInteraction,
     Event
-} from "@barry/core";
+} from "@barry-bot/core";
 import type { BaseModerationModule } from "../../../../../types/moderation.js";
 import type { BlacklistableModule } from "../../../../../types/blacklist.js";
 import type { LocalReportWithReport } from "../database/LocalReportRepository.js";

@@ -2,13 +2,13 @@ import {
     UpdatableInteraction,
     ModalSubmitInteraction,
     MessageComponentInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,
     mockGuild,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { unblacklistGuild, unblacklistUser } from "../../../../../../../src/modules/developers/commands/chatinput/devtools/tools/index.js";
 
 import { ComponentType } from "@discordjs/core";

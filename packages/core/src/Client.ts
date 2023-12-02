@@ -22,7 +22,7 @@ import {
     GatewayDispatchEvents
 } from "@discordjs/core";
 
-import { type BaseLogger, Logger } from "@barry/logger";
+import { type BaseLogger, Logger } from "@barry-bot/logger";
 import { type Server, StatusCodes } from "./Server.js";
 
 import type { Gateway } from "./types.js";

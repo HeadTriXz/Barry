@@ -1,6 +1,6 @@
 import { type PartialGuildMember, isAboveMember } from "../permissions.js";
 import type { APIUser } from "@discordjs/core";
-import type { ReplyableInteraction } from "@barry/core";
+import type { ReplyableInteraction } from "@barry-bot/core";
 import type { WarnOptions } from "../../../../types/moderation.js";
 import type ModerationModule from "../../index.js";
 

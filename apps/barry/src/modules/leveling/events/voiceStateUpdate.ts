@@ -2,7 +2,7 @@ import { type GatewayVoiceState, GatewayDispatchEvents } from "@discordjs/core";
 import type { PickRequired } from "../index.js";
 import type LevelingModule from "../index.js";
 
-import { Event } from "@barry/core";
+import { Event } from "@barry-bot/core";
 import { DiscordAPIError } from "@discordjs/rest";
 
 /**

@@ -17,11 +17,11 @@ import {
     MessageComponentInteraction,
     ReplyableInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { ComponentType } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/application.js";

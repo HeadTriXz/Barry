@@ -12,7 +12,7 @@ import {
     type GuildInteraction,
     type UpdatableInteraction,
     getAvatarURL
-} from "@barry/core";
+} from "@barry-bot/core";
 import type { Application } from "../../Application.js";
 import type { Image } from "@napi-rs/canvas";
 import type { ModuleWithSettings } from "../../types/modules.js";

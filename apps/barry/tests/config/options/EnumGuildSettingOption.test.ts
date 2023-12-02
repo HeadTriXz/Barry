@@ -2,14 +2,14 @@ import {
     type GuildInteraction,
     MessageComponentInteraction,
     UpdatableInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 
 import { ComponentType } from "@discordjs/core";
 import { EnumGuildSettingOption } from "../../../src/config/options/EnumGuildSettingOption.js";
 import { GuildSettingType } from "../../../src/config/option.js";
 import { GuildSettingsStore } from "../../../src/config/store.js";
 import { createMockApplication } from "../../mocks/index.js";
-import { createMockMessageComponentInteraction } from "@barry/testing";
+import { createMockMessageComponentInteraction } from "@barry-bot/testing";
 import { timeoutContent } from "../../../src/common.js";
 
 describe("EnumGuildSettingOption", () => {

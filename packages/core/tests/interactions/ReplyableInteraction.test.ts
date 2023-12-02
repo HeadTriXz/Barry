@@ -5,7 +5,7 @@ import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 describe("ReplyableInteraction", () => {
     let client: Client;

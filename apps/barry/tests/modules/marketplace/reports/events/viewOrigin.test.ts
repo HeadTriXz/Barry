@@ -16,9 +16,9 @@ import {
     mockChannel,
     mockGuild,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
-import { MessageComponentInteraction } from "@barry/core";
+import { MessageComponentInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../mocks/application.js";
 
 import ViewOriginEvent, { type ModuleWithContent } from "../../../../../src/modules/marketplace/dependencies/reports/events/viewOrigin.js";

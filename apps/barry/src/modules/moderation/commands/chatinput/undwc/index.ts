@@ -7,7 +7,7 @@ import {
     type ApplicationCommandInteraction,
     SlashCommand,
     SlashCommandOptionBuilder
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     type PartialGuildMember,
     isAboveMember

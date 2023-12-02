@@ -19,7 +19,7 @@ import type {
 import type { Application } from "../Application.js";
 
 import { GuildSettingsStore } from "./store.js";
-import { Module } from "@barry/core";
+import { Module } from "@barry-bot/core";
 
 /**
  * Represents any typed guild setting option.

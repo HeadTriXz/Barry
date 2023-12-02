@@ -1,12 +1,12 @@
 import {
     ApplicationCommandInteraction,
     MessageComponentInteraction
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     createMockApplicationCommandInteraction,
     createMockMessageComponentInteraction,
     mockMessage
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { ComponentType } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
 import { timeoutContent } from "../../../../../../src/common.js";

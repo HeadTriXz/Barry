@@ -9,7 +9,7 @@ import {
 import { type Request, type RequestsSettings, RequestStatus } from "@prisma/client";
 import type { RequestWithAttachments } from "../../database/index.js";
 
-import { getAvatarURL } from "@barry/core";
+import { getAvatarURL } from "@barry-bot/core";
 import config from "../../../../../../config.js";
 
 /**

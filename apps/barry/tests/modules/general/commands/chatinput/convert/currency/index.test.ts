@@ -1,9 +1,9 @@
 import { MockAgent, setGlobalDispatcher } from "undici";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../../mocks/application.js";
-import { createMockApplicationCommandInteraction } from "@barry/testing";
+import { createMockApplicationCommandInteraction } from "@barry-bot/testing";
 
 import ConvertCurrencyCommand from "../../../../../../../src/modules/general/commands/chatinput/convert/currency/index.js";
 import GeneralModule from "../../../../../../../src/modules/general/index.js";

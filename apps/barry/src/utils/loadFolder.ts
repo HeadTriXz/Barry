@@ -6,7 +6,7 @@ import {
     BaseCommand,
     Event,
     Module
-} from "@barry/core";
+} from "@barry-bot/core";
 
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";

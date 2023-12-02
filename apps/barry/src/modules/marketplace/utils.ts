@@ -1,4 +1,4 @@
-import type { ReplyableInteraction } from "@barry/core";
+import type { ReplyableInteraction } from "@barry-bot/core";
 import {
     type APIEmbed,
     ButtonStyle,

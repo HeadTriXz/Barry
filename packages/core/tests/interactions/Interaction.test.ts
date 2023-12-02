@@ -16,7 +16,7 @@ import {
     createMockMessageComponentInteraction,
     createMockModalSubmitInteraction,
     mockPingInteraction
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 describe("Interaction", () => {
     const client = new Client({

@@ -1,7 +1,7 @@
 import type { ReportsSettings } from "@prisma/client";
 
 import { ReportsSettingsRepository } from "../../../../../src/modules/marketplace/dependencies/reports/database/index.js";
-import { mockChannel } from "@barry/testing";
+import { mockChannel } from "@barry-bot/testing";
 import { prisma } from "../../../../mocks/index.js";
 
 describe("ReportsSettingsRepository", () => {

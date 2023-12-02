@@ -10,7 +10,7 @@ import {
     type ApplicationCommandInteraction,
     type ReplyableInteraction,
     SlashCommand
-} from "@barry/core";
+} from "@barry-bot/core";
 import type LevelingModule from "../../../index.js";
 
 import { MemberActivitySortBy, MemberActivitySortOrder } from "../../../database/index.js";

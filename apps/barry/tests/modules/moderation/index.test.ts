@@ -22,9 +22,9 @@ import {
     mockMessage,
     mockRole,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { DiscordAPIError } from "@discordjs/rest";
-import { Module } from "@barry/core";
+import { Module } from "@barry-bot/core";
 import { createMockApplication } from "../../mocks/application.js";
 import { mockCase } from "./mocks/case.js";
 

@@ -1,4 +1,4 @@
-import type { ModalSubmitInteraction } from "@barry/core";
+import type { ModalSubmitInteraction } from "@barry-bot/core";
 import type { Prisma } from "@prisma/client";
 
 import {

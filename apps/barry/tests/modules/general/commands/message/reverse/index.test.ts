@@ -3,9 +3,9 @@ import {
     createMockApplicationCommandInteraction,
     mockAttachment,
     mockMessage
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
 
 import GeneralModule from "../../../../../../src/modules/general/index.js";

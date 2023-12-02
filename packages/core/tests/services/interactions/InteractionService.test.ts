@@ -8,7 +8,7 @@ import {
     InteractionService,
     PingInteractionHandler
 } from "../../../src/index.js";
-import { createMockApplicationCommandInteraction } from "@barry/testing";
+import { createMockApplicationCommandInteraction } from "@barry-bot/testing";
 
 describe("InteractionService", () => {
     let client: Client;

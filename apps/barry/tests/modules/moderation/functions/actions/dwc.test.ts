@@ -15,8 +15,8 @@ import {
     mockRole,
     mockMember,
     mockMessage
-} from "@barry/testing";
-import { ApplicationCommandInteraction } from "@barry/core";
+} from "@barry-bot/testing";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { ApplicationCommandType } from "@discordjs/core";
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../../mocks/application.js";

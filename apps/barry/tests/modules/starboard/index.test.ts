@@ -2,7 +2,7 @@ import { type APIAttachment, ButtonStyle, ComponentType } from "@discordjs/core"
 import type { StarboardMessage, StarboardSettings } from "@prisma/client";
 
 import { StarboardMessageRepository, StarboardSettingsRepository } from "../../../src/modules/starboard/database/index.js";
-import { mockMember, mockMessage } from "@barry/testing";
+import { mockMember, mockMessage } from "@barry-bot/testing";
 import { createMockApplication } from "../../mocks/application.js";
 
 import StarboardModule, { type UpdateMessageOptions } from "../../../src/modules/starboard/index.js";

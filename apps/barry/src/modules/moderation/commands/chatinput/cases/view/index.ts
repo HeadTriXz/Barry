@@ -9,7 +9,7 @@ import {
     SlashCommand,
     SlashCommandOptionBuilder,
     getAvatarURL
-} from "@barry/core";
+} from "@barry-bot/core";
 import type { CaseWithNotes } from "../../../../database/index.js";
 import type ModerationModule from "../../../../index.js";
 

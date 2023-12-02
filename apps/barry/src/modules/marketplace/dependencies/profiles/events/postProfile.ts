@@ -1,4 +1,4 @@
-import { type AnyInteraction, Event, getCreatedAt } from "@barry/core";
+import { type AnyInteraction, Event, getCreatedAt } from "@barry-bot/core";
 import type ProfilesModule from "../index.js";
 
 import {

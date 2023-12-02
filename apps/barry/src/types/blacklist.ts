@@ -1,4 +1,4 @@
-import type { Module } from "@barry/core";
+import type { Module } from "@barry-bot/core";
 
 /**
  * Represents a repository for managing blacklisted users or guilds.

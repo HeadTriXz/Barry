@@ -1,6 +1,6 @@
 import { PingInteraction, PingInteractionHandler } from "../../../src/index.js";
 import { InteractionResponseType } from "@discordjs/core";
-import { mockPingInteraction } from "@barry/testing";
+import { mockPingInteraction } from "@barry-bot/testing";
 
 describe("PingInteractionHandler", () => {
     let handler: PingInteractionHandler;

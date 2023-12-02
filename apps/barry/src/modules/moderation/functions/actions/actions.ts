@@ -6,7 +6,7 @@ import type {
     MuteFunction,
     WarnFunction
 } from "../../../../types/moderation.js";
-import { type ReplyableInteraction, UpdatableInteraction } from "@barry/core";
+import { type ReplyableInteraction, UpdatableInteraction } from "@barry-bot/core";
 import type ModerationModule from "../../index.js";
 
 import { MessageFlags } from "@discordjs/core";

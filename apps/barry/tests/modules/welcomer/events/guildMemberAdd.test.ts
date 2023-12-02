@@ -1,7 +1,7 @@
 import type { GatewayGuildMemberAddDispatchData } from "@discordjs/core";
 import type { WelcomerSettings } from "@prisma/client";
 
-import { mockMember, mockMessage } from "@barry/testing";
+import { mockMember, mockMessage } from "@barry-bot/testing";
 import { DiscordAPIError } from "@discordjs/rest";
 import { createMockApplication } from "../../../mocks/application.js";
 

@@ -23,7 +23,7 @@ import {
     createMockAutocompleteInteraction,
     mockAutocompleteCommand,
     mockAutocompleteSubcommand
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 class MockAutocompleteCommand extends MockSlashCommand {
     constructor(module: Module) {

@@ -7,7 +7,7 @@ import {
     loadFolder,
     loadModules
 } from "../../src/utils/index.js";
-import { BaseCommand } from "@barry/core";
+import { BaseCommand } from "@barry-bot/core";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 

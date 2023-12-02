@@ -1,9 +1,9 @@
 import type { Canvas } from "canvas-constructor/napi-rs";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../mocks/index.js";
-import { createMockApplicationCommandInteraction } from "@barry/testing";
+import { createMockApplicationCommandInteraction } from "@barry-bot/testing";
 
 import ColorCommand from "../../../../../../src/modules/general/commands/chatinput/color/index.js";
 import GeneralModule from "../../../../../../src/modules/general/index.js";

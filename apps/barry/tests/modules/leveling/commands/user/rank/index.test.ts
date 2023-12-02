@@ -1,7 +1,7 @@
 import { Canvas, loadImage } from "canvas-constructor/napi-rs";
-import { createMockApplicationCommandInteraction, mockUser } from "@barry/testing";
+import { createMockApplicationCommandInteraction, mockUser } from "@barry-bot/testing";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { createMockApplication } from "../../../../../mocks/application.js";
 
 import LevelingModule from "../../../../../../src/modules/leveling/index.js";

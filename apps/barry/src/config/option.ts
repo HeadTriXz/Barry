@@ -1,4 +1,4 @@
-import type { GuildInteraction, UpdatableInteraction } from "@barry/core";
+import type { GuildInteraction, UpdatableInteraction } from "@barry-bot/core";
 import type { GuildSettingsStore, Nullable } from "./store.js";
 import type { BaseSettings } from "../types/modules.js";
 

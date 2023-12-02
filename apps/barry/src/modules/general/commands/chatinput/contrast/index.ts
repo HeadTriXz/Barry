@@ -2,7 +2,7 @@ import {
     type ApplicationCommandInteraction,
     SlashCommand,
     SlashCommandOptionBuilder
-} from "@barry/core";
+} from "@barry-bot/core";
 import type GeneralModule from "../../../index.js";
 
 import { Canvas, loadFont } from "canvas-constructor/napi-rs";

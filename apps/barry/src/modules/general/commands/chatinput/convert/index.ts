@@ -1,6 +1,6 @@
 import type GeneralModule from "../../../index.js";
 
-import { SlashCommand } from "@barry/core";
+import { SlashCommand } from "@barry-bot/core";
 import ConvertCurrencyCommand from "./currency/index.js";
 import ConvertUnitCommand from "./unit/index.js";
 

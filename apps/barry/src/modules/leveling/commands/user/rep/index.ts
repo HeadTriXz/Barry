@@ -2,7 +2,7 @@ import {
     type ApplicationCommandInteraction,
     type UserCommandTarget,
     UserCommand
-} from "@barry/core";
+} from "@barry-bot/core";
 import type LevelingModule from "../../../index.js";
 
 import { MessageFlags } from "@discordjs/core";

@@ -1,6 +1,6 @@
 import type { Application } from "../../src/Application.js";
 
-import { Event, Module, UserCommand } from "@barry/core";
+import { Event, Module, UserCommand } from "@barry-bot/core";
 import { GatewayDispatchEvents } from "@discordjs/core";
 
 export class MockCommand extends UserCommand {

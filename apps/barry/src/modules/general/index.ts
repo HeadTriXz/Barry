@@ -1,6 +1,6 @@
 import type { Application } from "../../Application.js";
 
-import { Module } from "@barry/core";
+import { Module } from "@barry-bot/core";
 import { loadCommands } from "../../utils/index.js";
 
 /**

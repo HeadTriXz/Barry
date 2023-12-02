@@ -1,5 +1,5 @@
 import { type APIApplicationCommandOptionChoice, MessageFlags } from "@discordjs/core";
-import { type ApplicationCommandInteraction, SlashCommand, SlashCommandOptionBuilder } from "@barry/core";
+import { type ApplicationCommandInteraction, SlashCommand, SlashCommandOptionBuilder } from "@barry-bot/core";
 import type GeneralModule from "../../../../index.js";
 
 import { fetch } from "undici";

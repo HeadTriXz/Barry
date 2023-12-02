@@ -1,10 +1,10 @@
-import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
+import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry-bot/core";
 import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core";
 import {
     createMockApplicationCommandInteraction,
     createMockAutocompleteInteraction,
     mockAutocompleteCommand
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { createMockApplication } from "../../../../../../mocks/application.js";
 
 import ConvertUnitCommand from "../../../../../../../src/modules/general/commands/chatinput/convert/unit/index.js";

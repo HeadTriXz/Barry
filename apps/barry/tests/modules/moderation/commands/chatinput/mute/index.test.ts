@@ -1,13 +1,13 @@
 import type { MuteOptions } from "../../../../../../src/types/moderation.js";
 
-import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
+import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry-bot/core";
 import { ApplicationCommandType } from "@discordjs/core";
 import {
     createMockApplicationCommandInteraction,
     createMockAutocompleteInteraction,
     mockMember,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { COMMON_MINOR_REASONS } from "../../../../../../src/modules/moderation/constants.js";
 import { createMockApplication } from "../../../../../mocks/application.js";

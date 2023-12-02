@@ -2,7 +2,7 @@ import {
     type ApplicationCommandInteraction,
     SlashCommand,
     SlashCommandOptionBuilder
-} from "@barry/core";
+} from "@barry-bot/core";
 import { type MuteOptions } from "../../../../../types/moderation.js";
 import type ModerationModule from "../../../index.js";
 

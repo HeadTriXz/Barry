@@ -2,10 +2,10 @@ import type { CaseWithNotes } from "../../../../../../../../src/modules/moderati
 import {
     createMockApplicationCommandInteraction,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 import { mockCase, mockCaseNote } from "../../../../../mocks/case.js";
 
-import { ApplicationCommandInteraction } from "@barry/core";
+import { ApplicationCommandInteraction } from "@barry-bot/core";
 import { MessageFlags } from "@discordjs/core";
 import { createMockApplication } from "../../../../../../../mocks/application.js";
 

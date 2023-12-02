@@ -1,6 +1,6 @@
 import { type PartialGuildMember, isAboveMember } from "../permissions.js";
 import type { KickOptions } from "../../../../types/moderation.js";
-import type { ReplyableInteraction } from "@barry/core";
+import type { ReplyableInteraction } from "@barry-bot/core";
 import type ModerationModule from "../../index.js";
 
 import { CaseType } from "@prisma/client";

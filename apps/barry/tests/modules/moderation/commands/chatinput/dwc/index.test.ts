@@ -1,11 +1,11 @@
 import type { DWCOptions } from "../../../../../../src/types/moderation.js";
 
-import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry/core";
+import { ApplicationCommandInteraction, AutocompleteInteraction } from "@barry-bot/core";
 import {
     createMockApplicationCommandInteraction,
     createMockAutocompleteInteraction,
     mockUser
-} from "@barry/testing";
+} from "@barry-bot/testing";
 
 import { ApplicationCommandType } from "@discordjs/core";
 import { COMMON_DWC_REASONS } from "../../../../../../src/modules/moderation/constants.js";

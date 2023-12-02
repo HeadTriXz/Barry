@@ -6,7 +6,7 @@ import {
     ReportType
 } from "@prisma/client";
 import { ReportActionButton } from "../../../../src/modules/marketplace/dependencies/reports/index.js";
-import { mockUser } from "@barry/testing";
+import { mockUser } from "@barry-bot/testing";
 
 describe("getReportContent", () => {
     const creatorID = "257522665437265920";

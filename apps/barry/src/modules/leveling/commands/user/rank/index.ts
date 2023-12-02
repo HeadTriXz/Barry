@@ -3,7 +3,7 @@ import {
     type UserCommandTarget,
     UserCommand,
     getAvatarURL
-} from "@barry/core";
+} from "@barry-bot/core";
 import {
     type Image,
     Canvas,
