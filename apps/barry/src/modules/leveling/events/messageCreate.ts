@@ -40,18 +40,16 @@ export default class extends Event<LevelingModule> {
             return;
         }
 
-        const key = `lastMessage:${message.author.id}:${message.guild_id}`;
-        if (this.client.cooldowns.has(key)) {
-            return;
-        }
-
         const settings = await this.module.settings.getOrCreate(message.guild_id);
         if (this.#isBlacklisted(message, settings)) {
             return;
         }
+        const key = `lastMessage:${message.author.id}:${message.guild_id}`;
+        if (!this.client.cooldowns.has(key)) {
+            await this.#addExperience(message);
 
-        await this.#addExperience(message);
-        this.client.cooldowns.set(key, 60000);
+            this.client.cooldowns.set(key, 60000);
+        }
 
         if (settings.messageRep) {
             await this.#addReputation(message);

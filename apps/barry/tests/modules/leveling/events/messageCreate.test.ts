@@ -202,16 +202,12 @@ describe("MessageCreate Event", () => {
             message.content = "Thank you!";
             message.mentions = [{ ...mockUser, id: "30527482987641765" }];
 
-            vi.spyOn(event.client.cooldowns, "has").mockReturnValue(true);
-
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(message);
+            await event.execute(message);
 
-            expect(incrementSpy).not.toHaveBeenCalledTimes(2);
-            expect(incrementSpy).not.toHaveBeenCalledWith(guildID, "30527482987641765", {
-                reputation: 1
-            });
+            expect(incrementSpy).not.toHaveBeenCalledTimes(3);
         });
 
         it("should not add reputation if the user mentioned themselves", async () => {
