@@ -1,14 +1,21 @@
 import { type GatewayMessageCreateDispatchData, GatewayDispatchEvents } from "@discordjs/core";
+import type { LevelingSettings } from "@prisma/client";
 import type { PickRequired } from "../index.js";
 import type LevelingModule from "../index.js";
 
 import { DiscordAPIError } from "@discordjs/rest";
 import { Event } from "@barry-bot/core";
+import config from "../../../config.js";
 
 /**
  * Represents dispatch data of the 'MESSAGE_CREATE' event in a guild.
  */
 type GuildMessageCreateDispatchData = PickRequired<GatewayMessageCreateDispatchData, "guild_id">;
+
+/**
+ * A regular expression that matches messages that contain a "thank you".
+ */
+const THANKS_REGEX = /(?:|\s)(?:thank(?:s| you)|ty|thn?x|cheers)(?:\s|)/i;
 
 /**
  * Tracks user activity and assigns experience and levels based on their participation in the guild.
@@ -33,18 +40,20 @@ export default class extends Event<LevelingModule> {
             return;
         }
 
+        const settings = await this.module.settings.getOrCreate(message.guild_id);
+        if (this.#isBlacklisted(message, settings)) {
+            return;
+        }
         const key = `lastMessage:${message.author.id}:${message.guild_id}`;
-        if (this.client.cooldowns.has(key)) {
-            return;
+        if (!this.client.cooldowns.has(key)) {
+            await this.#addExperience(message);
+
+            this.client.cooldowns.set(key, 60000);
         }
 
-        const blacklisted = await this.#isBlacklisted(message);
-        if (blacklisted) {
-            return;
+        if (settings.messageRep) {
+            await this.#addReputation(message);
         }
-
-        await this.#addExperience(message);
-        this.client.cooldowns.set(key, 60000);
     }
 
     /**
@@ -71,13 +80,50 @@ export default class extends Event<LevelingModule> {
     }
 
     /**
+     * Adds reputation to the user if their message contains a "thank you".
+     *
+     * @param message The message data received from the gateway.
+     */
+    async #addReputation(message: GuildMessageCreateDispatchData): Promise<void> {
+        const cooldownKey = `${message.guild_id}:Give Reputation:${message.author.id}`;
+        if (this.client.cooldowns.has(cooldownKey)) {
+            return;
+        }
+
+        const mention = message.mentions[0] ?? message.referenced_message?.author;
+        if (mention === undefined || mention.bot || mention.id === message.author.id) {
+            return;
+        }
+
+        if (!THANKS_REGEX.test(message.content)) {
+            return;
+        }
+
+        await this.module.memberActivity.increment(message.guild_id, mention.id, {
+            reputation: 1
+        });
+
+        await this.client.api.channels.createMessage(message.channel_id, {
+            allowed_mentions: {
+                replied_user: false,
+                parse: []
+            },
+            content: `${config.emotes.check} Gave +1 rep to <@${mention.id}>.`,
+            message_reference: {
+                message_id: message.id
+            }
+        });
+
+        this.client.cooldowns.set(cooldownKey, 86400000);
+    }
+
+    /**
      * Checks if the user (or channel) is blacklisted from receiving experience points.
      *
      * @param message The message data received from the gateway.
      * @returns Whether the user is blacklisted.
      */
-    async #isBlacklisted(message: GuildMessageCreateDispatchData): Promise<boolean> {
-        const settings = await this.module.settings.getOrCreate(message.guild_id);
+    #isBlacklisted(message: GuildMessageCreateDispatchData, settings: LevelingSettings): boolean {
         return !settings.enabled
             || settings.ignoredChannels.includes(message.channel_id)
             || settings.ignoredRoles.some((id) => message.member?.roles.includes(id));
