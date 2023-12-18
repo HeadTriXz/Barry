@@ -34,7 +34,8 @@ describe("MessageCreate Event", () => {
             guildID: guildID,
             enabled: true,
             ignoredChannels: [],
-            ignoredRoles: []
+            ignoredRoles: [],
+            messageRep: true
         });
 
         vi.spyOn(module.memberActivity, "upsert").mockResolvedValue({
@@ -46,6 +47,8 @@ describe("MessageCreate Event", () => {
             reputation: 2,
             voiceMinutes: 0
         });
+
+        vi.spyOn(client.api.channels, "createMessage").mockResolvedValue(mockMessage);
     });
 
     describe("execute", () => {
@@ -91,7 +94,8 @@ describe("MessageCreate Event", () => {
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: ["30527482987641765"],
-                ignoredRoles: []
+                ignoredRoles: [],
+                messageRep: false
             });
 
             await event.execute(message);
@@ -106,7 +110,8 @@ describe("MessageCreate Event", () => {
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [],
-                ignoredRoles: ["68239102456844360"]
+                ignoredRoles: ["68239102456844360"],
+                messageRep: false
             });
 
             await event.execute(message);
@@ -145,6 +150,95 @@ describe("MessageCreate Event", () => {
 
             expect(event.client.logger.error).toHaveBeenCalledOnce();
             expect(cooldownSpy).toHaveBeenCalledOnce();
+        });
+
+        it("should add reputation if the message contains a 'thank you'", async () => {
+            message.content = "Thank you!";
+            message.mentions = [{ ...mockUser, id: "30527482987641765" }];
+
+            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
+
+            await event.execute(message);
+
+            expect(incrementSpy).toHaveBeenCalledTimes(2);
+            expect(incrementSpy).toHaveBeenCalledWith(guildID, "30527482987641765", {
+                reputation: 1
+            });
+        });
+
+        it("should not add reputation if the message does not contain a 'thank you'", async () => {
+            message.content = "Hello!";
+            message.mentions = [{ ...mockUser, id: "30527482987641765" }];
+
+            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
+
+            await event.execute(message);
+
+            expect(incrementSpy).not.toHaveBeenCalledTimes(2);
+            expect(incrementSpy).not.toHaveBeenCalledWith(guildID, "30527482987641765", {
+                reputation: 1
+            });
+        });
+
+        it("should not add reputation if the user is on cooldown", async () => {
+            message.content = "Thank you!";
+            message.mentions = [{ ...mockUser, id: "30527482987641765" }];
+
+            vi.spyOn(event.client.cooldowns, "has").mockReturnValue(true);
+
+            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
+
+            await event.execute(message);
+        });
+
+        it("should not add reputation if the user mentioned themselves", async () => {
+            message.content = "Thank you!";
+            message.mentions = [{ ...mockUser, id: userID }];
+
+            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
+
+            await event.execute(message);
+
+            expect(incrementSpy).not.toHaveBeenCalledTimes(2);
+            expect(incrementSpy).not.toHaveBeenCalledWith(guildID, userID, {
+                reputation: 1
+            });
+        });
+
+        it("should not add reputation if the user mentioned a bot", async () => {
+            message.content = "Thank you!";
+            message.mentions = [{ ...mockUser, bot: true, id: "30527482987641765" }];
+
+            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
+
+            await event.execute(message);
+
+            expect(incrementSpy).not.toHaveBeenCalledTimes(2);
+            expect(incrementSpy).not.toHaveBeenCalledWith(guildID, "30527482987641765", {
+                reputation: 1
+            });
+        });
+
+        it("should not add reputation if message reputation is disabled", async () => {
+            message.content = "Thank you!";
+            message.mentions = [{ ...mockUser, id: "30527482987641765" }];
+
+            vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
+                guildID: guildID,
+                enabled: true,
+                ignoredChannels: [],
+                ignoredRoles: [],
+                messageRep: false
+            });
+
+            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
+
+            await event.execute(message);
+
+            expect(incrementSpy).not.toHaveBeenCalledTimes(2);
+            expect(incrementSpy).not.toHaveBeenCalledWith(guildID, "30527482987641765", {
+                reputation: 1
+            });
         });
     });
 });

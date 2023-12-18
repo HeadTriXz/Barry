@@ -15,7 +15,7 @@ type GuildMessageCreateDispatchData = PickRequired<GatewayMessageCreateDispatchD
 /**
  * A regular expression that matches messages that contain a "thank you".
  */
-const THANKS_REGEX = /(?:^|\s)(?:thank(?:s| you)|ty|thn?x|cheers)(?:\s|$)/i;
+const THANKS_REGEX = /(?:|\s)(?:thank(?:s| you)|ty|thn?x|cheers)(?:\s|)/i;
 
 /**
  * Tracks user activity and assigns experience and levels based on their participation in the guild.
@@ -88,8 +88,7 @@ export default class extends Event<LevelingModule> {
      */
     async #addReputation(message: GuildMessageCreateDispatchData): Promise<void> {
         const cooldownKey = `${message.guild_id ?? "global"}:Give Reputation:${message.author.id}`;
-        const expiresAt = this.client.cooldowns.get(cooldownKey);
-        if (expiresAt !== undefined) {
+        if (this.client.cooldowns.has(cooldownKey)) {
             return;
         }
 
