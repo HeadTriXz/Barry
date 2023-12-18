@@ -166,6 +166,24 @@ describe("MessageCreate Event", () => {
             });
         });
 
+        it("should add reputation if the message replies to a user", async () => {
+            message.content = "Thank you!";
+            message.mentions = [];
+            message.referenced_message = {
+                ...mockMessage,
+                author: { ...mockUser, id: "30527482987641765" }
+            };
+
+            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
+
+            await event.execute(message);
+
+            expect(incrementSpy).toHaveBeenCalledTimes(2);
+            expect(incrementSpy).toHaveBeenCalledWith(guildID, "30527482987641765", {
+                reputation: 1
+            });
+        });
+
         it("should not add reputation if the message does not contain a 'thank you'", async () => {
             message.content = "Hello!";
             message.mentions = [{ ...mockUser, id: "30527482987641765" }];
@@ -189,6 +207,11 @@ describe("MessageCreate Event", () => {
             const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(message);
+
+            expect(incrementSpy).not.toHaveBeenCalledTimes(2);
+            expect(incrementSpy).not.toHaveBeenCalledWith(guildID, "30527482987641765", {
+                reputation: 1
+            });
         });
 
         it("should not add reputation if the user mentioned themselves", async () => {
