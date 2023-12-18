@@ -85,7 +85,7 @@ export default class extends Event<LevelingModule> {
      * @param message The message data received from the gateway.
      */
     async #addReputation(message: GuildMessageCreateDispatchData): Promise<void> {
-        const cooldownKey = `${message.guild_id ?? "global"}:Give Reputation:${message.author.id}`;
+        const cooldownKey = `${message.guild_id}:Give Reputation:${message.author.id}`;
         if (this.client.cooldowns.has(cooldownKey)) {
             return;
         }
