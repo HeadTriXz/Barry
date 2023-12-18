@@ -111,6 +111,10 @@ export default class LevelingModule extends ConfigurableModule<LevelingModule> i
                 ignoredRoles: new RoleArrayGuildSettingOption({
                     name: "Ignored Roles",
                     description: "Roles that are ignored when tracking user activity."
+                }),
+                messageRep: new BooleanGuildSettingOption({
+                    name: "Message Reputation",
+                    description: "Whether to check if a message contains a 'thank you' and give reputation."
                 })
             }
         });
