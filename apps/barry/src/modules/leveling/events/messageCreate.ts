@@ -15,7 +15,7 @@ type GuildMessageCreateDispatchData = PickRequired<GatewayMessageCreateDispatchD
 /**
  * A regular expression that matches messages that contain a "thank you".
  */
-const THANKS_REGEX = /(?:\s|\n|^)(?:thank(?:s| you)|ty|thn?x|cheers)(?:\s|\n|$)/i;
+const THANKS_REGEX = /(\s|^)(thanks?|ty|thn?x|cheers)(\p{P}|\s|$)/iu;
 
 /**
  * Tracks user activity and assigns experience and levels based on their participation in the guild.
