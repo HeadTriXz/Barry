@@ -8,8 +8,6 @@ import { type Module, Client } from "../../src/index.js";
 import {
     MockModule,
     MockSlashCommand,
-    MockSlashCommandBar,
-    MockSlashCommandFoo,
     baseSlashCommandOptions,
     slashCommandOptions
 } from "../mocks/index.js";

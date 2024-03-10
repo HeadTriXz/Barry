@@ -157,7 +157,7 @@ export abstract class SlashCommand<M extends Module = Module> extends BaseComman
     /**
      * Registers a subcommand.
      *
-     * @param child The subcommand to register. 
+     * @param child The subcommand to register.
      */
     #registerChild(child: SlashCommand<M>): void {
         if (child.defaultMemberPermissions !== undefined) {
