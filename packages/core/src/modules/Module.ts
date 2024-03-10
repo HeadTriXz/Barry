@@ -169,7 +169,10 @@ export abstract class Module<T extends Client = Client> {
      */
     async #loadCommands(commands: ConstructorArray<AnyCommand>): Promise<void> {
         for (const CommandClass of await commands) {
-            this.commands.push(new CommandClass(this));
+            const command = new CommandClass(this);
+            await command.initialize();
+
+            this.commands.push(command);
         }
     }
 

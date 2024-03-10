@@ -137,6 +137,11 @@ export abstract class BaseCommand<M extends Module = Module> {
     }
 
     /**
+     * Initializes the command.
+     */
+    async initialize(): Promise<void> {}
+
+    /**
      * Returns an object with the properties required to register a new command.
      */
     toJSON(): RESTPostAPIApplicationCommandsJSONBody {

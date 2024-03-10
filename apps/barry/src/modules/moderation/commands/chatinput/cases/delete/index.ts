@@ -37,7 +37,7 @@ export default class extends SlashCommand<ModerationModule> {
         super(module, {
             name: "delete",
             description: "Delete a specific case.",
-            defaultMemberPermissions: PermissionFlagsBits.ManageGuild,
+            defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
             guildOnly: true,
             options: {
                 case: SlashCommandOptionBuilder.integer({
