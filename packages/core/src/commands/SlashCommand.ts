@@ -25,11 +25,11 @@ type ApplicationCommandSubcommandOption =
 /**
  * Options for a {@link SlashCommand}.
  */
-export interface SlashCommandOptions extends ApplicationCommandOptions {
+export interface SlashCommandOptions<M extends Module = Module> extends ApplicationCommandOptions {
     /**
      * The subcommands of the command.
      */
-    children?: ConstructorArray<SlashCommand>;
+    children?: ConstructorArray<SlashCommand<M>>;
 
     /**
      * A description of the command.
@@ -78,32 +78,22 @@ export abstract class SlashCommand<M extends Module = Module> extends BaseComman
     type: ApplicationCommandType.ChatInput = ApplicationCommandType.ChatInput;
 
     /**
+     * An array of commands to register during initialization.
+     */
+    #toRegister: ConstructorArray<SlashCommand<M>>;
+
+    /**
      * Represents a slash command.
      *
      * @param module The module this command belong to.
      * @param options Options for the command.
      */
-    constructor(module: M, options: SlashCommandOptions) {
+    constructor(module: M, options: SlashCommandOptions<M>) {
         super(module, options);
 
         this.description = options.description;
         this.descriptionLocalizations = options.descriptionLocalizations;
-
-        if (Array.isArray(options.children)) {
-            for (const CommandClass of options.children) {
-                const instance = new CommandClass(module) as SlashCommand<M>;
-
-                this.children.set(instance.name, instance);
-            }
-        } else if (options.children !== undefined) {
-            options.children.then((children) => {
-                for (const CommandClass of children) {
-                    const instance = new CommandClass(module) as SlashCommand<M>;
-
-                    this.children.set(instance.name, instance);
-                }
-            });
-        }
+        this.#toRegister = options.children ?? [];
 
         if (options.options !== undefined) {
             for (const key in options.options) {
@@ -145,6 +135,13 @@ export abstract class SlashCommand<M extends Module = Module> extends BaseComman
     }
 
     /**
+     * Initializes the command.
+     */
+    override async initialize(): Promise<void> {
+        await this.#registerChildren(this.#toRegister);
+    }
+
+    /**
      * Returns an object with the properties required to register a new command.
      */
     toJSON(): RESTPostAPIApplicationCommandsJSONBody {
@@ -155,6 +152,34 @@ export abstract class SlashCommand<M extends Module = Module> extends BaseComman
             description_localizations: this.descriptionLocalizations,
             options: this.getOptions()
         });
+    }
+
+    /**
+     * Registers a subcommand.
+     *
+     * @param child The subcommand to register.
+     */
+    #registerChild(child: SlashCommand<M>): void {
+        if (child.defaultMemberPermissions !== undefined) {
+            this.defaultMemberPermissions ??= 0n;
+            this.defaultMemberPermissions |= child.defaultMemberPermissions;
+        }
+
+        this.children.set(child.name, child);
+    }
+
+    /**
+     * Registers all the children of the command.
+     *
+     * @param children The children to register.
+     */
+    async #registerChildren(children: ConstructorArray<SlashCommand<M>>): Promise<void> {
+        for (const CommandClass of await children) {
+            const command = new CommandClass(this.module);
+            await command.initialize();
+
+            this.#registerChild(command);
+        }
     }
 
     /**

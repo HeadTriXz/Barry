@@ -89,11 +89,13 @@ describe("CommandService", () => {
     });
 
     describe("get", () => {
-        it("should return a registered global command", () => {
+        it("should return a registered global command", async () => {
             const data = createMockApplicationCommandInteraction();
             const command = new MockSlashCommand(module, {
                 name: data.data.name
             });
+
+            await command.initialize();
 
             commands.add(command);
             const interaction = new ApplicationCommandInteraction(data, client);
@@ -102,7 +104,7 @@ describe("CommandService", () => {
             expect(commands.get(interaction)).toBe(command);
         });
 
-        it("should return a registered guild command", () => {
+        it("should return a registered guild command", async () => {
             const data = createMockApplicationCommandInteraction({
                 ...mockChatInputCommand,
                 guild_id: "68239102456844360"
@@ -112,16 +114,16 @@ describe("CommandService", () => {
                 name: data.data.name,
                 guilds: ["68239102456844360", "30527482987641765"]
             });
+            await command.initialize();
 
             commands.add(command);
-
             const interaction = new ApplicationCommandInteraction(data, client);
 
             expect(commands.size).toBe(2);
             expect(commands.get(interaction)).toBe(command);
         });
 
-        it("should return a registered subcommand", () => {
+        it("should return a registered subcommand", async () => {
             const data = createMockApplicationCommandInteraction({
                 ...mockChatInputCommand,
                 options: [{
@@ -139,47 +141,51 @@ describe("CommandService", () => {
                 children: [MockSlashCommandFoo, MockSlashCommandBar]
             });
 
-            commands.add(command);
+            await command.initialize();
 
+            commands.add(command);
             const interaction = new ApplicationCommandInteraction(data, client);
 
             expect(commands.size).toBe(1);
             expect(commands.get(interaction)).toBeInstanceOf(MockSlashCommandFooBar);
         });
 
-        it("should return a message command", () => {
+        it("should return a message command", async () => {
             const data = createMockApplicationCommandInteraction(mockMessageCommand);
             const command = new MockMessageCommand(module, {
                 name: data.data.name
             });
 
-            commands.add(command);
+            await command.initialize();
 
+            commands.add(command);
             const interaction = new ApplicationCommandInteraction(data, client);
 
             expect(commands.size).toBe(1);
             expect(commands.get(interaction)).toBe(command);
         });
 
-        it("should return a user command", () => {
+        it("should return a user command", async () => {
             const data = createMockApplicationCommandInteraction(mockUserCommand);
             const command = new MockUserCommand(module, {
                 name: data.data.name
             });
 
-            commands.add(command);
+            await command.initialize();
 
+            commands.add(command);
             const interaction = new ApplicationCommandInteraction(data, client);
 
             expect(commands.size).toBe(1);
             expect(commands.get(interaction)).toBe(command);
         });
 
-        it("should throw an error if the command type is not expected", () => {
+        it("should throw an error if the command type is not expected", async () => {
             const data = createMockApplicationCommandInteraction();
             const command = new MockSlashCommand(module, {
                 name: data.data.name
             });
+            await command.initialize();
 
             commands.add(command);
             command.type = ApplicationCommandType.User as ApplicationCommandType.ChatInput;

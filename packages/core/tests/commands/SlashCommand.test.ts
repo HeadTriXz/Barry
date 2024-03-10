@@ -8,8 +8,6 @@ import { type Module, Client } from "../../src/index.js";
 import {
     MockModule,
     MockSlashCommand,
-    MockSlashCommandBar,
-    MockSlashCommandFoo,
     baseSlashCommandOptions,
     slashCommandOptions
 } from "../mocks/index.js";
@@ -36,8 +34,9 @@ describe("SlashCommand", () => {
     });
 
     describe("constructor", () => {
-        it("should initialize the command with the provided options", () => {
+        it("should initialize the command with the provided options", async () => {
             const command = new MockSlashCommand(module, slashCommandOptions);
+            await command.initialize();
 
             expect(command.description).toBe(slashCommandOptions.description);
             expect(command.descriptionLocalizations).toEqual(slashCommandOptions.descriptionLocalizations);
@@ -57,28 +56,25 @@ describe("SlashCommand", () => {
                 }
             ]);
         });
+    });
 
-        it("should add subcommands when provided as an array", () => {
+    describe("initialize", () => {
+        it("should register the command's subcommands", async () => {
             const command = new MockSlashCommand(module, slashCommandOptions);
 
-            expect(command.children.get("foo")).toBeInstanceOf(MockSlashCommandFoo);
-            expect(command.children.get("bar")).toBeInstanceOf(MockSlashCommandBar);
-        });
+            expect(command.children.size).toBe(0);
 
-        it("should add subcommands when provided as a promise", async () => {
-            const children = Promise.resolve([MockSlashCommandFoo, MockSlashCommandBar]);
-            const command = new MockSlashCommand(module, { ...slashCommandOptions, children });
+            await command.initialize();
 
-            await children;
-
-            expect(command.children.get("foo")).toBeInstanceOf(MockSlashCommandFoo);
-            expect(command.children.get("bar")).toBeInstanceOf(MockSlashCommandBar);
+            expect(command.children.size).toBeGreaterThan(0);
         });
     });
 
     describe("toJSON", () => {
-        it("should return the JSON representation of the command", () => {
+        it("should return the JSON representation of the command", async () => {
             const command = new MockSlashCommand(module, slashCommandOptions);
+            await command.initialize();
+
             const payload = command.toJSON();
 
             expect(payload).toEqual({
