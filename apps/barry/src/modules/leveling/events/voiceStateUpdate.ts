@@ -48,7 +48,7 @@ export default class extends Event<LevelingModule> {
         }
 
         if (type & VoiceChannelUpdateType.JOIN) {
-            const blacklisted = await this.#isBlacklisted(state, channelID);
+            const blacklisted = await this.#isBlacklisted(state, state.channel_id!);
             if (blacklisted) {
                 return;
             }
