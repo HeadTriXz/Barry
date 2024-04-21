@@ -46,7 +46,7 @@ export default class extends Event<LevelingModule> {
         if (type & VoiceChannelUpdateType.LEAVE) {
             await this.#updateVoiceMinutes(state.guild_id, state.user_id, channelID);
         }
-    
+
         if (type & VoiceChannelUpdateType.JOIN) {
             const blacklisted = await this.#isBlacklisted(state, channelID);
             if (blacklisted) {
@@ -69,7 +69,7 @@ export default class extends Event<LevelingModule> {
         if (state.channel_id !== null) {
             type |= VoiceChannelUpdateType.JOIN;
         }
-    
+
         if (channelID !== undefined || state.channel_id === null) {
             type |= VoiceChannelUpdateType.LEAVE;
         }
