@@ -11,6 +11,14 @@ import { DiscordAPIError } from "@discordjs/rest";
 type GuildGatewayVoiceState = PickRequired<GatewayVoiceState, "guild_id">;
 
 /**
+ * Represents the type of voice channel update.
+ */
+enum VoiceChannelUpdateType {
+    JOIN = 1 << 0,
+    LEAVE = 1 << 1
+}
+
+/**
  * Represents an event handler that tracks user voice activity.
  */
 export default class extends Event<LevelingModule> {
@@ -34,18 +42,39 @@ export default class extends Event<LevelingModule> {
             return;
         }
 
-        const blacklisted = await this.#isBlacklisted(state, channelID);
-        if (blacklisted) {
-            return;
+        const type = this.#getType(state, channelID);
+        if (type & VoiceChannelUpdateType.LEAVE) {
+            await this.#updateVoiceMinutes(state.guild_id, state.user_id, channelID);
         }
+    
+        if (type & VoiceChannelUpdateType.JOIN) {
+            const blacklisted = await this.#isBlacklisted(state, channelID);
+            if (blacklisted) {
+                return;
+            }
 
-        if (state.channel_id === null) {
-            return this.#updateVoiceMinutes(state.guild_id, state.user_id, channelID);
-        }
-
-        if (channelID === undefined) {
             await this.client.redis.set(`voice:${state.guild_id}:${state.user_id}`, Date.now());
         }
+    }
+
+    /**
+     * Gets the type of voice channel update.
+     *
+     * @param state The voice state data received from the gateway.
+     * @param channelID The ID of the previous channel the user was in.
+     * @returns The type of voice channel update.
+     */
+    #getType(state: GatewayVoiceState, channelID?: string): VoiceChannelUpdateType {
+        let type = 0;
+        if (state.channel_id !== null) {
+            type |= VoiceChannelUpdateType.JOIN;
+        }
+    
+        if (channelID !== undefined || state.channel_id === null) {
+            type |= VoiceChannelUpdateType.LEAVE;
+        }
+
+        return type;
     }
 
     /**

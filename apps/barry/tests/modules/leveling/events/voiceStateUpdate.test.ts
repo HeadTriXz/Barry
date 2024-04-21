@@ -40,7 +40,8 @@ describe("VoiceStateUpdate Event", () => {
             guildID: guildID,
             enabled: true,
             ignoredChannels: [],
-            ignoredRoles: []
+            ignoredRoles: [],
+            messageRep: false
         });
 
         vi.spyOn(module.memberActivity, "getOrCreate").mockResolvedValue({
@@ -52,6 +53,8 @@ describe("VoiceStateUpdate Event", () => {
             reputation: 2,
             voiceMinutes: 0
         });
+
+        vi.mocked(redis.get).mockResolvedValue(null);
     });
 
     afterEach(() => {
@@ -119,34 +122,34 @@ describe("VoiceStateUpdate Event", () => {
             expect(incrementSpy).toHaveBeenCalledOnce();
         });
 
-        it("should not update voice minutes if the channel is blacklisted", async () => {
+        it("should not keep track of voice minutes if the channel is blacklisted", async () => {
             vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [channelID],
-                ignoredRoles: []
+                ignoredRoles: [],
+                messageRep: false
             });
-            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(state, channelID);
 
-            expect(incrementSpy).not.toHaveBeenCalled();
+            expect(redis.set).not.toHaveBeenCalled();
         });
 
-        it("should not update voice minutes if the user has a blacklisted role", async () => {
+        it("should not keep track of voice minutes if the user has a blacklisted role", async () => {
             state.member = { ...mockMember, roles: ["68239102456844360"] };
 
             vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
                 ignoredChannels: [],
-                ignoredRoles: ["68239102456844360"]
+                ignoredRoles: ["68239102456844360"],
+                messageRep: false
             });
-            const incrementSpy = vi.spyOn(event.module.memberActivity, "increment");
 
             await event.execute(state, channelID);
 
-            expect(incrementSpy).not.toHaveBeenCalled();
+            expect(redis.set).not.toHaveBeenCalled();
         });
 
         it("should not update voice minutes if the start time is not cached", async () => {
