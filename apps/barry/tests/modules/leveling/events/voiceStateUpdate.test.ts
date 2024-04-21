@@ -123,6 +123,8 @@ describe("VoiceStateUpdate Event", () => {
         });
 
         it("should not keep track of voice minutes if the channel is blacklisted", async () => {
+            state.channel_id = channelID;
+
             vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
                 guildID: guildID,
                 enabled: true,
@@ -131,12 +133,13 @@ describe("VoiceStateUpdate Event", () => {
                 messageRep: false
             });
 
-            await event.execute(state, channelID);
+            await event.execute(state);
 
             expect(redis.set).not.toHaveBeenCalled();
         });
 
         it("should not keep track of voice minutes if the user has a blacklisted role", async () => {
+            state.channel_id = channelID;
             state.member = { ...mockMember, roles: ["68239102456844360"] };
 
             vi.mocked(event.module.settings.getOrCreate).mockResolvedValue({
@@ -147,7 +150,7 @@ describe("VoiceStateUpdate Event", () => {
                 messageRep: false
             });
 
-            await event.execute(state, channelID);
+            await event.execute(state);
 
             expect(redis.set).not.toHaveBeenCalled();
         });
