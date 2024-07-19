@@ -131,6 +131,11 @@ describe("SlashCommand", () => {
             const payload = command.toJSON();
 
             expect(payload).toEqual({
+                contexts: [
+                    InteractionContextType.Guild,
+                    InteractionContextType.BotDM,
+                    InteractionContextType.PrivateChannel
+                ],
                 description: "Mock command for testing purposes",
                 name: "test",
                 options: [],
