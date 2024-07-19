@@ -8,6 +8,7 @@ import {
     type APIMessageComponentInteractionData,
     type APIModalSubmitInteraction,
     type APIPingInteraction,
+    ApplicationIntegrationType,
     InteractionType
 } from "@discordjs/core";
 
@@ -21,6 +22,9 @@ import { mockMessageButton } from "./components.js";
 const baseInteraction = {
     application_id: "49072635294295155",
     app_permissions: "8",
+    authorizing_integration_owners: {
+        [ApplicationIntegrationType.GuildInstall]: "68239102456844360"
+    },
     entitlements: [],
     guild_id: "68239102456844360",
     guild_locale: "en-US",
