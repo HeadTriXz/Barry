@@ -6,8 +6,8 @@ import {
 import type { BanOptions } from "../../../../../types/moderation.js";
 import type ModerationModule from "../../../index.js";
 
+import { InteractionContextType, PermissionFlagsBits } from "@discordjs/core";
 import { COMMON_SEVERE_REASONS } from "../../../constants.js";
-import { PermissionFlagsBits } from "@discordjs/core";
 
 /**
  * Represents a slash command that bans a user.
@@ -23,8 +23,8 @@ export default class extends SlashCommand<ModerationModule> {
             name: "ban",
             description: "Ban a user from the server.",
             appPermissions: PermissionFlagsBits.BanMembers,
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.BanMembers,
-            guildOnly: true,
             options: {
                 user: SlashCommandOptionBuilder.user({
                     description: "The user to ban.",

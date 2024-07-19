@@ -1,6 +1,7 @@
 import {
     type APIGuild,
     type APIUser,
+    InteractionContextType,
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
@@ -62,8 +63,8 @@ export default class extends SlashCommand<ModerationModule> {
         super(module, {
             name: "view",
             description: "View specific or all cases.",
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
-            guildOnly: true,
             options: {
                 case: SlashCommandOptionBuilder.integer({
                     description: "The ID of the case to view.",

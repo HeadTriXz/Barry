@@ -1,7 +1,9 @@
-import type {
-    ApplicationCommandType,
-    LocalizationMap,
-    RESTPostAPIApplicationCommandsJSONBody
+import {
+    type ApplicationCommandType,
+    type ApplicationIntegrationType,
+    type LocalizationMap,
+    type RESTPostAPIApplicationCommandsJSONBody,
+    InteractionContextType
 } from "@discordjs/core";
 
 import type { ApplicationCommandInteraction } from "../index.js";
@@ -17,6 +19,11 @@ export interface ApplicationCommandOptions {
     appPermissions?: bigint;
 
     /**
+     * Array of interaction context(s) where the command can be used, only for globally-scoped commands.
+     */
+    contexts?: InteractionContextType[];
+
+    /**
      * The period during which the user cannot execute the same command (in seconds).
      */
     cooldown?: number;
@@ -28,6 +35,7 @@ export interface ApplicationCommandOptions {
 
     /**
      * Whether the command can only be used inside a guild.
+     * @deprecated Use `contexts` instead.
      */
     guildOnly?: boolean;
 
@@ -35,6 +43,11 @@ export interface ApplicationCommandOptions {
      * Array of guild IDs the command is available in.
      */
     guilds?: string[];
+
+    /**
+     * Array of installation context(s) where the command is available, only for globally-scoped commands.
+     */
+    integrationTypes?: ApplicationIntegrationType[];
 
     /**
      * The name of the command.
@@ -73,6 +86,11 @@ export abstract class BaseCommand<M extends Module = Module> {
     client: M["client"];
 
     /**
+     * Array of interaction context(s) where the command can be used.
+     */
+    contexts?: InteractionContextType[];
+
+    /**
      * The period during which the user cannot execute the same command (in seconds).
      */
     cooldown?: number;
@@ -84,6 +102,7 @@ export abstract class BaseCommand<M extends Module = Module> {
 
     /**
      * Whether the command can only be used inside a guild.
+     * @deprecated Use `contexts` instead.
      */
     guildOnly: boolean;
 
@@ -91,6 +110,11 @@ export abstract class BaseCommand<M extends Module = Module> {
      * Array of guild IDs the command is available in.
      */
     guilds?: string[];
+
+    /**
+     * Array of installation context(s) where the command is available, only for globally-scoped commands.
+     */
+    integrationTypes?: ApplicationIntegrationType[];
 
     /**
      * The name of the command.
@@ -126,10 +150,31 @@ export abstract class BaseCommand<M extends Module = Module> {
     constructor(public module: M, options: ApplicationCommandOptions) {
         this.appPermissions = options.appPermissions;
         this.client = module.client;
+        this.contexts = options.contexts;
         this.cooldown = options.cooldown ?? 3;
         this.defaultMemberPermissions = options.defaultMemberPermissions;
         this.guildOnly = options.guildOnly ?? false;
+
+        if (options.guildOnly !== undefined && options.contexts === undefined) {
+            console.warn("The 'guildOnly' option is deprecated. Please use the 'contexts' option instead.");
+
+            if (options.guildOnly) {
+                this.contexts = [InteractionContextType.Guild];
+            } else {
+                this.contexts = [
+                    InteractionContextType.Guild,
+                    InteractionContextType.BotDM,
+                    InteractionContextType.PrivateChannel
+                ];
+            }
+        }
+
+        if (options.contexts !== undefined) {
+            this.guildOnly = options.contexts.length === 1 && options.contexts[0] === InteractionContextType.Guild;
+        }
+
         this.guilds = options.guilds;
+        this.integrationTypes = options.integrationTypes;
         this.name = options.name;
         this.nameLocalizations = options.nameLocalizations;
         this.nsfw = options.nsfw;
@@ -148,8 +193,9 @@ export abstract class BaseCommand<M extends Module = Module> {
      */
     toJSON(): RESTPostAPIApplicationCommandsJSONBody {
         return {
+            contexts: this.contexts,
             default_member_permissions: this.defaultMemberPermissions?.toString(),
-            dm_permission: !this.guildOnly,
+            integration_types: this.integrationTypes,
             name: this.name,
             name_localizations: this.nameLocalizations,
             nsfw: this.nsfw,

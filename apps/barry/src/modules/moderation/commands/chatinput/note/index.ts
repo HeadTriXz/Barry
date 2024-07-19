@@ -1,5 +1,6 @@
 import {
     type APIUser,
+    InteractionContextType,
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
@@ -41,8 +42,8 @@ export default class extends SlashCommand<ModerationModule> {
         super(module, {
             name: "note",
             description: "Adds a note to a user.",
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
-            guildOnly: true,
             options: {
                 user: SlashCommandOptionBuilder.user({
                     description: "The user to add a note to.",

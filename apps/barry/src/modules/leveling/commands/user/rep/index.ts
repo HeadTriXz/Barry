@@ -5,7 +5,7 @@ import {
 } from "@barry-bot/core";
 import type LevelingModule from "../../../index.js";
 
-import { MessageFlags } from "@discordjs/core";
+import { InteractionContextType, MessageFlags } from "@discordjs/core";
 import config from "../../../../../config.js";
 
 /**
@@ -20,8 +20,8 @@ export default class extends UserCommand<LevelingModule> {
     constructor(module: LevelingModule) {
         super(module, {
             name: "Give Reputation",
-            cooldown: 86400,
-            guildOnly: true
+            contexts: [InteractionContextType.Guild],
+            cooldown: 86400
         });
     }
 

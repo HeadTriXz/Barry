@@ -5,7 +5,11 @@ import {
 } from "@barry-bot/core";
 import type ModerationModule from "../../../../../index.js";
 
-import { MessageFlags, PermissionFlagsBits } from "@discordjs/core";
+import {
+    InteractionContextType,
+    MessageFlags,
+    PermissionFlagsBits
+} from "@discordjs/core";
 import config from "../../../../../../../config.js";
 
 /**
@@ -41,8 +45,8 @@ export default class extends SlashCommand<ModerationModule> {
         super(module, {
             name: "edit",
             description: "Edits the content of a note.",
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
-            guildOnly: true,
             options: {
                 case: SlashCommandOptionBuilder.integer({
                     description: "The ID of the case.",

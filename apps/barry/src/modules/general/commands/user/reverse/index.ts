@@ -6,7 +6,7 @@ import {
 
 import type GeneralModule from "../../../index.js";
 
-import { MessageFlags } from "@discordjs/core";
+import { ApplicationIntegrationType, MessageFlags } from "@discordjs/core";
 import { getReverseAvatarContent } from "../../../functions/reverse/getReverseContent.js";
 
 import config from "../../../../../config.js";
@@ -22,7 +22,8 @@ export default class extends UserCommand<GeneralModule> {
      */
     constructor(module: GeneralModule) {
         super(module, {
-            name: "Reverse Search Avatar"
+            name: "Reverse Search Avatar",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall]
         });
     }
 

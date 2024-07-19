@@ -6,6 +6,7 @@ import {
 } from "@barry-bot/core";
 import type LevelingModule from "../../../index.js";
 
+import { InteractionContextType } from "@discordjs/core";
 import { viewRank } from "../../../functions/viewRank.js";
 
 /**
@@ -21,7 +22,7 @@ export default class extends SlashCommand<LevelingModule> {
         super(module, {
             name: "rank",
             description: "View someone's rank card.",
-            guildOnly: true,
+            contexts: [InteractionContextType.Guild],
             options: {
                 user: SlashCommandOptionBuilder.user({
                     description: "The user to view the rank card of.",

@@ -6,8 +6,8 @@ import {
 import { type DWCOptions } from "../../../../../types/moderation.js";
 import type ModerationModule from "../../../index.js";
 
+import { InteractionContextType, PermissionFlagsBits } from "@discordjs/core";
 import { COMMON_DWC_REASONS } from "../../../constants.js";
-import { PermissionFlagsBits } from "@discordjs/core";
 
 /**
  * Represents a slash command to mark a user as 'Deal with Caution'.
@@ -23,8 +23,8 @@ export default class extends SlashCommand<ModerationModule> {
             name: "dwc",
             description: "Marks a user as 'Deal With Caution' and bans them after a week.",
             appPermissions: PermissionFlagsBits.BanMembers | PermissionFlagsBits.ManageRoles,
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.BanMembers,
-            guildOnly: true,
             options: {
                 user: SlashCommandOptionBuilder.user({
                     description: "The user to mark as 'Deal With Caution'.",

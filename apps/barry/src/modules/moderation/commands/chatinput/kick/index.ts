@@ -6,8 +6,8 @@ import {
 import { type KickOptions } from "../../../../../types/moderation.js";
 import type ModerationModule from "../../../index.js";
 
+import { InteractionContextType, PermissionFlagsBits } from "@discordjs/core";
 import { COMMON_SEVERE_REASONS } from "../../../constants.js";
-import { PermissionFlagsBits } from "@discordjs/core";
 
 /**
  * Represents a slash command that kicks a user.
@@ -23,8 +23,8 @@ export default class extends SlashCommand<ModerationModule> {
             name: "kick",
             description: "Kick a user from the server.",
             appPermissions: PermissionFlagsBits.KickMembers,
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.KickMembers,
-            guildOnly: true,
             options: {
                 member: SlashCommandOptionBuilder.member({
                     description: "The member to kick.",

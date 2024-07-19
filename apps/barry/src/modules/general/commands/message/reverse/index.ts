@@ -6,7 +6,7 @@ import {
 
 import type GeneralModule from "../../../index.js";
 
-import { MessageFlags } from "@discordjs/core";
+import { ApplicationIntegrationType, MessageFlags } from "@discordjs/core";
 import { PaginationMessage } from "../../../../../utils/pagination.js";
 import { getReverseContent } from "../../../functions/reverse/getReverseContent.js";
 
@@ -23,7 +23,8 @@ export default class extends MessageCommand<GeneralModule> {
      */
     constructor(module: GeneralModule) {
         super(module, {
-            name: "Reverse Search Image"
+            name: "Reverse Search Image",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall]
         });
     }
 

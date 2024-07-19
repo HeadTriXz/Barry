@@ -6,8 +6,8 @@ import {
 import { type WarnOptions } from "../../../../../types/moderation.js";
 import type ModerationModule from "../../../index.js";
 
+import { InteractionContextType, PermissionFlagsBits } from "@discordjs/core";
 import { COMMON_MINOR_REASONS } from "../../../constants.js";
-import { PermissionFlagsBits } from "@discordjs/core";
 
 /**
  * Represents a slash command that warns a user.
@@ -22,8 +22,8 @@ export default class extends SlashCommand<ModerationModule> {
         super(module, {
             name: "warn",
             description: "Warns a user.",
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
-            guildOnly: true,
             options: {
                 member: SlashCommandOptionBuilder.member({
                     description: "The member to warn.",

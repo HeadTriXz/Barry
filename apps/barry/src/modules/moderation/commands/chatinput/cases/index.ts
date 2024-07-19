@@ -1,5 +1,6 @@
 import type ModerationModule from "../../../index.js";
 
+import { InteractionContextType } from "@discordjs/core";
 import { SlashCommand } from "@barry-bot/core";
 import DeleteCommand from "./delete/index.js";
 import NoteCommand from "./notes/index.js";
@@ -18,7 +19,7 @@ export default class extends SlashCommand<ModerationModule> {
         super(module, {
             name: "cases",
             description: "Manage or view a case.",
-            guildOnly: true,
+            contexts: [InteractionContextType.Guild],
             children: [
                 DeleteCommand,
                 NoteCommand,

@@ -3,7 +3,11 @@ import {
     SlashCommand,
     SlashCommandOptionBuilder
 } from "@barry-bot/core";
-import { type APIAttachment, MessageFlags } from "@discordjs/core";
+import {
+    type APIAttachment,
+    ApplicationIntegrationType,
+    MessageFlags
+} from "@discordjs/core";
 import type GeneralModule from "../../../../index.js";
 
 import { getReverseContent } from "../../../../functions/reverse/getReverseContent.js";
@@ -22,6 +26,7 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "image",
             description: "Reverse search an image.",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall],
             options: {
                 image: SlashCommandOptionBuilder.attachments({
                     description: "The image to reverse search.",

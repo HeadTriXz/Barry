@@ -1,5 +1,13 @@
-import { type APIApplicationCommandOptionChoice, MessageFlags } from "@discordjs/core";
-import { type ApplicationCommandInteraction, SlashCommand, SlashCommandOptionBuilder } from "@barry-bot/core";
+import {
+    type APIApplicationCommandOptionChoice,
+    ApplicationIntegrationType,
+    MessageFlags
+} from "@discordjs/core";
+import {
+    type ApplicationCommandInteraction,
+    SlashCommand,
+    SlashCommandOptionBuilder
+} from "@barry-bot/core";
 import type GeneralModule from "../../../../index.js";
 
 import { fetch } from "undici";
@@ -137,6 +145,7 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "currency",
             description: "Converts currency from one to another.",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall],
             options: {
                 amount: SlashCommandOptionBuilder.number({
                     description: "The amount to convert.",

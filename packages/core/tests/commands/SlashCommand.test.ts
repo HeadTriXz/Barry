@@ -1,7 +1,9 @@
 import {
     type API,
     ApplicationCommandOptionType,
-    ApplicationCommandType
+    ApplicationCommandType,
+    ApplicationIntegrationType,
+    InteractionContextType
 } from "@discordjs/core";
 import { type Module, Client } from "../../src/index.js";
 
@@ -78,10 +80,11 @@ describe("SlashCommand", () => {
             const payload = command.toJSON();
 
             expect(payload).toEqual({
+                contexts: [InteractionContextType.Guild],
                 default_member_permissions: "512",
                 description: slashCommandOptions.description,
                 description_localizations: slashCommandOptions.descriptionLocalizations,
-                dm_permission: !slashCommandOptions.guildOnly,
+                integration_types: [ApplicationIntegrationType.GuildInstall],
                 name: slashCommandOptions.name,
                 name_localizations: slashCommandOptions.nameLocalizations,
                 nsfw: slashCommandOptions.nsfw,
@@ -129,7 +132,6 @@ describe("SlashCommand", () => {
 
             expect(payload).toEqual({
                 description: "Mock command for testing purposes",
-                dm_permission: true,
                 name: "test",
                 options: [],
                 type: ApplicationCommandType.ChatInput

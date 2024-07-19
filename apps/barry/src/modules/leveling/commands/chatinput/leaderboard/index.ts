@@ -2,6 +2,7 @@ import {
     type APIButtonComponentWithCustomId,
     ButtonStyle,
     ComponentType,
+    InteractionContextType,
     MessageFlags,
     TextInputStyle
 } from "@discordjs/core";
@@ -69,7 +70,7 @@ export default class extends SlashCommand<LevelingModule> {
         super(module, {
             name: "leaderboard",
             description: "View the most active members of this server.",
-            guildOnly: true
+            contexts: [InteractionContextType.Guild]
         });
     }
 

@@ -1,4 +1,8 @@
-import { type APIApplicationCommandOptionChoice, MessageFlags } from "@discordjs/core";
+import {
+    type APIApplicationCommandOptionChoice,
+    ApplicationIntegrationType,
+    MessageFlags
+} from "@discordjs/core";
 import {
     type ApplicationCommandInteraction,
     type AutocompleteInteraction,
@@ -63,6 +67,7 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "unit",
             description: "Converts one unit to another.",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall],
             options: {
                 amount: SlashCommandOptionBuilder.number({
                     description: "The amount to convert.",
