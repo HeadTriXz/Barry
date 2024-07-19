@@ -8,6 +8,7 @@ import type ModerationModule from "../../../../index.js";
 import {
     ButtonStyle,
     ComponentType,
+    InteractionContextType,
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
@@ -37,8 +38,8 @@ export default class extends SlashCommand<ModerationModule> {
         super(module, {
             name: "delete",
             description: "Delete a specific case.",
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
-            guildOnly: true,
             options: {
                 case: SlashCommandOptionBuilder.integer({
                     description: "The ID of the case to delete.",

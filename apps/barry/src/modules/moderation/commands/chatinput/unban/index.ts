@@ -1,5 +1,6 @@
 import {
     type APIUser,
+    InteractionContextType,
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
@@ -43,8 +44,8 @@ export default class extends SlashCommand<ModerationModule> {
             name: "unban",
             description: "Unban a user.",
             appPermissions: PermissionFlagsBits.BanMembers,
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.BanMembers,
-            guildOnly: true,
             options: {
                 user: SlashCommandOptionBuilder.user({
                     description: "The user to unban.",

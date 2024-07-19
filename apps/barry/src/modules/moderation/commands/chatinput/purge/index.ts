@@ -1,6 +1,7 @@
 import {
     type APIMessage,
     type APIUser,
+    InteractionContextType,
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
@@ -48,8 +49,8 @@ export default class extends SlashCommand<ModerationModule> {
             name: "purge",
             description: "Purge messages from the current channel.",
             appPermissions: PermissionFlagsBits.ManageMessages,
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.ManageMessages,
-            guildOnly: true,
             options: {
                 amount: SlashCommandOptionBuilder.integer({
                     description: "The amount of messages to purge.",

@@ -1,5 +1,6 @@
 import {
     type APIUser,
+    InteractionContextType,
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
@@ -45,8 +46,8 @@ export default class extends SlashCommand<ModerationModule> {
             name: "undwc",
             description: "Removes the 'Deal With Caution' flag from a user.",
             appPermissions: PermissionFlagsBits.ManageRoles,
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.BanMembers,
-            guildOnly: true,
             options: {
                 user: SlashCommandOptionBuilder.user({
                     description: "The user to remove the flag of.",

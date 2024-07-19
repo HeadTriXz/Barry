@@ -5,6 +5,7 @@ import {
 } from "@barry-bot/core";
 import type GeneralModule from "../../../index.js";
 
+import { ApplicationIntegrationType } from "@discordjs/core";
 import {
     generateParagraphs,
     generateSentences,
@@ -45,6 +46,7 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "lipsum",
             description: "Lorem ipsum dolor sit amet.",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall],
             options: {
                 words: SlashCommandOptionBuilder.integer({
                     description: "The amount of words to generate.",

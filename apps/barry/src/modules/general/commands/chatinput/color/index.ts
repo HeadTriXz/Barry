@@ -5,8 +5,8 @@ import {
 } from "@barry-bot/core";
 import type GeneralModule from "../../../index.js";
 
+import { ApplicationIntegrationType, MessageFlags } from "@discordjs/core";
 import { Canvas } from "canvas-constructor/napi-rs";
-import { MessageFlags } from "@discordjs/core";
 import { parseColor } from "../../../functions/colors.js";
 import config from "../../../../../config.js";
 
@@ -33,6 +33,7 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "color",
             description: "Shows information about a color.",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall],
             options: {
                 color: SlashCommandOptionBuilder.string({
                     description: "The color to show information about.",

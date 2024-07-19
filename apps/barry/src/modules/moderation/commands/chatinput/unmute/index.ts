@@ -6,7 +6,11 @@ import {
 import type { PartialGuildMember } from "../../../functions/permissions.js";
 import type ModerationModule from "../../../index.js";
 
-import { MessageFlags, PermissionFlagsBits } from "@discordjs/core";
+import {
+    InteractionContextType,
+    MessageFlags,
+    PermissionFlagsBits
+} from "@discordjs/core";
 import { CaseType } from "@prisma/client";
 import config from "../../../../../config.js";
 
@@ -39,8 +43,8 @@ export default class extends SlashCommand<ModerationModule> {
             name: "unmute",
             description: "Unmute a member.",
             appPermissions: PermissionFlagsBits.ModerateMembers,
+            contexts: [InteractionContextType.Guild],
             defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
-            guildOnly: true,
             options: {
                 member: SlashCommandOptionBuilder.member({
                     description: "The member to unmute.",

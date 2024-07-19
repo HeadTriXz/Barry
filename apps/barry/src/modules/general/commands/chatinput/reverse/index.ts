@@ -1,5 +1,6 @@
 import type GeneralModule from "../../../index.js";
 
+import { ApplicationIntegrationType } from "@discordjs/core";
 import { SlashCommand } from "@barry-bot/core";
 import ReverseImageCommand from "./image/index.js";
 
@@ -16,7 +17,8 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "reverse",
             description: "Reverse search an image.",
-            children: [ReverseImageCommand]
+            children: [ReverseImageCommand],
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall]
         });
     }
 

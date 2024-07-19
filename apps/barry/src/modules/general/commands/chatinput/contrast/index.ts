@@ -5,9 +5,9 @@ import {
 } from "@barry-bot/core";
 import type GeneralModule from "../../../index.js";
 
+import { ApplicationIntegrationType, MessageFlags } from "@discordjs/core";
 import { Canvas, loadFont } from "canvas-constructor/napi-rs";
 import { getContrastScore, parseColor } from "../../../functions/colors.js";
-import { MessageFlags } from "@discordjs/core";
 import { join } from "node:path";
 import config from "../../../../../config.js";
 
@@ -52,6 +52,7 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "contrast",
             description: "Check the contrast between two colors.",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall],
             options: {
                 background: SlashCommandOptionBuilder.string({
                     description: "The background color.",

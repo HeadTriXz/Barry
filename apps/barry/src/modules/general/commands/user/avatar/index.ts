@@ -4,8 +4,9 @@ import {
     UserCommand,
     getDefaultAvatarURL
 } from "@barry-bot/core";
-
 import type GeneralModule from "../../../index.js";
+
+import { ApplicationIntegrationType } from "@discordjs/core";
 import config from "../../../../../config.js";
 
 /**
@@ -19,7 +20,8 @@ export default class extends UserCommand<GeneralModule> {
      */
     constructor(module: GeneralModule) {
         super(module, {
-            name: "View Avatar"
+            name: "View Avatar",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall]
         });
     }
 

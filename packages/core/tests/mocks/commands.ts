@@ -1,4 +1,4 @@
-import { ApplicationCommandType } from "@discordjs/core";
+import { ApplicationCommandType, ApplicationIntegrationType, InteractionContextType } from "@discordjs/core";
 import {
     type ApplicationCommandOptions,
     type Module,
@@ -107,10 +107,11 @@ export class MockSlashCommandBar extends SlashCommand {
 
 export const baseCommandOptions: ApplicationCommandOptions = {
     appPermissions: 2112n,
+    contexts: [InteractionContextType.Guild],
     cooldown: 5,
     defaultMemberPermissions: 512n,
-    guildOnly: true,
     guilds: ["68239102456844360", "30527482987641765"],
+    integrationTypes: [ApplicationIntegrationType.GuildInstall],
     name: "test",
     nameLocalizations: {
         "en-US": "Test",

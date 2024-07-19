@@ -5,6 +5,7 @@ import {
 } from "@barry-bot/core";
 import type LevelingModule from "../../../index.js";
 
+import { InteractionContextType } from "@discordjs/core";
 import { viewRank } from "../../../functions/viewRank.js";
 
 /**
@@ -19,7 +20,7 @@ export default class extends UserCommand<LevelingModule> {
     constructor(module: LevelingModule) {
         super(module, {
             name: "View Rank",
-            guildOnly: true
+            contexts: [InteractionContextType.Guild]
         });
     }
 

@@ -2,6 +2,7 @@ import {
     type APIEmbedFooter,
     type APISelectMenuOption,
     ComponentType,
+    InteractionContextType,
     MessageFlags,
     PermissionFlagsBits
 } from "@discordjs/core";
@@ -51,8 +52,8 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "config",
             description: "Manage the configuration of the bot for this server.",
-            defaultMemberPermissions: PermissionFlagsBits.ManageGuild,
-            guildOnly: true
+            contexts: [InteractionContextType.Guild],
+            defaultMemberPermissions: PermissionFlagsBits.ManageGuild
         });
     }
 

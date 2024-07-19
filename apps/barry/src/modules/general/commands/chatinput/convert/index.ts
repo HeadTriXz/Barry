@@ -1,5 +1,6 @@
 import type GeneralModule from "../../../index.js";
 
+import { ApplicationIntegrationType } from "@discordjs/core";
 import { SlashCommand } from "@barry-bot/core";
 import ConvertCurrencyCommand from "./currency/index.js";
 import ConvertUnitCommand from "./unit/index.js";
@@ -17,6 +18,7 @@ export default class extends SlashCommand<GeneralModule> {
         super(module, {
             name: "convert",
             description: "Converts one unit to another.",
+            integrationTypes: [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall],
             children: [
                 ConvertCurrencyCommand,
                 ConvertUnitCommand
