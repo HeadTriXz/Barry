@@ -10,6 +10,15 @@ import type { ApplicationCommandInteraction } from "../index.js";
 import type { Module } from "../modules/index.js";
 
 /**
+ * The default interaction contexts for a command.
+ */
+const DEFAULT_INTERACTION_CONTEXTS = [
+    InteractionContextType.Guild,
+    InteractionContextType.BotDM,
+    InteractionContextType.PrivateChannel
+];
+
+/**
  * Options for a {@link BaseCommand}.
  */
 export interface ApplicationCommandOptions {
@@ -86,9 +95,9 @@ export abstract class BaseCommand<M extends Module = Module> {
     client: M["client"];
 
     /**
-     * Array of interaction context(s) where the command can be used.
+     * Array of interaction context(s) where the command can be used. Defaults to all contexts.
      */
-    contexts?: InteractionContextType[];
+    contexts: InteractionContextType[];
 
     /**
      * The period during which the user cannot execute the same command (in seconds).
@@ -150,7 +159,7 @@ export abstract class BaseCommand<M extends Module = Module> {
     constructor(public module: M, options: ApplicationCommandOptions) {
         this.appPermissions = options.appPermissions;
         this.client = module.client;
-        this.contexts = options.contexts;
+        this.contexts = options.contexts ?? DEFAULT_INTERACTION_CONTEXTS;
         this.cooldown = options.cooldown ?? 3;
         this.defaultMemberPermissions = options.defaultMemberPermissions;
         this.guildOnly = options.guildOnly ?? false;
@@ -158,15 +167,9 @@ export abstract class BaseCommand<M extends Module = Module> {
         if (options.guildOnly !== undefined && options.contexts === undefined) {
             console.warn("The 'guildOnly' option is deprecated. Please use the 'contexts' option instead.");
 
-            if (options.guildOnly) {
-                this.contexts = [InteractionContextType.Guild];
-            } else {
-                this.contexts = [
-                    InteractionContextType.Guild,
-                    InteractionContextType.BotDM,
-                    InteractionContextType.PrivateChannel
-                ];
-            }
+            this.contexts = options.guildOnly
+                ? [InteractionContextType.Guild]
+                : DEFAULT_INTERACTION_CONTEXTS;
         }
 
         if (options.contexts !== undefined) {
