@@ -44,6 +44,11 @@ describe("BaseCommand", () => {
                 name: "test"
             });
 
+            expect(command.contexts).toEqual([
+                InteractionContextType.Guild,
+                InteractionContextType.BotDM,
+                InteractionContextType.PrivateChannel
+            ]);
             expect(command.cooldown).toBe(3);
             expect(command.ownerOnly).toBe(false);
         });
@@ -121,6 +126,11 @@ describe("BaseCommand", () => {
             const payload = command.toJSON();
 
             expect(payload).toEqual({
+                contexts: [
+                    InteractionContextType.Guild,
+                    InteractionContextType.BotDM,
+                    InteractionContextType.PrivateChannel
+                ],
                 name: "test",
                 type: ApplicationCommandType.ChatInput
             });
