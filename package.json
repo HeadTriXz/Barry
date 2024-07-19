@@ -10,6 +10,7 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "packageManager": "npm@10.5.0",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -22,7 +23,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
-    "start": "dotenv -- turbo run start",
+    "start": "dotenv -- turbo run start --env-mode=loose",
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
     "test:watch": "turbo run test:watch",
@@ -38,7 +39,7 @@
     "eslint": "^8.39.0",
     "rimraf": "^5.0.0",
     "tsup": "^7.1.0",
-    "turbo": "^1.10.7",
+    "turbo": "^2.0.7",
     "typescript": "^5.2.2",
     "vitest": "^0.34.1",
     "vitest-mock-extended": "^1.2.0"
