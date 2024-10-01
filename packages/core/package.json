@@ -7,6 +7,13 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "directories": {
+    "lib": "src",
+    "test": "tests"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
