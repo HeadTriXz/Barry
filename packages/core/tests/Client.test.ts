@@ -8,8 +8,8 @@ import {
 } from "../src/index.js";
 import {
     type API,
+    type APIVoiceState,
     type GatewayMessageDeleteDispatchData,
-    type GatewayVoiceState,
     GatewayDispatchEvents,
     GatewayOpcodes
 } from "@discordjs/core";
@@ -148,14 +148,11 @@ describe("Client", () => {
             };
 
             gatewaySpy.mock.calls[0][1]({
-                data: {
-                    op: GatewayOpcodes.Dispatch,
-                    t: GatewayDispatchEvents.MessageDelete,
-                    d: deleteEvent,
-                    s: 0
-                },
-                shardId: 0
-            });
+                op: GatewayOpcodes.Dispatch,
+                t: GatewayDispatchEvents.MessageDelete,
+                d: deleteEvent,
+                s: 0
+            }, 0);
 
             expect(gatewaySpy).toHaveBeenCalledOnce();
             expect(onMessageDelete).toHaveBeenCalledOnce();
@@ -171,14 +168,11 @@ describe("Client", () => {
             const handleSpy = vi.spyOn(client.interactions, "handle").mockResolvedValue();
 
             gatewaySpy.mock.calls[0][1]({
-                data: {
-                    op: GatewayOpcodes.Dispatch,
-                    t: GatewayDispatchEvents.InteractionCreate,
-                    d: mockPingInteraction,
-                    s: 0
-                },
-                shardId: 0
-            });
+                op: GatewayOpcodes.Dispatch,
+                t: GatewayDispatchEvents.InteractionCreate,
+                d: mockPingInteraction,
+                s: 0
+            }, 0);
 
             expect(gatewaySpy).toHaveBeenCalledOnce();
             expect(handleSpy).toHaveBeenCalledOnce();
@@ -189,7 +183,7 @@ describe("Client", () => {
                 channel_id: "30527482987641765",
                 guild_id: "68239102456844360",
                 user_id: "257522665441460225"
-            } as GatewayVoiceState;
+            } as APIVoiceState;
 
             it("should handle incoming voice state update events and update 'voiceConnections'", () => {
                 const gateway: Gateway = new MockGateway();
@@ -198,20 +192,17 @@ describe("Client", () => {
                 options.gateway = gateway;
                 client = new Client(options);
 
-                const onVoiceStateUpdate = vi.fn<[GatewayVoiceState, string | undefined]>();
+                const onVoiceStateUpdate = vi.fn<[APIVoiceState, string | undefined]>();
                 client.on(GatewayDispatchEvents.VoiceStateUpdate, onVoiceStateUpdate);
 
                 expect(client.voiceConnections.size).toBe(0);
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: voiceStateUpdateEvent,
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: voiceStateUpdateEvent,
+                    s: 0
+                }, 0);
 
                 expect(gatewaySpy).toHaveBeenCalledOnce();
                 expect(onVoiceStateUpdate).toHaveBeenCalledOnce();
@@ -230,26 +221,20 @@ describe("Client", () => {
                 expect(client.voiceConnections.size).toBe(0);
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: voiceStateUpdateEvent,
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: voiceStateUpdateEvent,
+                    s: 0
+                }, 0);
 
                 expect(client.voiceConnections.size).toBe(1);
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: { ...voiceStateUpdateEvent, channel_id: null },
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: { ...voiceStateUpdateEvent, channel_id: null },
+                    s: 0
+                }, 0);
 
                 expect(client.voiceConnections.size).toBe(0);
             });
@@ -261,28 +246,22 @@ describe("Client", () => {
                 options.gateway = gateway;
                 client = new Client(options);
 
-                const onVoiceStateUpdate = vi.fn<[GatewayVoiceState, string | undefined]>();
+                const onVoiceStateUpdate = vi.fn<[APIVoiceState, string | undefined]>();
                 client.on(GatewayDispatchEvents.VoiceStateUpdate, onVoiceStateUpdate);
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: voiceStateUpdateEvent,
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: voiceStateUpdateEvent,
+                    s: 0
+                }, 0);
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: { ...voiceStateUpdateEvent, channel_id: "60527482987641760" },
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: { ...voiceStateUpdateEvent, channel_id: "60527482987641760" },
+                    s: 0
+                }, 0);
 
                 expect(gatewaySpy).toHaveBeenCalledOnce();
                 expect(onVoiceStateUpdate).toHaveBeenCalledTimes(2);
@@ -300,34 +279,25 @@ describe("Client", () => {
                 client.on(GatewayDispatchEvents.VoiceStateUpdate, vi.fn());
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: voiceStateUpdateEvent,
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: voiceStateUpdateEvent,
+                    s: 0
+                }, 0);
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: { ...voiceStateUpdateEvent, guild_id: "60527482987641760" },
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: { ...voiceStateUpdateEvent, guild_id: "60527482987641760" },
+                    s: 0
+                }, 0);
 
                 gatewaySpy.mock.calls[0][1]({
-                    data: {
-                        op: GatewayOpcodes.Dispatch,
-                        t: GatewayDispatchEvents.VoiceStateUpdate,
-                        d: { ...voiceStateUpdateEvent, guild_id: undefined },
-                        s: 0
-                    },
-                    shardId: 0
-                });
+                    op: GatewayOpcodes.Dispatch,
+                    t: GatewayDispatchEvents.VoiceStateUpdate,
+                    d: { ...voiceStateUpdateEvent, guild_id: undefined },
+                    s: 0
+                }, 0);
 
                 expect(client.voiceConnections.size).toBe(3);
             });

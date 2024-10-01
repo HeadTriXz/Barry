@@ -15,10 +15,10 @@ import {
 import {
     type API,
     type APIInteraction,
+    type APIVoiceState,
     type GatewayDispatchPayload,
-    type GatewayVoiceState,
     type MappedEvents,
-    type WithIntrinsicProps,
+    type ToEventProps,
     GatewayDispatchEvents
 } from "@discordjs/core";
 
@@ -42,12 +42,12 @@ type IncludedEvents = Omit<
  * A mapped type that extracts the intrinsic props from the values of a given mapped type.
  */
 export type ClientEvents = {
-    [K in keyof IncludedEvents]: MappedEvents[K] extends [WithIntrinsicProps<infer U>]
+    [K in keyof IncludedEvents]: MappedEvents[K] extends [ToEventProps<infer U>]
         ? [U]
         : MappedEvents[K];
 } & {
     [GatewayDispatchEvents.InteractionCreate]: [AnyInteraction];
-    [GatewayDispatchEvents.VoiceStateUpdate]: [GatewayVoiceState, string?];
+    [GatewayDispatchEvents.VoiceStateUpdate]: [APIVoiceState, string?];
 };
 
 /**
@@ -224,8 +224,8 @@ export class Client extends EventEmitter {
         this.interactions = new InteractionService(this);
         this.modules = new ModuleService();
 
-        this.gateway?.on(WebSocketShardEvents.Dispatch, ({ data }) => {
-            this.#handleGatewayDispatchEvent(data);
+        this.gateway?.on(WebSocketShardEvents.Dispatch, (dispatch) => {
+            this.#handleGatewayDispatchEvent(dispatch);
         });
 
         this.server?.post(this.#options.serverEndpoint, async (body, respond) => {
