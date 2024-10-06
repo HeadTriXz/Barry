@@ -174,7 +174,7 @@ describe("ApplicationCommandInteractionHandler", () => {
                 await handler.handle(interaction);
 
                 await expect(() => handler.handle(interaction)).rejects.toThrowError(
-                    "Barry needs to rest his wings for a moment."
+                    "Please wait before using the command again. You can use it again "
                 );
             });
         });
