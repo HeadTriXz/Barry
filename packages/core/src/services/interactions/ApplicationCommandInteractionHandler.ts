@@ -64,7 +64,7 @@ export class ApplicationCommandInteractionHandler implements InteractionHandler 
             const expiresAt = this.#client.cooldowns.get(key);
 
             if (expiresAt !== undefined) {
-                throw new ValidationError(`Barry needs to rest his wings for a moment. Bee patient, he'll be back in action <t:${Math.trunc(expiresAt / 1000)}:R>.`);
+                throw new ValidationError(`Please wait before using the command again. You can use it again <t:${Math.trunc(expiresAt / 1000)}:R>.`);
             }
 
             this.#client.cooldowns.set(key, command.cooldown * 1000);
